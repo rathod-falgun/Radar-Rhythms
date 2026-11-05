@@ -6,6 +6,7 @@ import SwipeSlider from './components/SwipeSlider';
 import MapViewer from './components/MapViewer';
 import AnalyticsPanel from './components/AnalyticsPanel';
 import ScientificExplain from './components/ScientificExplain';
+import HDF5Inspector from './components/HDF5Inspector';
 import { Loader2, Radio, Info, X, ShieldAlert, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -148,6 +149,11 @@ export default function App() {
             parameters={comparisonData.parameters}
           />
         )}
+
+        {/* Step 6: Phase 3 NISAR HDF5 Data Architecture Inspector */}
+        {!loading && (
+          <HDF5Inspector dateStr={eventDate} />
+        )}
       </main>
 
       {/* Footer */}
@@ -223,3 +229,4 @@ export default function App() {
     </div>
   );
 }
+

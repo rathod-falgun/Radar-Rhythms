@@ -119,3 +119,4 @@ NASA SPACE APP 2026/
 * **No Double Calibration/Terrain Correction:** Uses Level 2 GCOV products where radiometric terrain correction (RTC) and geocoding to UTM Zone 46N have already been performed by the official NISAR science pipeline.
 * **Exact Orbit Geometry Matching:** Both before and after scenes are constrained to Track 019 and Frame 075 (12-day repeat), eliminating baseline parallax artifacts.
 * **Physical Scattering Differentiation:** Explicitly separates specular open water from double-bounce flooded vegetation and unflooded smooth terrain.
+

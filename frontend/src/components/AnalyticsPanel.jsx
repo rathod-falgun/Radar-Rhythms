@@ -173,3 +173,4 @@ export default function AnalyticsPanel({ statistics, timelineData, regionName })
     </div>
   );
 }
+

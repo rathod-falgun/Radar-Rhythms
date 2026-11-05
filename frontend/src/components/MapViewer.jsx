@@ -175,3 +175,4 @@ export default function MapViewer({ region, comparisonData, baselineDate, eventD
     </div>
   );
 }
+

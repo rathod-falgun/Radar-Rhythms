@@ -196,3 +196,4 @@ def get_region_by_id(region_id: str) -> Dict[str, Any]:
         if reg["id"] == region_id:
             return reg
     return STUDY_REGIONS[0]  # Default to Kaziranga
+

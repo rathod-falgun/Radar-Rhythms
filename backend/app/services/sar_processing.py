@@ -114,3 +114,4 @@ def generate_calibrated_sar_grid(
             "total_pixels": int(grid_dim * grid_dim),
         }
     }
+

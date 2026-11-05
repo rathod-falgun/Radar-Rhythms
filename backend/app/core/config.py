@@ -14,3 +14,4 @@ class AppConfig(BaseModel):
     )
 
 settings = AppConfig()
+
