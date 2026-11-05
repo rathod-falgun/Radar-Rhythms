@@ -12,9 +12,9 @@ import {
   Legend,
   Line
 } from 'recharts';
-import { TrendingUp, Droplets, AlertTriangle, Activity, BarChart3, TreePine } from 'lucide-react';
+import { TrendingUp, Droplets, AlertTriangle, Activity, BarChart3, TreePine, Download, FileText, Globe } from 'lucide-react';
 
-export default function AnalyticsPanel({ statistics, timelineData, regionName }) {
+export default function AnalyticsPanel({ statistics, timelineData, regionName, regionId, baselineDate, eventDate }) {
   if (!statistics) return null;
 
   const {
@@ -25,22 +25,46 @@ export default function AnalyticsPanel({ statistics, timelineData, regionName })
     flooded_vegetation_km2,
     total_water_affected_km2,
     inundation_percent_of_region,
+    confidence_partition
   } = statistics;
 
   const newlyInundatedHectares = Math.round(newly_inundated_km2 * 100);
 
+  const handleDownloadGeoJSON = () => {
+    window.open(`/api/export/geojson?region_id=${regionId || 'kaziranga'}&baseline_date=${baselineDate || '2026-06-27'}&event_date=${eventDate || '2026-07-09'}`, '_blank');
+  };
+
+  const handleDownloadCSV = () => {
+    window.open(`/api/export/csv?region_id=${regionId || 'kaziranga'}`, '_blank');
+  };
+
   return (
     <div className="bg-[#111827] rounded-xl border border-slate-800 p-4 shadow-xl">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4 text-cyan-400" />
           <h3 className="text-sm font-semibold text-white">
             4. Flood Impact Analytics & Multi-Cycle Timeline
           </h3>
         </div>
-        <span className="text-xs text-slate-400 font-mono">
-          Monitored Area: {region_total_area_km2} km²
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleDownloadGeoJSON}
+            className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition-colors"
+            title="Download standard GeoJSON of detected flood extent"
+          >
+            <Globe className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Export GeoJSON</span>
+          </button>
+          <button
+            onClick={handleDownloadCSV}
+            className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700 transition-colors"
+            title="Download timeline statistics as CSV"
+          >
+            <FileText className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
       {/* Primary KPI Cards */}
@@ -109,6 +133,47 @@ export default function AnalyticsPanel({ statistics, timelineData, regionName })
           </div>
         </div>
       </div>
+
+      {/* Phase 5: Scientific Classification Confidence Breakdown */}
+      {confidence_partition && (
+        <div className="bg-slate-900/90 rounded-lg p-3 border border-slate-800 mb-5">
+          <div className="flex items-center justify-between text-xs text-slate-300 mb-2">
+            <span className="font-semibold text-white">Scientific Confidence Partitioning (Section 6 Requirement)</span>
+            <span className="text-slate-500 font-mono">Adaptive Otsu + RVI Verification</span>
+          </div>
+          <div className="w-full h-2 rounded-full overflow-hidden flex bg-slate-800 mb-2">
+            <div
+              className="bg-rose-500 h-full transition-all"
+              style={{ width: `${confidence_partition.high_confidence_percent}%` }}
+              title={`High Confidence Open Water: ${confidence_partition.high_confidence_percent}%`}
+            />
+            <div
+              className="bg-amber-500 h-full transition-all"
+              style={{ width: `${confidence_partition.moderate_confidence_percent}%` }}
+              title={`Moderate Confidence Marginal: ${confidence_partition.moderate_confidence_percent}%`}
+            />
+            <div
+              className="bg-emerald-400 h-full transition-all"
+              style={{ width: `${confidence_partition.emergent_canopy_percent}%` }}
+              title={`Emergent Canopy Double-Bounce: ${confidence_partition.emergent_canopy_percent}%`}
+            />
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+              <span>Confirmed Open Water: <strong>{confidence_partition.high_confidence_percent}%</strong></span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>Marginal / Wet Soil: <strong>{confidence_partition.moderate_confidence_percent}%</strong></span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>Emergent Canopy (Double-Bounce): <strong>{confidence_partition.emergent_canopy_percent}%</strong></span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Multi-Cycle Evolution Chart */}
       {timelineData && timelineData.length > 0 && (

@@ -136,12 +136,15 @@ export default function App() {
           </div>
         )}
 
-        {/* Step 4: Quantitative Analytics */}
+        {/* Step 4: Quantitative Analytics & Phase 5 Export */}
         {!loading && comparisonData && (
           <AnalyticsPanel
             statistics={comparisonData.statistics}
             timelineData={timelineData}
             regionName={selectedRegion?.name}
+            regionId={selectedRegionId}
+            baselineDate={baselineDate}
+            eventDate={eventDate}
           />
         )}
 
