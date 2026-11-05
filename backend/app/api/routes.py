@@ -215,6 +215,33 @@ def get_timeline_stats(
         "timeline": timeline
     }
 
+@router.get("/reaches/summary")
+def get_all_reaches_summary(
+    baseline_date: str = Query("2026-06-27"),
+    event_date: str = Query("2026-07-09")
+) -> List[Dict[str, Any]]:
+    """
+    Phase 6: Multi-reach comparative analytics across all 5 monitored reaches
+    along the Brahmaputra Valley for regional flood impact ranking.
+    """
+    summary = []
+    for reg in STUDY_REGIONS:
+        res = perform_sar_change_detection(reg["id"], baseline_date, event_date)
+        stats = res["statistics"]
+        summary.append({
+            "id": reg["id"],
+            "name": reg["name"],
+            "district": reg["district"],
+            "vulnerability": reg["vulnerability"],
+            "total_area_km2": stats["region_total_area_km2"],
+            "newly_inundated_km2": stats["newly_inundated_km2"],
+            "permanent_water_km2": stats["permanent_water_km2"],
+            "flooded_vegetation_km2": stats["flooded_vegetation_km2"],
+            "total_water_km2": stats["total_water_affected_km2"],
+            "inundation_percent": stats["inundation_percent_of_region"]
+        })
+    return summary
+
 @router.get("/nisar/inspect")
 def inspect_nisar_product(
     date_str: str = Query("2026-07-09", description="Observation date to inspect")

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Radio, Satellite, AlertTriangle, Info, ExternalLink, ShieldCheck, Waves } from 'lucide-react';
 
-export default function Navbar({ onOpenInfo }) {
+export default function Navbar({ onOpenInfo, onOpenPresentation }) {
   return (
     <header className="bg-[#0d131f]/90 backdrop-blur border-b border-cyan-900/40 sticky top-0 z-50 px-4 py-3">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
@@ -51,6 +51,12 @@ export default function Navbar({ onOpenInfo }) {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={onOpenPresentation}
+            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black shadow-md shadow-amber-500/20 transition-all"
+          >
+            <span>Judges Pitch Deck</span>
+          </button>
           <button
             onClick={onOpenInfo}
             className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-cyan-950/70 hover:bg-cyan-900/90 text-cyan-300 border border-cyan-800/50 transition-colors"

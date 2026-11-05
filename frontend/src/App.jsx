@@ -7,6 +7,8 @@ import MapViewer from './components/MapViewer';
 import AnalyticsPanel from './components/AnalyticsPanel';
 import ScientificExplain from './components/ScientificExplain';
 import HDF5Inspector from './components/HDF5Inspector';
+import ReachSummaryTable from './components/ReachSummaryTable';
+import PresentationModal from './components/PresentationModal';
 import { Loader2, Radio, Info, X, ShieldAlert, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -22,6 +24,7 @@ export default function App() {
   const [timelineData, setTimelineData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showPresentationModal, setShowPresentationModal] = useState(false);
 
   // 1. Initial Load: Fetch Regions and Observations
   useEffect(() => {
@@ -85,7 +88,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#0a0e17] text-slate-100 flex flex-col font-sans">
-      <Navbar onOpenInfo={() => setShowInfoModal(true)} />
+      <Navbar
+        onOpenInfo={() => setShowInfoModal(true)}
+        onOpenPresentation={() => setShowPresentationModal(true)}
+      />
 
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
         {/* Step 1: Study Region Selector */}
@@ -148,6 +154,16 @@ export default function App() {
           />
         )}
 
+        {/* Phase 6: Multi-Reach Regional Flood Risk & Inundation Matrix */}
+        {!loading && (
+          <ReachSummaryTable
+            selectedRegionId={selectedRegionId}
+            onSelectRegion={setSelectedRegionId}
+            baselineDate={baselineDate}
+            eventDate={eventDate}
+          />
+        )}
+
         {/* Step 5: Scientific Explanation & Limitations */}
         {!loading && comparisonData && (
           <ScientificExplain
@@ -161,6 +177,12 @@ export default function App() {
           <HDF5Inspector dateStr={eventDate} />
         )}
       </main>
+
+      {/* Phase 7: NASA Space Apps Presentation & Validation Deck Modal */}
+      <PresentationModal
+        isOpen={showPresentationModal}
+        onClose={() => setShowPresentationModal(false)}
+      />
 
       {/* Footer */}
       <footer className="bg-[#080c14] border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500">

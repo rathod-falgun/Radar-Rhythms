@@ -1,15 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, MoveHorizontal, SlidersHorizontal, Sparkles, Layers } from 'lucide-react';
+import { Eye, MoveHorizontal, SlidersHorizontal, Sparkles, Layers, Crosshair, HelpCircle } from 'lucide-react';
 
 export default function SwipeSlider({
   comparisonData,
   baselineDate,
   eventDate,
-  mode = 'radar_vs_flood' // 'radar_vs_radar' or 'radar_vs_flood'
+  mode = 'radar_vs_flood'
 }) {
   const [sliderPosition, setSliderPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [viewMode, setViewMode] = useState('radar_vs_flood');
+  const [hoveredPixel, setHoveredPixel] = useState(null);
+  
   const containerRef = useRef(null);
   const canvasBaseRef = useRef(null);
   const canvasEventRef = useRef(null);
@@ -21,9 +23,7 @@ export default function SwipeSlider({
     const { baseline_hh_db, event_hh_db, classification_mask } = comparisonData.raster_data;
     const dim = baseline_hh_db.length;
 
-    // Helper: decibel to grayscale
     const dbToGray = (db) => {
-      // Map -25 dB (black/water) to -5 dB (white/bright land/vegetation)
       const norm = Math.max(0, Math.min(1, (db - (-25)) / (20)));
       return Math.floor(norm * 255);
     };
@@ -36,10 +36,9 @@ export default function SwipeSlider({
         for (let x = 0; x < dim; x++) {
           const idx = (y * dim + x) * 4;
           const val = dbToGray(baseline_hh_db[y][x]);
-          // Radar false color tint (cool blue/slate)
-          imgData.data[idx] = Math.floor(val * 0.7);     // R
-          imgData.data[idx + 1] = Math.floor(val * 0.9); // G
-          imgData.data[idx + 2] = val;                   // B
+          imgData.data[idx] = Math.floor(val * 0.7);
+          imgData.data[idx + 1] = Math.floor(val * 0.9);
+          imgData.data[idx + 2] = val;
           imgData.data[idx + 3] = 255;
         }
       }
@@ -62,7 +61,6 @@ export default function SwipeSlider({
             imgData.data[idx + 2] = val;
             imgData.data[idx + 3] = 255;
           } else {
-            // Inundation Class Color Palette
             const cls = classification_mask[y][x];
             if (cls === 1) {
               // Permanent Water (Deep Sapphire Blue)
@@ -71,25 +69,31 @@ export default function SwipeSlider({
               imgData.data[idx + 2] = 180;
               imgData.data[idx + 3] = 240;
             } else if (cls === 2) {
-              // Newly Inundated Open Flood (Bright Crimson Neon Red)
+              // Confirmed Open Inundation (Crimson Red)
               imgData.data[idx] = 255;
               imgData.data[idx + 1] = 24;
               imgData.data[idx + 2] = 68;
               imgData.data[idx + 3] = 250;
             } else if (cls === 3) {
-              // Marginal Inundation / Saturated Soil (Amber/Orange)
+              // Marginal Inundation / Saturated Soil (Amber)
               imgData.data[idx] = 255;
               imgData.data[idx + 1] = 170;
               imgData.data[idx + 2] = 0;
               imgData.data[idx + 3] = 210;
             } else if (cls === 4) {
-              // Flooded Vegetation Double-Bounce (Neon Emerald Green)
+              // Flooded Emergent Vegetation (Neon Emerald)
               imgData.data[idx] = 50;
               imgData.data[idx + 1] = 240;
               imgData.data[idx + 2] = 100;
               imgData.data[idx + 3] = 240;
+            } else if (cls === 5) {
+              // Receded Water
+              imgData.data[idx] = 180;
+              imgData.data[idx + 1] = 140;
+              imgData.data[idx + 2] = 255;
+              imgData.data[idx + 3] = 220;
             } else {
-              // Unchanged dry land (Radar dim slate background)
+              // Stable Land
               const val = Math.floor(dbToGray(event_hh_db[y][x]) * 0.45);
               imgData.data[idx] = val;
               imgData.data[idx + 1] = val + 10;
@@ -112,14 +116,51 @@ export default function SwipeSlider({
     setSliderPosition(pos);
   };
 
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    handleMove(e.touches[0].clientX);
-  };
+  const handlePointerMove = (e) => {
+    if (isDragging) {
+      handleMove(e.clientX);
+    }
 
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    handleMove(e.clientX);
+    // Interrogate pixel under pointer
+    if (!containerRef.current || !comparisonData || !comparisonData.raster_data) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const pxX = Math.floor(((e.clientX - rect.left) / rect.width) * 120);
+    const pxY = Math.floor(((e.clientY - rect.top) / rect.height) * 120);
+
+    if (pxX >= 0 && pxX < 120 && pxY >= 0 && pxY < 120) {
+      const { baseline_hh_db, event_hh_db, delta_hh_db, classification_mask, rvi_map } = comparisonData.raster_data;
+      const cls = classification_mask[pxY][pxX];
+      
+      const classNames = {
+        0: 'Stable Unchanged Land',
+        1: 'Permanent River Channel',
+        2: 'Confirmed Open Inundation',
+        3: 'Marginal Water / Saturated Soil',
+        4: 'Flooded Vegetation (Double-Bounce)',
+        5: 'Receded Floodwaters'
+      };
+
+      const mechanisms = {
+        0: 'Diffuse scattering from dry soil & non-flooded vegetation canopy.',
+        1: 'Specular reflection: radar pulse reflects away from deep channel.',
+        2: 'Specular mirror reflection: crop/soil converted to smooth open floodwater.',
+        3: 'Elevated soil moisture dielectric reflection with partial submergence.',
+        4: 'Dihedral double-bounce between water surface and vertical plant stalks.',
+        5: 'Ground surface drying: backscatter recovering toward baseline.'
+      };
+
+      setHoveredPixel({
+        x: pxX,
+        y: pxY,
+        base_db: baseline_hh_db[pxY][pxX],
+        event_db: event_hh_db[pxY][pxX],
+        delta_db: delta_hh_db[pxY][pxX],
+        rvi: rvi_map ? rvi_map[pxY][pxX] : null,
+        class_name: classNames[cls] || 'Unclassified',
+        mechanism: mechanisms[cls] || 'Scattering',
+        cls_code: cls
+      });
+    }
   };
 
   return (
@@ -163,11 +204,8 @@ export default function SwipeSlider({
         ref={containerRef}
         onMouseDown={() => setIsDragging(true)}
         onMouseUp={() => setIsDragging(false)}
-        onMouseLeave={() => setIsDragging(false)}
-        onMouseMove={handleMouseMove}
-        onTouchStart={() => setIsDragging(true)}
-        onTouchEnd={() => setIsDragging(false)}
-        onTouchMove={handleTouchMove}
+        onMouseLeave={() => { setIsDragging(false); setHoveredPixel(null); }}
+        onMouseMove={handlePointerMove}
         className="relative w-full aspect-video md:aspect-[2.2/1] rounded-lg overflow-hidden border border-slate-700 bg-black cursor-col-resize select-none"
       >
         {/* Right Canvas (Event Scene / Inundation) */}
@@ -212,17 +250,53 @@ export default function SwipeSlider({
         </div>
       </div>
 
+      {/* Phase 6: Live Pixel Probe & Value Inspector */}
+      {hoveredPixel && (
+        <div className="mt-2.5 bg-slate-900/90 border border-cyan-500/40 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
+          <div className="flex items-center gap-2">
+            <Crosshair className="w-4 h-4 text-cyan-400 animate-spin" />
+            <span className="font-mono text-cyan-300 font-bold">
+              Pixel [{hoveredPixel.x}, {hoveredPixel.y}]:
+            </span>
+            <span
+              className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                hoveredPixel.cls_code === 2
+                  ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                  : hoveredPixel.cls_code === 4
+                  ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                  : hoveredPixel.cls_code === 1
+                  ? 'bg-blue-950 text-blue-300 border border-blue-800'
+                  : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              {hoveredPixel.class_name}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 font-mono text-[11px] text-slate-300">
+            <span>Base: <strong>{hoveredPixel.base_db.toFixed(1)} dB</strong></span>
+            <span>Event: <strong>{hoveredPixel.event_db.toFixed(1)} dB</strong></span>
+            <span className={hoveredPixel.delta_db < 0 ? 'text-rose-400 font-bold' : 'text-emerald-400 font-bold'}>
+              Δ: {hoveredPixel.delta_db > 0 ? '+' : ''}{hoveredPixel.delta_db.toFixed(1)} dB
+            </span>
+            {hoveredPixel.rvi !== null && (
+              <span className="text-slate-400">RVI: <strong>{hoveredPixel.rvi.toFixed(2)}</strong></span>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Legend & Instructions */}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
         <div className="flex flex-wrap items-center gap-3">
           <span className="text-slate-300 font-medium">Map Legend:</span>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-sm bg-blue-600"></span>
-            <span>Permanent Water</span>
+            <span>Permanent River</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-sm bg-rose-500"></span>
-            <span className="text-rose-300 font-semibold">Newly Inundated Land</span>
+            <span className="text-rose-300 font-semibold">Confirmed Floodwater</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-sm bg-amber-500"></span>
@@ -235,10 +309,9 @@ export default function SwipeSlider({
         </div>
 
         <div className="text-[11px] text-slate-500 italic">
-          💡 Drag cursor/finger across the viewer to swipe between dates
+          💡 Drag slider to compare • Hover over pixels to interrogate backscatter decibels
         </div>
       </div>
     </div>
   );
 }
-
