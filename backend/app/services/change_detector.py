@@ -8,15 +8,19 @@ import numpy as np
 from typing import Dict, Any
 from .sar_processing import generate_calibrated_sar_grid, compute_log_ratio
 from .nisar_metadata import get_region_by_id, get_observation_by_date
+from .radar_preprocessing import verify_and_preprocess_pair
 
 def perform_sar_change_detection(
     region_id: str,
     baseline_date: str = "2026-06-27",
     event_date: str = "2026-07-09",
-    threshold_db: float = -4.5
+    threshold_db: float = -4.5,
+    apply_speckle_filter: bool = True,
+    filter_window: int = 5
 ) -> Dict[str, Any]:
     """
     Executes rigorous SAR change detection between baseline and event dates.
+    Integrates Phase 4 preprocessing (Lee speckle filter, geometric alignment, and polarimetric QA).
     Uses multi-criteria classification to separate:
     1. Newly Inundated Water (specular drop)
     2. Permanent Water (consistently low backscatter)
@@ -33,10 +37,27 @@ def perform_sar_change_detection(
     baseline_data = generate_calibrated_sar_grid(region_id, baseline_date, grid_dim=dim)
     event_data = generate_calibrated_sar_grid(region_id, event_date, grid_dim=dim)
     
-    base_hh = np.array(baseline_data["hh_db"])
-    event_hh = np.array(event_data["hh_db"])
+    raw_base_hh = np.array(baseline_data["hh_db"])
+    raw_base_hv = np.array(baseline_data["hv_db"])
+    raw_event_hh = np.array(event_data["hh_db"])
+    raw_event_hv = np.array(event_data["hv_db"])
+
+    # Phase 4: Execute Speckle Filtering & Preprocessing Verification
+    preproc = verify_and_preprocess_pair(
+        baseline_hh_db=raw_base_hh,
+        baseline_hv_db=raw_base_hv,
+        event_hh_db=raw_event_hh,
+        event_hv_db=raw_event_hv,
+        apply_filtering=apply_speckle_filter,
+        filter_window=filter_window
+    )
     
-    # Compute Log-Ratio Difference (dB space)
+    base_hh = np.array(preproc["baseline_hh_clean"])
+    event_hh = np.array(preproc["event_hh_clean"])
+    base_rvi = np.array(preproc["baseline_indices"]["rvi"])
+    event_rvi = np.array(preproc["event_indices"]["rvi"])
+    
+    # Compute Log-Ratio Difference (dB space) on preprocessed data
     delta_hh = compute_log_ratio(event_hh, base_hh)
     
     # 1. Permanent Water: low in both acquisitions
@@ -116,7 +137,9 @@ def perform_sar_change_detection(
             "event_hh_db": event_data["hh_db"],
             "delta_hh_db": np.round(delta_hh, 2).tolist(),
             "classification_mask": class_mask.tolist(),
+            "rvi_map": preproc["event_indices"]["rvi"],
         },
+        "preprocessing_qa": preproc["qa_audit"],
         "scientific_explanation": explanation
     }
 

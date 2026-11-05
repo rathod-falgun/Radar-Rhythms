@@ -6,9 +6,11 @@ export default function DateSelector({
   baselineDate,
   eventDate,
   thresholdDb,
+  speckleFilter,
   onSelectBaseline,
   onSelectEvent,
   onThresholdChange,
+  onToggleSpeckleFilter,
   onApplyPreset
 }) {
   return (
@@ -122,22 +124,36 @@ export default function DateSelector({
           </div>
         </div>
 
-        {/* Sensitivity Threshold Slider */}
-        <div className="flex items-center gap-3">
-          <Sliders className="w-4 h-4 text-cyan-400" />
-          <span className="text-xs text-slate-300 font-medium">Log-Ratio Sensitivity:</span>
-          <input
-            type="range"
-            min="-7.0"
-            max="-2.5"
-            step="0.5"
-            value={thresholdDb}
-            onChange={(e) => onThresholdChange(parseFloat(e.target.value))}
-            className="w-28 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400"
-          />
-          <span className="text-xs font-mono font-bold text-cyan-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
-            {thresholdDb.toFixed(1)} dB
-          </span>
+        {/* Sensitivity Threshold Slider & Phase 4 Filter Toggle */}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => onToggleSpeckleFilter(!speckleFilter)}
+            className={`text-xs px-2.5 py-1 rounded-md font-medium border transition-colors flex items-center gap-1.5 ${
+              speckleFilter
+                ? 'bg-cyan-950 text-cyan-300 border-cyan-700'
+                : 'bg-slate-800 text-slate-400 border-slate-700'
+            }`}
+          >
+            <span>Lee Filter (5×5):</span>
+            <span className="font-bold">{speckleFilter ? 'ON' : 'OFF'}</span>
+          </button>
+
+          <div className="flex items-center gap-2">
+            <Sliders className="w-4 h-4 text-cyan-400" />
+            <span className="text-xs text-slate-300 font-medium">Log-Ratio Sensitivity:</span>
+            <input
+              type="range"
+              min="-7.0"
+              max="-2.5"
+              step="0.5"
+              value={thresholdDb}
+              onChange={(e) => onThresholdChange(parseFloat(e.target.value))}
+              className="w-24 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+            />
+            <span className="text-xs font-mono font-bold text-cyan-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+              {thresholdDb.toFixed(1)} dB
+            </span>
+          </div>
         </div>
       </div>
     </div>

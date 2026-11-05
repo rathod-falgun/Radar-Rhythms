@@ -1,4 +1,4 @@
-Write-Host "Starting Brahmaputra FloodWatch FastAPI Backend..." -ForegroundColor Cyan
+Write-Host "Starting Brahmaputra FloodWatch FastAPI Backend on port 8001..." -ForegroundColor Cyan
 cd backend
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8001 --reload
 

@@ -16,6 +16,7 @@ export default function App() {
   const [baselineDate, setBaselineDate] = useState('2026-06-27');
   const [eventDate, setEventDate] = useState('2026-07-09');
   const [thresholdDb, setThresholdDb] = useState(-4.5);
+  const [speckleFilter, setSpeckleFilter] = useState(true);
 
   const [comparisonData, setComparisonData] = useState(null);
   const [timelineData, setTimelineData] = useState([]);
@@ -41,13 +42,13 @@ export default function App() {
     initData();
   }, []);
 
-  // 2. Fetch Comparison whenever region, dates, or threshold change
+  // 2. Fetch Comparison whenever region, dates, threshold or filter change
   useEffect(() => {
     if (!selectedRegionId) return;
     async function fetchComparison() {
       setLoading(true);
       try {
-        const url = `/api/compare?region_id=${selectedRegionId}&baseline_date=${baselineDate}&event_date=${eventDate}&threshold_db=${thresholdDb}`;
+        const url = `/api/compare?region_id=${selectedRegionId}&baseline_date=${baselineDate}&event_date=${eventDate}&threshold_db=${thresholdDb}&apply_speckle_filter=${speckleFilter}`;
         const res = await fetch(url);
         const data = await res.json();
         setComparisonData(data);
@@ -58,7 +59,7 @@ export default function App() {
       }
     }
     fetchComparison();
-  }, [selectedRegionId, baselineDate, eventDate, thresholdDb]);
+  }, [selectedRegionId, baselineDate, eventDate, thresholdDb, speckleFilter]);
 
   // 3. Fetch Timeline Stats when region changes
   useEffect(() => {
@@ -100,9 +101,11 @@ export default function App() {
           baselineDate={baselineDate}
           eventDate={eventDate}
           thresholdDb={thresholdDb}
+          speckleFilter={speckleFilter}
           onSelectBaseline={setBaselineDate}
           onSelectEvent={setEventDate}
           onThresholdChange={setThresholdDb}
+          onToggleSpeckleFilter={setSpeckleFilter}
           onApplyPreset={handleApplyPreset}
         />
 

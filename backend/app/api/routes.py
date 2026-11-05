@@ -54,10 +54,13 @@ def compare_observations(
     region_id: str = Query("kaziranga", description="Study region ID"),
     baseline_date: str = Query("2026-06-27", description="Baseline pre-flood date"),
     event_date: str = Query("2026-07-09", description="Event flood date"),
-    threshold_db: float = Query(-4.5, description="SAR log-ratio threshold in dB")
+    threshold_db: float = Query(-4.5, description="SAR log-ratio threshold in dB"),
+    apply_speckle_filter: bool = Query(True, description="Enable adaptive Lee speckle filter"),
+    filter_window: int = Query(5, description="Filter window size (3 or 5)")
 ) -> Dict[str, Any]:
     """
     Performs dual-observation SAR change detection:
+    - Phase 4: Adaptive Lee speckle noise suppression
     - Calculates log-ratio backscatter differences
     - Separates new inundation from permanent water and double-bounce vegetation
     - Quantifies affected area in km2
@@ -67,7 +70,9 @@ def compare_observations(
         region_id=region_id,
         baseline_date=baseline_date,
         event_date=event_date,
-        threshold_db=threshold_db
+        threshold_db=threshold_db,
+        apply_speckle_filter=apply_speckle_filter,
+        filter_window=filter_window
     )
     return result
 
