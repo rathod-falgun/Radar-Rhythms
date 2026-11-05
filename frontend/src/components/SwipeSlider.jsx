@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Eye, MoveHorizontal, SlidersHorizontal, Sparkles, Layers, Crosshair, HelpCircle } from 'lucide-react';
+import { playBackscatterProbeTone } from '../utils/audio';
 
 export default function SwipeSlider({
   comparisonData,
@@ -160,6 +161,11 @@ export default function SwipeSlider({
         mechanism: mechanisms[cls] || 'Scattering',
         cls_code: cls
       });
+
+      // Play subtle acoustic pitch representing decibel return
+      if (Math.random() < 0.25) {
+        playBackscatterProbeTone(event_hh_db[pxY][pxX]);
+      }
     }
   };
 

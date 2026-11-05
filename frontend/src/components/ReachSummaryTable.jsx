@@ -119,3 +119,4 @@ export default function ReachSummaryTable({ selectedRegionId, onSelectRegion, ba
     </div>
   );
 }
+

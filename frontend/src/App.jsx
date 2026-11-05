@@ -9,7 +9,13 @@ import ScientificExplain from './components/ScientificExplain';
 import HDF5Inspector from './components/HDF5Inspector';
 import ReachSummaryTable from './components/ReachSummaryTable';
 import PresentationModal from './components/PresentationModal';
-import { Loader2, Radio, Info, X, ShieldAlert, Sparkles } from 'lucide-react';
+import PersonaSwitcher from './components/PersonaSwitcher';
+import DisasterAlertPanel from './components/DisasterAlertPanel';
+import ScientistRadarPanel from './components/ScientistRadarPanel';
+import StudentCitizenPanel from './components/StudentCitizenPanel';
+import WavelengthSimulator from './components/WavelengthSimulator';
+import { toggleRadarSound, isRadarSoundEnabled } from './utils/audio';
+import { Loader2, Radio, Info, X, ShieldAlert, Sparkles, Sliders } from 'lucide-react';
 
 export default function App() {
   const [regions, setRegions] = useState([]);
@@ -20,11 +26,20 @@ export default function App() {
   const [thresholdDb, setThresholdDb] = useState(-4.5);
   const [speckleFilter, setSpeckleFilter] = useState(true);
 
+  // Audience Persona: 'disaster' (default), 'scientist', 'student'
+  const [persona, setPersona] = useState('disaster');
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
   const [comparisonData, setComparisonData] = useState(null);
   const [timelineData, setTimelineData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPresentationModal, setShowPresentationModal] = useState(false);
+
+  const handleToggleSound = () => {
+    const newState = toggleRadarSound(!soundEnabled);
+    setSoundEnabled(newState);
+  };
 
   // 1. Initial Load: Fetch Regions and Observations
   useEffect(() => {
@@ -94,6 +109,14 @@ export default function App() {
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
+        {/* Top Header: Audience Persona Switcher & Radar Sound Synthesizer */}
+        <PersonaSwitcher
+          currentPersona={persona}
+          onSelectPersona={setPersona}
+          soundEnabled={soundEnabled}
+          onToggleSound={handleToggleSound}
+        />
+
         {/* Step 1: Study Region Selector */}
         <RegionSelector
           regions={regions}
@@ -138,8 +161,33 @@ export default function App() {
               comparisonData={comparisonData}
               baselineDate={baselineDate}
               eventDate={eventDate}
+              persona={persona}
             />
           </div>
+        )}
+
+        {/* AUDIENCE PERSONA SPECIFIC PANELS */}
+
+        {/* Persona A: Emergency Disaster Responder (ASDMA / NDRF) */}
+        {persona === 'disaster' && !loading && comparisonData && (
+          <DisasterAlertPanel
+            statistics={comparisonData.statistics}
+            regionName={selectedRegion?.name}
+            regionId={selectedRegionId}
+          />
+        )}
+
+        {/* Persona B: Remote Sensing Scientist */}
+        {persona === 'scientist' && !loading && comparisonData && (
+          <ScientistRadarPanel
+            comparisonData={comparisonData}
+            parameters={comparisonData.parameters}
+          />
+        )}
+
+        {/* Persona C: Student & Citizen Explorer */}
+        {persona === 'student' && !loading && (
+          <StudentCitizenPanel />
         )}
 
         {/* Step 4: Quantitative Analytics & Phase 5 Export */}
@@ -162,6 +210,11 @@ export default function App() {
             baselineDate={baselineDate}
             eventDate={eventDate}
           />
+        )}
+
+        {/* Physics Core: Wavelength & Penetration Simulator */}
+        {!loading && (
+          <WavelengthSimulator />
         )}
 
         {/* Step 5: Scientific Explanation & Limitations */}
@@ -257,4 +310,3 @@ export default function App() {
     </div>
   );
 }
-
