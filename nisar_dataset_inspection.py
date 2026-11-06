@@ -288,6 +288,9 @@ def run_nisar_inspection(
     print("=" * 80)
 
 if __name__ == "__main__":
-    target_h5 = "data/nisar_products/NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001.h5"
+    if len(sys.argv) > 1:
+        target_h5 = sys.argv[1]
+    else:
+        target_h5 = "data/nisar_products/NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001.h5"
     run_nisar_inspection(target_h5)
 

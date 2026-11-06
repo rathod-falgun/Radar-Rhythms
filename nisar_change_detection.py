@@ -378,7 +378,11 @@ def run_nisar_change_detection(
     print("=" * 80)
 
 if __name__ == "__main__":
-    baseline = "data/nisar_products/NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001.h5"
-    event = "data/nisar_products/NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001.h5"
+    if len(sys.argv) > 2:
+        baseline = sys.argv[1]
+        event = sys.argv[2]
+    else:
+        baseline = "data/nisar_products/NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001.h5"
+        event = "data/nisar_products/NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001.h5"
     run_nisar_change_detection(baseline, event)
 
