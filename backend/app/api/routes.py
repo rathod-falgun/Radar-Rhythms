@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Query, HTTPException, UploadFile, File, Response
+from fastapi import APIRouter, Query, HTTPException, UploadFile, File, Response, Body
 import os
 import io
 import csv
 import json
 import shutil
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+from pydantic import BaseModel, Field
 from ..services.nisar_metadata import (
     NISAR_OBSERVATION_CATALOG,
     STUDY_REGIONS,
@@ -14,6 +15,37 @@ from ..services.nisar_metadata import (
 from ..services.change_detector import perform_sar_change_detection
 from ..services.sar_processing import generate_calibrated_sar_grid
 from ..services.nisar_reader import NISARGCOVReader
+from ..services.bhoonidhi_service import (
+    bhoonidhi_service,
+    BhoonidhiAuthError,
+    BhoonidhiRateLimitError,
+    BhoonidhiAPIError
+)
+from ..core.config import settings
+
+class NISARSceneSearchRequest(BaseModel):
+    bbox: Optional[List[float]] = Field(
+        default=None,
+        description="Bounding box [west, south, east, north] in EPSG:4326. Defaults to Majuli Island."
+    )
+    start_date: Optional[str] = Field(
+        default=None,
+        description="ISO 8601 start datetime string (e.g. 2026-07-01T00:00:00Z)"
+    )
+    end_date: Optional[str] = Field(
+        default=None,
+        description="ISO 8601 end datetime string (e.g. 2026-09-30T23:59:59Z)"
+    )
+    collection: Optional[str] = Field(
+        default=None,
+        description="Target STAC collection (default: NISAR_SSAR_GCOV)"
+    )
+    limit: Optional[int] = Field(
+        default=100,
+        ge=1,
+        le=500,
+        description="Maximum scenes to retrieve per search"
+    )
 
 router = APIRouter()
 
@@ -265,4 +297,107 @@ def inspect_nisar_product(
         )
 
     return NISARGCOVReader.inspect_hdf5_structure(h5_path)
+
+
+# =============================================================================
+# ISRO BHOONIDHI API INTEGRATION (AUTHENTICATION & SCENE SEARCH)
+# =============================================================================
+
+@router.get("/nisar/status")
+def get_bhoonidhi_status() -> Dict[str, Any]:
+    """
+    Returns the current Bhoonidhi integration status, configuration state,
+    and target NISAR collection. Never exposes user credentials or access tokens.
+    """
+    status = bhoonidhi_service.get_status()
+    return {
+        "configured": status["configured"],
+        "service": "Bhoonidhi",
+        "collection": status["target_collection"],
+        "auth_status": status["auth_status"],
+        "token_valid": status["token_valid"],
+        "token_expires_in_seconds": status["token_expires_in_seconds"],
+        "base_url": status["base_url"]
+    }
+
+
+@router.post("/nisar/auth/test")
+def test_bhoonidhi_auth() -> Dict[str, Any]:
+    """
+    Tests Bhoonidhi authentication using configured credentials.
+    Reuses valid cached session or performs password-grant auth.
+    Never returns access_token or refresh_token in response.
+    """
+    result = bhoonidhi_service.test_authentication()
+    if not result.get("success") and not result.get("configured"):
+        raise HTTPException(
+            status_code=400,
+            detail=result.get("message", "Bhoonidhi credentials are not configured.")
+        )
+    elif not result.get("success"):
+        raise HTTPException(
+            status_code=401,
+            detail=result.get("message", "Bhoonidhi authentication failed.")
+        )
+    return result
+
+
+@router.post("/nisar/scenes")
+def search_nisar_scenes(request: Optional[NISARSceneSearchRequest] = Body(default=None)) -> Dict[str, Any]:
+    """
+    Searches for NISAR Level 2 GCOV satellite observation scenes via Bhoonidhi STAC API.
+    Accepts optional bounding box (defaults to Majuli Island), date range, and collection.
+    Enforces CQL2-JSON filters (Online = 'Y') and returns normalized metadata.
+    """
+    req = request or NISARSceneSearchRequest()
+
+    # Validate collection if specified
+    if req.collection and req.collection not in settings.ALLOWED_COLLECTIONS:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"Collection '{req.collection}' is not supported. "
+                f"Allowed collections: {settings.ALLOWED_COLLECTIONS}"
+            )
+        )
+
+    # Validate dates if specified
+    if req.start_date and req.end_date:
+        try:
+            from datetime import datetime
+            dt_start = datetime.fromisoformat(req.start_date.replace("Z", "+00:00"))
+            dt_end = datetime.fromisoformat(req.end_date.replace("Z", "+00:00"))
+            if dt_start > dt_end:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Start date ({req.start_date}) must not be later than end date ({req.end_date})."
+                )
+        except ValueError as e:
+            if "Start date" in str(e):
+                raise
+            raise HTTPException(
+                status_code=422,
+                detail=f"Invalid date format: {str(e)}. Use ISO 8601 (e.g. 2026-07-01T00:00:00Z)."
+            )
+
+    try:
+        results = bhoonidhi_service.search_scenes(
+            bbox=req.bbox,
+            start_date=req.start_date,
+            end_date=req.end_date,
+            collection=req.collection,
+            limit=req.limit or 100
+        )
+        return results
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except BhoonidhiAuthError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except BhoonidhiRateLimitError as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except BhoonidhiAPIError as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error executing Bhoonidhi scene search: {str(e)}")
+
 

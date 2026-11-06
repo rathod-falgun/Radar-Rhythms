@@ -52,11 +52,11 @@
         "baseline_date": "2026-06-27",
         "orbit_track": "019",
         "frame": "075",
-        "newly_inundated_km2": 2.22,
-        "flooded_vegetation_km2": 1.19,
-        "permanent_channel_km2": 1.55,
-        "total_water_affected_km2": 4.96,
-        "submergence_percent": 54.18,
+        "newly_inundated_km2": 1.57,
+        "flooded_vegetation_km2": 0.94,
+        "permanent_channel_km2": 0.79,
+        "total_water_affected_km2": 3.3,
+        "submergence_percent": 36.1,
         "confidence_pct": 94.2
       },
       "geometry": {

@@ -1,26 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { Database, FolderTree, FileCode, CheckCircle, ShieldCheck, ChevronRight, ChevronDown } from 'lucide-react';
+import { Database, FolderTree, FileCode, CheckCircle, ShieldCheck, ChevronRight, ChevronDown, Satellite, Search, Loader2 } from 'lucide-react';
 
 export default function HDF5Inspector({ dateStr }) {
   const [hdf5Data, setHdf5Data] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(true);
+  const [bhoonidhiStatus, setBhoonidhiStatus] = useState(null);
+  const [searchingScenes, setSearchingScenes] = useState(false);
+  const [searchResults, setSearchResults] = useState(null);
 
   useEffect(() => {
-    async function fetchHdf5Info() {
+    async function fetchData() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/nisar/inspect?date_str=${dateStr}`);
-        const data = await res.json();
-        setHdf5Data(data);
+        const [h5Res, statusRes] = await Promise.all([
+          fetch(`/api/nisar/inspect?date_str=${dateStr}`),
+          fetch('/api/nisar/status')
+        ]);
+        if (h5Res.ok) setHdf5Data(await h5Res.json());
+        if (statusRes.ok) setBhoonidhiStatus(await statusRes.json());
       } catch (err) {
-        console.error('Failed to inspect HDF5:', err);
+        console.error('Failed to load inspector data:', err);
       } finally {
         setLoading(false);
       }
     }
-    fetchHdf5Info();
+    fetchData();
   }, [dateStr]);
+
+  const handleSearchBhoonidhi = async () => {
+    setSearchingScenes(true);
+    setSearchResults(null);
+    try {
+      const res = await fetch('/api/nisar/scenes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collection: 'NISAR_SSAR_GCOV',
+          bbox: [93.60, 26.50, 94.60, 27.30],
+          start_date: '2026-07-01T00:00:00Z',
+          end_date: '2026-09-30T23:59:59Z'
+        })
+      });
+      const data = await res.json();
+      setSearchResults(data);
+    } catch (err) {
+      console.error('Failed to search Bhoonidhi scenes:', err);
+      setSearchResults({ error: 'Network error calling backend Bhoonidhi scene search' });
+    } finally {
+      setSearchingScenes(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -107,6 +137,56 @@ export default function HDF5Inspector({ dateStr }) {
               <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>UTM Zone 46N (EPSG:32646) Aligned</span>
             </div>
+          </div>
+
+          {/* ISRO Bhoonidhi Satellite API Integration Bar */}
+          <div className="bg-gradient-to-r from-blue-950/40 via-slate-900/80 to-slate-900/90 rounded-lg p-3 border border-blue-900/40 text-[11px] space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Satellite className="w-4 h-4 text-blue-400" />
+                <span className="font-semibold text-slate-200">ISRO Bhoonidhi Satellite Portal Connection:</span>
+                {bhoonidhiStatus?.configured ? (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 font-mono text-[10px] border border-emerald-800">
+                    Configured ({bhoonidhiStatus.auth_status})
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 font-mono text-[10px] border border-amber-800">
+                    Awaiting Credentials in .env
+                  </span>
+                )}
+                <span className="text-slate-500 font-mono text-[10px]">Collection: NISAR_SSAR_GCOV</span>
+              </div>
+
+              <button
+                onClick={handleSearchBhoonidhi}
+                disabled={searchingScenes}
+                className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 text-white font-medium flex items-center gap-1.5 transition text-[11px]"
+              >
+                {searchingScenes ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+                <span>{searchingScenes ? 'Querying STAC...' : 'Search Majuli AOI Scenes'}</span>
+              </button>
+            </div>
+
+            {searchResults && (
+              <div className="mt-2 p-2.5 rounded bg-black/60 border border-slate-800 font-mono text-[10px] text-slate-300">
+                {searchResults.error || searchResults.detail ? (
+                  <span className="text-rose-400 font-sans">
+                    Notice: {searchResults.error || searchResults.detail}
+                  </span>
+                ) : (
+                  <div className="space-y-1">
+                    <div className="text-emerald-400 font-bold">
+                      ✓ {searchResults.message} (Total: {searchResults.total_scenes})
+                    </div>
+                    {searchResults.scenes?.slice(0, 2).map((s) => (
+                      <div key={s.id} className="text-slate-400 truncate">
+                        • <span className="text-cyan-300">{s.id}</span> ({s.datetime || 'N/A'})
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

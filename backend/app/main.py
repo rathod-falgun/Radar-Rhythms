@@ -42,7 +42,10 @@ def root():
             "/api/observations",
             "/api/sar-grid",
             "/api/compare",
-            "/api/timeline-stats"
+            "/api/timeline-stats",
+            "/api/nisar/status",
+            "/api/nisar/auth/test",
+            "/api/nisar/scenes"
         ]
     }
 

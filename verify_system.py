@@ -161,7 +161,13 @@ def test_fastapi_endpoints():
     res = client.get("/api/export/csv?region_id=kaziranga")
     assert res.status_code == 200
     assert "Acquisition_Date" in res.text
-    print("      ✓ All 8 FastAPI REST API routes responded with 200 OK and valid schemas.")
+
+    # 9. Bhoonidhi Status
+    res = client.get("/api/nisar/status")
+    assert res.status_code == 200
+    assert "service" in res.json()
+    assert res.json()["service"] == "Bhoonidhi"
+    print("      ✓ All FastAPI REST API routes (including Bhoonidhi integration) responded with 200 OK.")
 
 def test_frontend_dist():
     print("[6/6] Verifying Frontend Production Distribution...")

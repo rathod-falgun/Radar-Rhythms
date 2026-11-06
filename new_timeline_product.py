@@ -70,3 +70,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     create_and_view(date_str=args.date, cycle_num=args.cycle, region_id=args.region, auto_view=args.view)
+
