@@ -3,10 +3,16 @@ dist/
 __pycache__/
 *.pyc
 .env
+.env.*
+*.env
+**/.env
+**/.env.*
+!*.env.example
 .venv/
 venv/
 .DS_Store
 data/nisar_products/
 *.h5
 *.tif
+
 
