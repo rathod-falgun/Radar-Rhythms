@@ -1,0 +1,8 @@
+cycle,date,stage,discharge_m3s,permanent_water_km2,newly_inundated_km2,flooded_vegetation_km2,marginal_saturated_km2,total_water_km2,inundation_pct,otsu_threshold_db
+22,2026-06-03,Pre-Monsoon Reference,14500,0.798,0.0,0.0,0.0,0.798,8.72,0.0
+23,2026-06-15,Monsoon Onset,26800,0.784,0.168,0.741,0.097,1.694,18.51,-4.29
+24,2026-06-27,Pre-Flood High Flow,38200,0.788,0.74,0.0,0.255,1.528,16.69,-3.93
+25,2026-07-09,Peak Flood Event,56400,0.791,2.895,1.174,0.149,4.86,53.1,-4.55
+26,2026-07-21,Flood Recession,42100,0.789,1.574,0.94,0.173,3.304,36.1,-3.96
+27,2026-08-02,Late Monsoon Drydown,31800,0.789,0.868,0.768,0.156,2.425,26.5,-3.74
+28,2026-08-14,Secondary Surge,37500,0.79,1.214,0.933,0.176,2.937,32.09,-4.02
