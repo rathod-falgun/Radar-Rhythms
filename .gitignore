@@ -6,4 +6,7 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+data/nisar_products/
+*.h5
+*.tif
 

@@ -26,3 +26,4 @@ Write-Host "- Frontend UI:  http://localhost:5173" -ForegroundColor White
 Write-Host "- Backend API:  http://127.0.0.1:8001" -ForegroundColor White
 Write-Host "- API Docs:     http://127.0.0.1:8001/docs" -ForegroundColor White
 Write-Host "=====================================================================" -ForegroundColor Cyan
+

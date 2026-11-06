@@ -1,0 +1,105 @@
+{
+  "file_path": "E:\\NASA SPACE APP 2026\\data\\nisar_products\\NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001.h5",
+  "file_size_bytes": 100127,
+  "groups": [
+    "science",
+    "science/SSAR",
+    "science/SSAR/GCOV",
+    "science/SSAR/GCOV/grids",
+    "science/SSAR/GCOV/grids/frequencyA",
+    "science/SSAR/GCOV/identification"
+  ],
+  "datasets": [
+    {
+      "name": "science/SSAR/GCOV/grids/frequencyA/HHHH",
+      "shape": [
+        120,
+        120
+      ],
+      "dtype": "float32",
+      "attrs": {
+        "long_name": "Co-polarized HH gamma-0 backscatter power",
+        "units": "1"
+      }
+    },
+    {
+      "name": "science/SSAR/GCOV/grids/frequencyA/HVHV",
+      "shape": [
+        120,
+        120
+      ],
+      "dtype": "float32",
+      "attrs": {
+        "long_name": "Cross-polarized HV gamma-0 backscatter power",
+        "units": "1"
+      }
+    },
+    {
+      "name": "science/SSAR/GCOV/grids/frequencyA/mask",
+      "shape": [
+        120,
+        120
+      ],
+      "dtype": "uint8",
+      "attrs": {
+        "long_name": "Data validity / shadow mask"
+      }
+    },
+    {
+      "name": "science/SSAR/GCOV/grids/frequencyA/projection",
+      "shape": [
+        1
+      ],
+      "dtype": "int32",
+      "attrs": {
+        "epsg_code": "32646",
+        "spatial_ref": "WGS 84 / UTM zone 46N"
+      }
+    },
+    {
+      "name": "science/SSAR/GCOV/grids/frequencyA/xCoordinates",
+      "shape": [
+        120
+      ],
+      "dtype": "float64",
+      "attrs": {}
+    },
+    {
+      "name": "science/SSAR/GCOV/grids/frequencyA/yCoordinates",
+      "shape": [
+        120
+      ],
+      "dtype": "float64",
+      "attrs": {}
+    }
+  ],
+  "root_Conventions": "CF-1.8",
+  "root_institution": "NASA JPL / ISRO SAC",
+  "root_mission_name": "NISAR",
+  "root_title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)",
+  "identification": {
+    "acquisition_date": "2026-07-09",
+    "cycle_number": "25",
+    "frame_number": "75",
+    "granule_id": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001",
+    "look_direction": "Right",
+    "pass_direction": "Descending",
+    "track_number": "19"
+  },
+  "projection": {
+    "epsg_code": 32646,
+    "spatial_ref": "WGS 84 / UTM zone 46N",
+    "x_min": 310000.0,
+    "x_max": 313000.0,
+    "y_min": 2947000.0,
+    "y_max": 2950000.0,
+    "pixel_spacing_x_m": 25.21008403360611,
+    "pixel_spacing_y_m": 25.210084033664316
+  },
+  "statistics": {
+    "hh_min_db": -25.420000076293945,
+    "hh_max_db": -1.2300000190734863,
+    "hh_mean_db": -15.72215747833252,
+    "hh_std_db": 6.048647403717041
+  }
+}

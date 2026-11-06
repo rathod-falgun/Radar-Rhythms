@@ -190,3 +190,4 @@ export default function DisasterAlertPanel({ statistics, regionName, regionId })
     </div>
   );
 }
+

@@ -29,3 +29,4 @@ echo =====================================================================
 echo.
 echo To stop the servers, simply close the opened command windows.
 pause
+

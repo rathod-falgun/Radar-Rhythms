@@ -96,3 +96,4 @@ export default function ScientistRadarPanel({ comparisonData, parameters }) {
     </div>
   );
 }
+

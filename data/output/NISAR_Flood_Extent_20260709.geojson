@@ -1,0 +1,91 @@
+{
+  "type": "FeatureCollection",
+  "name": "Brahmaputra_FloodWatch_NISAR_09July2026_Inundation",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "feature": "Monitored Reach Bounding Box",
+        "reach_name": "Kaziranga National Park & Floodplain Corridor",
+        "state": "Assam, India",
+        "total_area_km2": 9.15
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              92.75,
+              26.5
+            ],
+            [
+              93.75,
+              26.5
+            ],
+            [
+              93.75,
+              26.75
+            ],
+            [
+              92.75,
+              26.75
+            ],
+            [
+              92.75,
+              26.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "feature": "NISAR Detected Inundation Extent",
+        "event_date": "2026-07-09",
+        "baseline_date": "2026-06-27",
+        "orbit_track": "019",
+        "frame": "075",
+        "newly_inundated_km2": 2.22,
+        "flooded_vegetation_km2": 1.19,
+        "permanent_channel_km2": 1.55,
+        "total_water_affected_km2": 4.96,
+        "submergence_percent": 54.18,
+        "confidence_pct": 94.2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              92.85,
+              26.55
+            ],
+            [
+              93.65,
+              26.58
+            ],
+            [
+              93.6,
+              26.72
+            ],
+            [
+              92.8,
+              26.68
+            ],
+            [
+              92.85,
+              26.55
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

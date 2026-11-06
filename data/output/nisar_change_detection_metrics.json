@@ -1,0 +1,26 @@
+{
+  "baseline_product": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001.h5",
+  "baseline_date": "2026-06-27",
+  "event_product": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001.h5",
+  "event_date": "2026-07-09",
+  "sensor": "ISRO S-band / NASA L-band NISAR",
+  "relative_track": 19,
+  "frame": 75,
+  "orbit_repeat_interval_days": 12,
+  "otsu_threshold_db": -4.457161671468555,
+  "total_reach_area_km2": 9.15,
+  "permanent_channel_km2": 1.55,
+  "newly_inundated_open_water_km2": 2.22,
+  "flooded_vegetation_double_bounce_km2": 1.19,
+  "marginal_saturated_soil_km2": 0.07,
+  "total_water_affected_km2": 4.96,
+  "inundation_percentage": 54.18,
+  "pixel_counts": {
+    "stable_land": 6492,
+    "permanent_water": 2436,
+    "new_open_flood": 3489,
+    "marginal": 106,
+    "flooded_vegetation": 1877,
+    "receded_water": 0
+  }
+}
