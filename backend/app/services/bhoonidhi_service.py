@@ -713,6 +713,208 @@ class BhoonidhiService:
             "message": f"Successfully retrieved scene metadata for {item_id}."
         }
 
+    # -------------------------------------------------------------------------
+    # Safe Download Preflight Inspection (GET /download?id={item_id}&collection={collection})
+    # -------------------------------------------------------------------------
+
+    def check_download_preflight(
+        self,
+        item_id: str,
+        collection: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Executes a safe preflight check against Bhoonidhi's /download endpoint.
+        Uses HTTP stream=True, allow_redirects=False, and NEVER reads or saves the response body.
+        Closes the HTTP stream immediately in a finally block.
+        Inspects headers only to determine file presence, content type, length, and redirect status.
+        Never retries on failure (respecting Bhoonidhi's 2 downloads/minute policy).
+        """
+        if not item_id or not item_id.strip():
+            raise ValueError("item_id must not be empty.")
+
+        target_collection = collection or settings.DEFAULT_COLLECTION
+        if target_collection not in settings.ALLOWED_COLLECTIONS:
+            raise ValueError(f"Collection '{target_collection}' is not allowed.")
+
+        access_token = self.get_valid_access_token()
+        url = f"{self.base_url}/download"
+        params = {"id": item_id.strip(), "collection": target_collection}
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "*/*"
+        }
+
+        logger.info(f"Initiating safe download preflight for '{item_id}' (stream=True, allow_redirects=False)...")
+
+        response = None
+        try:
+            # stream=True ensures body is not downloaded; allow_redirects=False halts on 3xx
+            response = requests.get(
+                url,
+                params=params,
+                headers=headers,
+                stream=True,
+                allow_redirects=False,
+                timeout=self.timeout
+            )
+            status_code = response.status_code
+            resp_headers = response.headers
+
+            content_type = resp_headers.get("Content-Type")
+            cl_str = resp_headers.get("Content-Length")
+            content_length_bytes = int(cl_str) if (cl_str and cl_str.isdigit()) else None
+
+            # Extract filename from Content-Disposition if present
+            cd_header = resp_headers.get("Content-Disposition")
+            content_disposition_filename = None
+            if cd_header and "filename=" in cd_header:
+                try:
+                    parts = cd_header.split("filename=")
+                    if len(parts) > 1:
+                        fname = parts[1].split(";")[0].strip("\"' ")
+                        content_disposition_filename = os.path.basename(fname)
+                except Exception:
+                    pass
+
+            is_redirect = (300 <= status_code < 400) or status_code in (301, 302, 303, 307, 308)
+
+            # Analyze file characteristics
+            file_mimes = {"application/octet-stream", "application/x-hdf5", "application/x-hdf", "application/zip"}
+            appears_to_be_file = False
+            appears_to_be_hdf5 = False
+
+            if not is_redirect and (200 <= status_code < 300):
+                ct_clean = content_type.split(";")[0].strip().lower() if content_type else ""
+                # If Content-Type is clearly an error/text format (e.g. JSON or HTML)
+                if ct_clean in {"application/json", "text/html", "text/plain", "application/problem+json"}:
+                    appears_to_be_file = False
+                elif ct_clean in file_mimes or (content_disposition_filename and content_disposition_filename.lower().endswith((".h5", ".hdf5", ".zip", ".tif"))):
+                    appears_to_be_file = True
+
+                # Check specifically for HDF5
+                if appears_to_be_file:
+                    if ct_clean in {"application/x-hdf5", "application/x-hdf"} or (
+                        content_disposition_filename and content_disposition_filename.lower().endswith((".h5", ".hdf5"))
+                    ) or "h5" in str(content_disposition_filename).lower():
+                        appears_to_be_hdf5 = True
+                    elif ct_clean == "application/octet-stream" and (content_length_bytes and content_length_bytes > 1_000_000_000):
+                        # Multi-gigabyte octet-stream for GCOV is HDF5
+                        appears_to_be_hdf5 = True
+
+            # Determine preflight status and safe explanatory message
+            if is_redirect:
+                preflight_status = "redirect_detected"
+                message = (
+                    f"Upstream returned HTTP {status_code} redirect. "
+                    "Redirect was not followed and redirect location is masked for security."
+                )
+                success = True
+            elif status_code == 200:
+                if appears_to_be_hdf5:
+                    preflight_status = "ready_for_download"
+                    size_gb = f" ({content_length_bytes / 1e9:.2f} GB)" if content_length_bytes else ""
+                    message = (
+                        f"NISAR measurement product headers verified{size_gb}. "
+                        "Preflight confirmed HDF5 stream availability without consuming the body."
+                    )
+                    success = True
+                elif appears_to_be_file:
+                    preflight_status = "file_response_non_hdf5"
+                    message = "Upstream returned a file response, but media type is not explicitly HDF5."
+                    success = True
+                else:
+                    preflight_status = "error_response"
+                    message = (
+                        f"Upstream returned HTTP 200 with non-file Content-Type: '{content_type}'. "
+                        "Response indicates an embedded error or message rather than a satellite measurement product."
+                    )
+                    success = False
+            elif status_code == 401:
+                preflight_status = "unauthorized"
+                message = "Bhoonidhi rejected credentials or download session is unauthorized (HTTP 401)."
+                success = False
+            elif status_code == 404:
+                preflight_status = "not_found"
+                message = f"Product '{item_id}' not found at download endpoint (HTTP 404)."
+                success = False
+            elif status_code == 412:
+                preflight_status = "precondition_failed"
+                message = (
+                    "Precondition failed (HTTP 412). "
+                    "This typically indicates concurrent download limits or pending product staging in Bhoonidhi."
+                )
+                success = False
+            elif status_code == 429:
+                preflight_status = "rate_limited"
+                message = (
+                    "Bhoonidhi download rate limit reached (HTTP 429). "
+                    "Policy permits a maximum of 2 download requests per minute."
+                )
+                success = False
+            elif status_code == 504:
+                preflight_status = "gateway_timeout"
+                message = "Bhoonidhi download gateway timed out (HTTP 504)."
+                success = False
+            else:
+                preflight_status = "upstream_error"
+                message = f"Bhoonidhi download endpoint returned HTTP {status_code}."
+                success = False
+
+            return {
+                "success": success,
+                "item_id": item_id,
+                "collection": target_collection,
+                "preflight_status": preflight_status,
+                "http_status_code": status_code,
+                "content_type": content_type,
+                "content_length_bytes": content_length_bytes,
+                "content_disposition_filename": content_disposition_filename,
+                "is_redirect": is_redirect,
+                "appears_to_be_file": appears_to_be_file,
+                "appears_to_be_hdf5": appears_to_be_hdf5,
+                "download_confirmed": False,
+                "message": message
+            }
+
+        except requests.exceptions.Timeout:
+            return {
+                "success": False,
+                "item_id": item_id,
+                "collection": target_collection,
+                "preflight_status": "gateway_timeout",
+                "http_status_code": 504,
+                "content_type": None,
+                "content_length_bytes": None,
+                "content_disposition_filename": None,
+                "is_redirect": False,
+                "appears_to_be_file": False,
+                "appears_to_be_hdf5": False,
+                "download_confirmed": False,
+                "message": f"Connection timed out after {self.timeout}s during download preflight."
+            }
+        except requests.exceptions.RequestException as e:
+            return {
+                "success": False,
+                "item_id": item_id,
+                "collection": target_collection,
+                "preflight_status": "network_error",
+                "http_status_code": 502,
+                "content_type": None,
+                "content_length_bytes": None,
+                "content_disposition_filename": None,
+                "is_redirect": False,
+                "appears_to_be_file": False,
+                "appears_to_be_hdf5": False,
+                "download_confirmed": False,
+                "message": f"Network error contacting Bhoonidhi download endpoint: {str(e)}"
+            }
+        finally:
+            if response is not None:
+                try:
+                    response.close()
+                except Exception:
+                    pass
+
 
 # Singleton instance
 bhoonidhi_service = BhoonidhiService()

@@ -432,7 +432,157 @@ class TestBhoonidhiAuthenticationAndSearch(unittest.TestCase):
             self.assertIn("not found", res.json()["detail"].lower())
 
 
+    # -------------------------------------------------------------------------
+    # 10. Safe Download Preflight Inspection Tests
+    # -------------------------------------------------------------------------
+
+    @patch("requests.get")
+    def test_download_preflight_200_hdf5(self, mock_get):
+        """Test HTTP 200 with an HDF5-like content type and large Content-Length."""
+        bhoonidhi_service._access_token = "active_valid_token"
+        bhoonidhi_service._expires_at = time.time() + 3600.0
+
+        mock_res = MagicMock()
+        mock_res.status_code = 200
+        mock_res.headers = {
+            "Content-Type": "application/octet-stream",
+            "Content-Length": "12666974812",
+            "Content-Disposition": 'attachment; filename="NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526.h5"'
+        }
+        mock_get.return_value = mock_res
+
+        with patch.dict(os.environ, {"BHOONIDHI_USER_ID": "test_user", "BHOONIDHI_PASSWORD": "test_password"}):
+            settings.BHOONIDHI_USER_ID = "test_user"
+            settings.BHOONIDHI_PASSWORD = "test_password"
+
+            item_id = "NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001"
+            res = client.post(f"/api/nisar/scenes/{item_id}/download-preflight")
+            self.assertEqual(res.status_code, 200)
+            data = res.json()
+
+            self.assertTrue(data["success"])
+            self.assertEqual(data["http_status_code"], 200)
+            self.assertEqual(data["preflight_status"], "ready_for_download")
+            self.assertTrue(data["appears_to_be_file"])
+            self.assertTrue(data["appears_to_be_hdf5"])
+            self.assertFalse(data["is_redirect"])
+            self.assertFalse(data["download_confirmed"], "download_confirmed MUST remain False")
+            self.assertEqual(data["content_length_bytes"], 12666974812)
+            self.assertEqual(data["content_disposition_filename"], "NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526.h5")
+
+            # Verify request parameters (stream=True, allow_redirects=False)
+            call_kwargs = mock_get.call_args.kwargs
+            self.assertTrue(call_kwargs.get("stream"), "Must use stream=True")
+            self.assertFalse(call_kwargs.get("allow_redirects"), "Must disable allow_redirects")
+
+            # Verify response was closed immediately and body was not read
+            mock_res.close.assert_called_once()
+            mock_res.json.assert_not_called()
+            mock_res.text.__str__.assert_not_called()
+
+    @patch("requests.get")
+    def test_download_preflight_200_json_error(self, mock_get):
+        """Test HTTP 200 with JSON error content (not a file)."""
+        bhoonidhi_service._access_token = "active_valid_token"
+        bhoonidhi_service._expires_at = time.time() + 3600.0
+
+        mock_res = MagicMock()
+        mock_res.status_code = 200
+        mock_res.headers = {
+            "Content-Type": "application/json; charset=utf-8",
+            "Content-Length": "128"
+        }
+        mock_get.return_value = mock_res
+
+        with patch.dict(os.environ, {"BHOONIDHI_USER_ID": "test_user", "BHOONIDHI_PASSWORD": "test_password"}):
+            settings.BHOONIDHI_USER_ID = "test_user"
+            settings.BHOONIDHI_PASSWORD = "test_password"
+
+            item_id = "NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001"
+            res = client.post(f"/api/nisar/scenes/{item_id}/download-preflight")
+            self.assertEqual(res.status_code, 200)
+            data = res.json()
+
+            self.assertFalse(data["success"])
+            self.assertEqual(data["preflight_status"], "error_response")
+            self.assertFalse(data["appears_to_be_file"])
+            self.assertFalse(data["appears_to_be_hdf5"])
+            self.assertFalse(data["download_confirmed"])
+            mock_res.close.assert_called_once()
+
+    @patch("requests.get")
+    def test_download_preflight_redirect_302(self, mock_get):
+        """Test redirect 302 response: must report redirect without following or exposing Location."""
+        bhoonidhi_service._access_token = "active_valid_token"
+        bhoonidhi_service._expires_at = time.time() + 3600.0
+
+        mock_res = MagicMock()
+        mock_res.status_code = 302
+        mock_res.headers = {
+            "Location": "https://s3.nrsc.gov.in/signed_storage/product.h5?AWSAccessKeyId=SECRET&Signature=TOKEN",
+            "Content-Type": "text/html"
+        }
+        mock_get.return_value = mock_res
+
+        with patch.dict(os.environ, {"BHOONIDHI_USER_ID": "test_user", "BHOONIDHI_PASSWORD": "test_password"}):
+            settings.BHOONIDHI_USER_ID = "test_user"
+            settings.BHOONIDHI_PASSWORD = "test_password"
+
+            item_id = "NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001"
+            res = client.post(f"/api/nisar/scenes/{item_id}/download-preflight")
+            self.assertEqual(res.status_code, 200)
+            data = res.json()
+
+            self.assertTrue(data["is_redirect"])
+            self.assertEqual(data["http_status_code"], 302)
+            self.assertEqual(data["preflight_status"], "redirect_detected")
+            self.assertFalse(data["download_confirmed"])
+
+            # SECURITY CHECK: Signed URL and secret token must NEVER be exposed
+            dumped = json.dumps(data)
+            self.assertNotIn("SECRET", dumped)
+            self.assertNotIn("Signature", dumped)
+            self.assertNotIn("Location", data)
+            mock_res.close.assert_called_once()
+
+    @patch("requests.get")
+    def test_download_preflight_status_codes(self, mock_get):
+        """Test 401, 404, 412, 429, and 504 error statuses."""
+        bhoonidhi_service._access_token = "active_valid_token"
+        bhoonidhi_service._expires_at = time.time() + 3600.0
+
+        status_expectations = [
+            (401, "unauthorized"),
+            (404, "not_found"),
+            (412, "precondition_failed"),
+            (429, "rate_limited"),
+            (504, "gateway_timeout")
+        ]
+
+        with patch.dict(os.environ, {"BHOONIDHI_USER_ID": "test_user", "BHOONIDHI_PASSWORD": "test_password"}):
+            settings.BHOONIDHI_USER_ID = "test_user"
+            settings.BHOONIDHI_PASSWORD = "test_password"
+
+            item_id = "NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001"
+
+            for code, expected_status in status_expectations:
+                mock_res = MagicMock()
+                mock_res.status_code = code
+                mock_res.headers = {"Content-Type": "application/json"}
+                mock_get.return_value = mock_res
+
+                res = client.post(f"/api/nisar/scenes/{item_id}/download-preflight")
+                self.assertEqual(res.status_code, 200)
+                data = res.json()
+                self.assertFalse(data["success"])
+                self.assertEqual(data["http_status_code"], code)
+                self.assertEqual(data["preflight_status"], expected_status)
+                self.assertFalse(data["download_confirmed"])
+                mock_res.close.assert_called()
+
+
 if __name__ == "__main__":
     unittest.main()
+
 
 

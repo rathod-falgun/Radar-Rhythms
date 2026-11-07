@@ -432,4 +432,37 @@ def get_nisar_scene_details(
         raise HTTPException(status_code=500, detail=f"Unexpected error retrieving scene details: {str(e)}")
 
 
+@router.post("/nisar/scenes/{item_id}/download-preflight")
+def check_nisar_download_preflight(
+    item_id: str,
+    collection: Optional[str] = Query(None, description="STAC collection ID (default: NISAR_SSAR_GCOV)")
+) -> Dict[str, Any]:
+    """
+    Executes a safe preflight inspection of the NISAR product download stream.
+    Queries GET /download?id={item_id}&collection={collection} using stream=True and allow_redirects=False.
+    Never downloads, buffers, or stores the measurement file; closes the connection immediately.
+    Inspects HTTP status code, Content-Type, Content-Length, Content-Disposition, and redirect flags.
+    """
+    if collection and collection not in settings.ALLOWED_COLLECTIONS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Collection '{collection}' is not supported. Allowed collections: {settings.ALLOWED_COLLECTIONS}"
+        )
+
+    try:
+        result = bhoonidhi_service.check_download_preflight(item_id=item_id, collection=collection)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except BhoonidhiAuthError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except BhoonidhiRateLimitError as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except BhoonidhiAPIError as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error executing download preflight: {str(e)}")
+
+
+
 
