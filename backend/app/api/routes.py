@@ -401,3 +401,35 @@ def search_nisar_scenes(request: Optional[NISARSceneSearchRequest] = Body(defaul
         raise HTTPException(status_code=500, detail=f"Unexpected error executing Bhoonidhi scene search: {str(e)}")
 
 
+@router.get("/nisar/scenes/{item_id}/details")
+def get_nisar_scene_details(
+    item_id: str,
+    collection: Optional[str] = Query(None, description="STAC collection ID (default: NISAR_SSAR_GCOV)")
+) -> Dict[str, Any]:
+    """
+    Retrieves detailed STAC metadata for an individual NISAR scene from ISRO Bhoonidhi.
+    Extracts platform, polarization, orbit geometry, processing info, canonical RFC 7946 bbox,
+    and asset breakdown (checking for measurement HDF5 and QA assets).
+    """
+    if collection and collection not in settings.ALLOWED_COLLECTIONS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Collection '{collection}' is not supported. Allowed collections: {settings.ALLOWED_COLLECTIONS}"
+        )
+
+    try:
+        details = bhoonidhi_service.get_scene_details(item_id=item_id, collection=collection)
+        return details
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except BhoonidhiAuthError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except BhoonidhiRateLimitError as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except BhoonidhiAPIError as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error retrieving scene details: {str(e)}")
+
+
+

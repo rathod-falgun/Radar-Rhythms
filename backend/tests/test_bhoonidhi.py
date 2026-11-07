@@ -329,6 +329,109 @@ class TestBhoonidhiAuthenticationAndSearch(unittest.TestCase):
         self.assertIn("not supported", res.json()["detail"].lower())
 
 
+    # -------------------------------------------------------------------------
+    # 9. Scene Detail Inspection
+    # -------------------------------------------------------------------------
+
+    @patch("requests.get")
+    def test_get_scene_details_success(self, mock_get):
+        """GET /api/nisar/scenes/{item_id}/details must extract all metadata & correct bbox."""
+        bhoonidhi_service._access_token = "active_valid_token"
+        bhoonidhi_service._expires_at = time.time() + 3600.0
+
+        mock_res = MagicMock()
+        mock_res.status_code = 200
+        mock_res.json.return_value = {
+            "type": "Feature",
+            "id": "NISAR_S2_PR_GCOV_031_040_A_015_3700_DHNA_A_20260920T230526_20260920T230602_P00500_M_F_I_001",
+            "collection": "NISAR_SSAR_GCOV",
+            "bbox": [92.330429, 28.114938, 95.406955, 25.350359],  # Inverted north/south as returned by Bhoonidhi
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [[[92.145, 28.246], [95.667, 28.223], [95.597, 25.209], [92.167, 25.230], [92.145, 28.246]]]
+            },
+            "properties": {
+                "datetime": "2026-09-20T23:05:26Z",
+                "Platform": "NISAR",
+                "Instrument": "SSAR",
+                "Polarization": "DH",
+                "Node": "Ascending",
+                "Look_dir": "Left",
+                "Track": 40,
+                "Frame": 15,
+                "CycleNumber": 31,
+                "IncidenceAngle": 41.237,
+                "Producer": "ISRO",
+                "SoftwareVersion": "1.4.00",
+                "DEMSource": "Copernicus GLO-30",
+                "Online": "Y"
+            },
+            "assets": {
+                "metadata": {"type": "application/json", "title": "metadata"},
+                "thumbnail": {"type": "image/jpeg", "title": "thumbnail"},
+                "QAZIP": {"type": "application/octet-stream", "title": "QAZIP"},
+                "QAPDF": {"type": "application/octet-stream", "title": "QAPDF"}
+            }
+        }
+        mock_get.return_value = mock_res
+
+        with patch.dict(os.environ, {"BHOONIDHI_USER_ID": "test_user", "BHOONIDHI_PASSWORD": "test_password"}):
+            settings.BHOONIDHI_USER_ID = "test_user"
+            settings.BHOONIDHI_PASSWORD = "test_password"
+
+            item_id = "NISAR_S2_PR_GCOV_031_040_A_015_3700_DHNA_A_20260920T230526_20260920T230602_P00500_M_F_I_001"
+            res = client.get(f"/api/nisar/scenes/{item_id}/details")
+            self.assertEqual(res.status_code, 200)
+            data = res.json()
+
+            self.assertTrue(data["success"])
+            self.assertEqual(data["id"], item_id)
+            self.assertEqual(data["polarization"], "DH")
+            self.assertEqual(data["orbit_direction"], "Ascending")
+            self.assertEqual(data["relative_orbit"], 40)
+            self.assertEqual(data["frame_number"], 15)
+            self.assertEqual(data["cycle_number"], 31)
+
+            # Asset verification
+            self.assertFalse(data["has_measurement_hdf5"])
+            self.assertTrue(data["has_qa_assets"])
+            self.assertIn("QAZIP", data["assets"])
+            self.assertIn("QAPDF", data["assets"])
+
+            # Verify Bounding Box Ordering: must be [west, south, east, north]
+            bbox = data["bbox"]
+            self.assertEqual(len(bbox), 4)
+            west, south, east, north = bbox
+            self.assertLess(west, east, "West longitude must be strictly less than East longitude")
+            self.assertLess(south, north, "South latitude must be strictly less than North latitude")
+            self.assertEqual(data["bbox_order"], "west_south_east_north")
+
+            # Security: No access tokens or signed download URLs exposed
+            res_str = json.dumps(data)
+            self.assertNotIn("active_valid_token", res_str)
+            self.assertNotIn("Bearer", res_str)
+
+    @patch("requests.get")
+    def test_get_scene_details_404(self, mock_get):
+        """GET /api/nisar/scenes/{item_id}/details should return 404 when item is missing."""
+        bhoonidhi_service._access_token = "active_valid_token"
+        bhoonidhi_service._expires_at = time.time() + 3600.0
+
+        mock_res = MagicMock()
+        mock_res.status_code = 404
+        mock_res.text = "Item not found"
+        mock_get.return_value = mock_res
+
+        with patch.dict(os.environ, {"BHOONIDHI_USER_ID": "test_user", "BHOONIDHI_PASSWORD": "test_password"}):
+            settings.BHOONIDHI_USER_ID = "test_user"
+            settings.BHOONIDHI_PASSWORD = "test_password"
+
+            res = client.get("/api/nisar/scenes/NON_EXISTENT_SCENE/details")
+            self.assertEqual(res.status_code, 404)
+            self.assertIn("not found", res.json()["detail"].lower())
+
+
 if __name__ == "__main__":
     unittest.main()
+
 

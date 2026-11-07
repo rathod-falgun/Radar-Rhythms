@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "back
 
 def test_nisar_metadata():
     print("[1/6] Testing NISAR Metadata & Orbital Catalog...")
+    # pyrefly: ignore[missing-import]
     from app.services.nisar_metadata import (
         NISAR_OBSERVATION_CATALOG,
         STUDY_REGIONS,
@@ -37,6 +38,7 @@ def test_nisar_metadata():
 def test_radar_preprocessing():
     print("[2/6] Testing Radar Preprocessing (Adaptive Lee Filter & Indices)...")
     import numpy as np
+    # pyrefly: ignore[missing-import]
     from app.services.radar_preprocessing import (
         apply_lee_speckle_filter,
         compute_polarimetric_indices
@@ -64,6 +66,7 @@ def test_radar_preprocessing():
 def test_change_detection_physics():
     print("[3/6] Testing Multi-Temporal SAR Change Detection & 6-Class Taxonomy...")
     import numpy as np
+    # pyrefly: ignore[missing-import]
     from app.services.change_detector import perform_sar_change_detection
     result = perform_sar_change_detection(
         region_id="kaziranga",
@@ -89,6 +92,7 @@ def test_change_detection_physics():
 
 def test_nisar_hdf5_architecture():
     print("[4/6] Testing NISAR Level 2 GCOV HDF5 Container & Reader...")
+    # pyrefly: ignore[missing-import]
     from app.services.nisar_reader import NISARGCOVReader
     import tempfile
 
@@ -116,6 +120,7 @@ def test_nisar_hdf5_architecture():
 def test_fastapi_endpoints():
     print("[5/6] Testing FastAPI REST Endpoints via TestClient...")
     from fastapi.testclient import TestClient
+    # pyrefly: ignore[missing-import]
     from app.main import app
 
     client = TestClient(app)

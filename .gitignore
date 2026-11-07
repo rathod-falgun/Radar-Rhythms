@@ -14,5 +14,6 @@ venv/
 data/nisar_products/
 *.h5
 *.tif
+rewrite_author.sh
 
 

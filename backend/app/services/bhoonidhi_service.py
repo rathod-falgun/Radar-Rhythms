@@ -37,6 +37,48 @@ class BhoonidhiAPIError(Exception):
         self.status_code = status_code
 
 
+def compute_canonical_bbox(
+    geometry: Optional[Dict[str, Any]],
+    raw_bbox: Optional[List[float]]
+) -> Optional[List[float]]:
+    """
+    Ensures standard GeoJSON RFC 7946 bbox ordering: [west, south, east, north].
+    Bhoonidhi upstream STAC occasionally provides bounding boxes in [west, north, east, south] order.
+    This helper derives the canonical [min_lon, min_lat, max_lon, max_lat] from geometry footprint coordinates
+    without modifying the footprint coordinates themselves.
+    """
+    if geometry and isinstance(geometry, dict) and "coordinates" in geometry:
+        try:
+            coords = geometry["coordinates"]
+
+            def flatten_coords(c):
+                pts = []
+                if isinstance(c, (list, tuple)):
+                    if len(c) >= 2 and isinstance(c[0], (int, float)) and isinstance(c[1], (int, float)):
+                        pts.append((float(c[0]), float(c[1])))
+                    else:
+                        for sub in c:
+                            pts.extend(flatten_coords(sub))
+                return pts
+
+            points = flatten_coords(coords)
+            if points:
+                lons = [p[0] for p in points]
+                lats = [p[1] for p in points]
+                return [round(min(lons), 6), round(min(lats), 6), round(max(lons), 6), round(max(lats), 6)]
+        except Exception:
+            pass
+
+    if raw_bbox and isinstance(raw_bbox, (list, tuple)) and len(raw_bbox) >= 4:
+        c = [float(x) for x in raw_bbox[:4]]
+        lon1, lat1, lon2, lat2 = c[0], c[1], c[2], c[3]
+        west, east = min(lon1, lon2), max(lon1, lon2)
+        south, north = min(lat1, lat2), max(lat1, lat2)
+        return [round(west, 6), round(south, 6), round(east, 6), round(north, 6)]
+
+    return None
+
+
 class BhoonidhiService:
     """
     Thread-safe client service for ISRO's Bhoonidhi Satellite Data Portal.
@@ -437,6 +479,9 @@ class BhoonidhiService:
                 for k, v in assets.items()
             } if isinstance(assets, dict) else {}
 
+            raw_item_bbox = item.get("bbox")
+            canonical_bbox = compute_canonical_bbox(item.get("geometry"), raw_item_bbox)
+
             # Extract fields safely, using None if not present
             scene = {
                 "id": item.get("id"),
@@ -446,26 +491,31 @@ class BhoonidhiService:
                 "online": props.get("Online") or props.get("online") or "Y",
                 "polarization": (
                     props.get("polarization") or
+                    props.get("Polarization") or
                     props.get("polarization_channels") or
                     props.get("sar:polarizations")
                 ),
                 "orbit_direction": (
                     props.get("orbit_direction") or
+                    props.get("Node") or
                     props.get("pass_direction") or
                     props.get("sat:orbit_state")
                 ),
                 "relative_orbit": (
                     props.get("track") or
+                    props.get("Track") or
                     props.get("relative_orbit") or
                     props.get("sat:relative_orbit") or
                     props.get("track_number")
                 ),
-                "frame_number": props.get("frame_number") or props.get("frame"),
+                "frame_number": props.get("frame_number") or props.get("Frame") or props.get("frame"),
                 "geometry": item.get("geometry"),
-                "bbox": item.get("bbox"),
+                "bbox": canonical_bbox,
+                "raw_bbox": raw_item_bbox,
+                "bbox_order": "west_south_east_north",
                 "product_size_bytes": props.get("product_size") or props.get("file_size"),
-                "instruments": props.get("instruments") or ["SSAR"],
-                "platform": props.get("platform") or "NISAR",
+                "instruments": props.get("instruments") or [props.get("Instrument", "SSAR")],
+                "platform": props.get("platform") or props.get("Platform", "NISAR"),
                 "available_assets": list(safe_assets.keys())
             }
             normalized_scenes.append(scene)
@@ -490,6 +540,177 @@ class BhoonidhiService:
             "scenes": normalized_scenes,
             "has_next_page": bool(next_link),
             "message": f"Successfully retrieved {len(normalized_scenes)} NISAR observation scene(s) from Bhoonidhi."
+        }
+
+    # -------------------------------------------------------------------------
+    # Scene Detail Inspection API (GET /data/collections/{collection}/items/{item_id})
+    # -------------------------------------------------------------------------
+
+    def get_scene_details(
+        self,
+        item_id: str,
+        collection: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Retrieves detailed STAC metadata for a specific NISAR scene from Bhoonidhi:
+        GET /data/collections/{collection_id}/items/{item_id}
+        """
+        if not item_id or not item_id.strip():
+            raise ValueError("item_id must not be empty.")
+
+        target_collection = collection or settings.DEFAULT_COLLECTION
+        access_token = self.get_valid_access_token()
+
+        url = f"{self.base_url}/data/collections/{target_collection}/items/{item_id.strip()}"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/json"
+        }
+
+        logger.info(f"Retrieving NISAR scene details from Bhoonidhi: {url}")
+        try:
+            response = requests.get(url, headers=headers, timeout=self.timeout)
+        except requests.exceptions.Timeout:
+            raise BhoonidhiAPIError(f"Request timed out retrieving scene details for '{item_id}'.", status_code=504)
+        except requests.exceptions.RequestException as e:
+            raise BhoonidhiAPIError(f"Network error querying Bhoonidhi scene details: {str(e)}", status_code=502)
+
+        if response.status_code == 404:
+            raise BhoonidhiAPIError(f"NISAR scene '{item_id}' not found in collection '{target_collection}'.", status_code=404)
+        elif response.status_code == 401:
+            with self._lock:
+                self._access_token = None
+            raise BhoonidhiAuthError("Bhoonidhi rejected access token (HTTP 401).")
+        elif response.status_code == 429:
+            raise BhoonidhiRateLimitError("Bhoonidhi rate limit reached (HTTP 429).")
+        elif response.status_code != 200:
+            raise BhoonidhiAPIError(
+                f"Bhoonidhi item endpoint returned HTTP {response.status_code}: {response.text[:200]}",
+                status_code=response.status_code
+            )
+
+        try:
+            raw_item = response.json()
+        except Exception:
+            raise BhoonidhiAPIError("Invalid JSON returned by Bhoonidhi scene detail API.", status_code=502)
+
+        return self._normalize_scene_detail(raw_item, target_collection)
+
+    def _normalize_scene_detail(self, item: Dict[str, Any], collection: str) -> Dict[str, Any]:
+        """
+        Extracts and structures detailed STAC item metadata according to task specifications.
+        Preserves original footprint coordinates without modification while computing canonical [west, south, east, north] bbox.
+        Identifies presence of measurement HDF5 and QA assets, and sanitizes download asset listings.
+        """
+        props = item.get("properties", {})
+        raw_assets = item.get("assets", {})
+        geometry = item.get("geometry")
+        raw_bbox = item.get("bbox")
+        item_id = item.get("id")
+
+        # Canonical bounding box [west, south, east, north]
+        canonical_bbox = compute_canonical_bbox(geometry, raw_bbox)
+
+        # Asset classification and sanitization
+        has_measurement_hdf5 = False
+        has_qa_assets = False
+        detailed_assets: Dict[str, Any] = {}
+        available_download_links: List[Dict[str, Any]] = []
+
+        qa_identifiers = {"QAZIP", "QAPDF", "QA", "QUALITY", "QC"}
+
+        for asset_key, asset_val in raw_assets.items():
+            if not isinstance(asset_val, dict):
+                continue
+
+            media_type = asset_val.get("type", "application/octet-stream")
+            title = asset_val.get("title", asset_key)
+            description = asset_val.get("description")
+            roles = asset_val.get("roles", [])
+
+            # Check for QA
+            is_qa = (
+                asset_key.upper() in qa_identifiers or
+                any(r.lower() in {"qa", "quality"} for r in roles)
+            )
+            if is_qa:
+                has_qa_assets = True
+
+            # Check for measurement HDF5 (must be verified HDF5 raster, not QA zip or report)
+            is_measurement = (
+                media_type in {"application/x-hdf5", "application/x-hdf"} or
+                asset_key.lower().endswith((".h5", ".hdf5")) or
+                "measurement" in str(roles).lower()
+            ) and not is_qa
+            if is_measurement:
+                has_measurement_hdf5 = True
+
+            detailed_assets[asset_key] = {
+                "name": asset_key,
+                "title": title,
+                "type": media_type,
+                "roles": roles if roles else ([ "qa" ] if is_qa else ([ "data" ] if is_measurement else None)),
+                "description": description,
+                "is_measurement": is_measurement,
+                "is_qa": is_qa,
+                "available": True
+            }
+
+            # Safe download reference without exposing signed URLs or auth tokens
+            available_download_links.append({
+                "asset": asset_key,
+                "title": title,
+                "type": media_type,
+                "is_qa": is_qa,
+                "is_measurement": is_measurement,
+                "description": description or f"{title} ({media_type})"
+            })
+
+        # Orbit and polarimetric information
+        pol_raw = props.get("Polarization") or props.get("polarization") or props.get("polarization_channels")
+        orbit_dir = props.get("Node") or props.get("orbit_direction") or props.get("pass_direction")
+        look_dir = props.get("Look_dir") or props.get("look_direction")
+        track_val = props.get("Track") or props.get("track") or props.get("relative_orbit")
+        frame_val = props.get("Frame") or props.get("frame") or props.get("frame_number")
+
+        return {
+            "success": True,
+            "id": item_id,
+            "collection": item.get("collection", collection),
+            "datetime": props.get("datetime") or props.get("start_datetime") or props.get("acquisition_date"),
+            "product_type": props.get("product_type") or props.get("ProductCode") or ("Level-2 GCOV" if "GCOV" in str(item_id) else None),
+            "platform": props.get("Platform") or props.get("platform") or "NISAR",
+            "instrument": props.get("Instrument") or props.get("instruments", ["SSAR"])[0] if isinstance(props.get("instruments"), list) else "SSAR",
+            "polarization": pol_raw,
+            "orbit_direction": orbit_dir,
+            "look_direction": look_dir,
+            "relative_orbit": int(track_val) if track_val is not None else None,
+            "frame_number": int(frame_val) if frame_val is not None else None,
+            "cycle_number": int(props.get("CycleNumber")) if props.get("CycleNumber") is not None else None,
+            "incidence_angle_deg": float(props.get("IncidenceAngle")) if props.get("IncidenceAngle") is not None else None,
+            "processing_information": {
+                "producer": props.get("Producer", "ISRO"),
+                "software_version": props.get("SoftwareVersion"),
+                "dem_source": props.get("DEMSource"),
+                "dem_correction": props.get("DEMCorrection"),
+                "generation_time": props.get("GenerationTime"),
+                "product_code": props.get("ProductCode"),
+                "scene_identifier": props.get("Scene_Identifier"),
+                "obs_id": props.get("OBSID"),
+                "input_resolution_along_m": props.get("InputResolutionAlong"),
+                "input_resolution_across_m": props.get("InputResolutionAcross")
+            },
+            "footprint": geometry,
+            "bbox": canonical_bbox,
+            "raw_bbox": raw_bbox,
+            "bbox_order": "west_south_east_north",
+            "product_size": props.get("product_size") or props.get("file_size"),
+            "has_measurement_hdf5": has_measurement_hdf5,
+            "has_qa_assets": has_qa_assets,
+            "assets": detailed_assets,
+            "available_download_links": available_download_links,
+            "online_status": props.get("Online") or props.get("online") or "Y",
+            "message": f"Successfully retrieved scene metadata for {item_id}."
         }
 
 

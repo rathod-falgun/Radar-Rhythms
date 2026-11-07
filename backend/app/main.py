@@ -45,7 +45,8 @@ def root():
             "/api/timeline-stats",
             "/api/nisar/status",
             "/api/nisar/auth/test",
-            "/api/nisar/scenes"
+            "/api/nisar/scenes",
+            "/api/nisar/scenes/{item_id}/details"
         ]
     }
 
