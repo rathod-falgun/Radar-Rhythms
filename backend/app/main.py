@@ -1,4 +1,6 @@
+# pyrefly: ignore[missing-import]
 from fastapi import FastAPI
+# pyrefly: ignore[missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 from .api.routes import router
 from .core.config import settings
