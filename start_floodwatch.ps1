@@ -7,8 +7,8 @@ Write-Host ""
 
 $workspace = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-Write-Host "[1/3] Starting FastAPI Backend on http://127.0.0.1:8001 ..." -ForegroundColor Green
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$workspace\backend'; python -m uvicorn app.main:app --host 127.0.0.1 --port 8001 --reload"
+Write-Host "[1/3] Starting FastAPI Backend on http://127.0.0.1:8005 ..." -ForegroundColor Green
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$workspace\backend'; python -m uvicorn app.main:app --host 127.0.0.1 --port 8005 --reload"
 
 Write-Host "[2/3] Starting Vite Frontend on http://localhost:5173 ..." -ForegroundColor Green
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$workspace\frontend'; npm run dev"
@@ -23,7 +23,7 @@ Write-Host ""
 Write-Host "=====================================================================" -ForegroundColor Cyan
 Write-Host "System is running!" -ForegroundColor Green
 Write-Host "- Frontend UI:  http://localhost:5173" -ForegroundColor White
-Write-Host "- Backend API:  http://127.0.0.1:8001" -ForegroundColor White
-Write-Host "- API Docs:     http://127.0.0.1:8001/docs" -ForegroundColor White
+Write-Host "- Backend API:  http://127.0.0.1:8005" -ForegroundColor White
+Write-Host "- API Docs:     http://127.0.0.1:8005/docs" -ForegroundColor White
 Write-Host "=====================================================================" -ForegroundColor Cyan
 
