@@ -6,7 +6,37 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+      },
       colors: {
+        // Midnight Atlas Brand Identity
+        midnight: '#0B132B',
+        indigo: '#1C2541',
+        dusk: '#3A506B',
+        teal: '#5BC0BE',
+        aqua: '#6FFFE9',
+        cloud: '#F4F6F8',
+        surface: '#FFFFFF',
+
+        // Neutrals
+        primary: '#0B132B',
+        body: '#475569',
+        muted: '#64748B',
+        border: '#E2E8F0',
+        subtle: '#F8FAFC',
+        disabled: '#CBD5E1',
+
+        // Scientific Map Semantic Colors (PRESERVED)
+        map: {
+          persistent: '#06B6D4',
+          inundated: '#E11D48',
+          land: '#64748B',
+          receded: '#D97706',
+        },
+
+        // Backward compatibility
         radar: {
           dark: '#0a0e17',
           card: '#111827',

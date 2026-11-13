@@ -146,7 +146,7 @@ export default function App() {
   const isBarpeta = selectedRegionId === 'barpeta';
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans space-dot-pattern selection:bg-sky-100 selection:text-sky-900">
+    <div className="min-h-screen bg-[#F4F6F8] text-[#0B132B] flex flex-col font-sans selection:bg-[#5BC0BE] selection:text-[#0B132B]">
       {/* Space-Inspired Top Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -161,15 +161,15 @@ export default function App() {
         {activeTab === 'monitor' && (
           <div className="space-y-6">
             {/* 1. Project Heading & Short Explanation */}
-            <div className="bg-[#0b132b] text-white rounded-2xl border border-[#1c2541] p-5 sm:p-6 shadow-md space-y-2">
+            <div className="bg-[#0B132B] text-white rounded-xl border border-[#1C2541] p-5 sm:p-6 shadow-sm space-y-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#5bc0be] animate-pulse"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#5BC0BE] animate-pulse"></span>
                   <h2 className="text-xl font-bold tracking-tight text-white">
                     All-Weather Radar Flood Observation Portal
                   </h2>
                 </div>
-                <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-[#1c2541] text-[#6fffe9] border border-[#3a506b]">
+                <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-[#1C2541] text-[#6FFFE9] border border-[#3A506B]">
                   NASA–ISRO SAR Earth Observation
                 </span>
               </div>
@@ -202,9 +202,9 @@ export default function App() {
 
             {/* Loading Indicator */}
             {loading && (
-              <div className="flex items-center justify-center p-8 bg-white rounded-2xl border border-slate-200 shadow-xs">
-                <Loader2 className="w-6 h-6 text-sky-600 animate-spin mr-3" />
-                <span className="text-sm font-semibold text-slate-700">
+              <div className="flex items-center justify-center p-8 bg-white rounded-xl border border-border shadow-xs">
+                <Loader2 className="w-5 h-5 text-teal animate-spin mr-3" />
+                <span className="text-sm font-medium text-primary">
                   Retrieving NISAR radar observations & computing water classification...
                 </span>
               </div>
@@ -212,28 +212,28 @@ export default function App() {
 
             {/* State when an unsupported area or date has no processed satellite results */}
             {!loading && comparisonData && (comparisonData.status === 'UNAVAILABLE' || (!isMajuli && !isBarpeta)) && (
-              <div className="bg-white rounded-2xl border border-amber-200 p-8 shadow-xs text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
-                  <ShieldAlert className="w-6 h-6" />
+              <div className="bg-white rounded-xl border border-amber-200 p-8 shadow-xs text-center space-y-4">
+                <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-800 flex items-center justify-center mx-auto border border-amber-200">
+                  <ShieldAlert className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-semibold text-primary">
                     No Processed Satellite Results for this Area
                   </h3>
-                  <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
+                  <p className="text-xs text-muted max-w-lg mx-auto leading-relaxed">
                     {comparisonData.message || 'No processed NISAR Level-2 satellite observations are available for this area. To inspect authentic satellite radar data, please select Majuli or Barpeta.'}
                   </p>
                 </div>
                 <div className="pt-2 flex justify-center gap-3">
                   <button
                     onClick={() => handleSelectRegion('majuli')}
-                    className="px-4 py-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-semibold text-xs border border-sky-200 transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-md bg-midnight text-white hover:bg-indigo font-medium text-xs border border-indigo transition-colors cursor-pointer"
                   >
                     View Majuli (Single-Date Water Extent)
                   </button>
                   <button
                     onClick={() => handleSelectRegion('barpeta')}
-                    className="px-4 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold text-xs border border-rose-200 transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-md bg-white text-primary hover:bg-cloud font-medium text-xs border border-border transition-colors cursor-pointer"
                   >
                     View Barpeta (Two-Date Flood Comparison)
                   </button>
@@ -246,13 +246,13 @@ export default function App() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sky-600"></span>
-                    <h2 className="text-base font-bold text-slate-900 tracking-tight">
+                    <span className="w-2.5 h-2.5 rounded-full bg-teal"></span>
+                    <h2 className="text-base font-semibold text-primary tracking-tight">
                       3. {isBarpeta ? 'Before-and-After Flood Comparison' : 'Classified Water Extent Map'}
                     </h2>
                   </div>
-                  <span className="text-xs text-slate-500 font-mono">
-                    {isMajuli ? 'Track 015 / Frame 3700 • 13,821 Extracted Polygons' : 'Track 019 / Frame 075 • 12-Day Interval (27 Jun vs 09 Jul 2026)'}
+                  <span className="text-xs text-muted font-mono">
+                    {isMajuli ? 'Track 015 / Frame 3700 • 13,821 Extracted Polygons' : 'Track 019 / Frame 075 • 12-day interval (27 Jun vs 09 Jul 2026)'}
                   </span>
                 </div>
 
@@ -309,7 +309,7 @@ export default function App() {
 
             {/* Optional Collapsible Drawer: Advanced Radar Scientist Diagnostics */}
             {!loading && comparisonData && comparisonData.status !== 'UNAVAILABLE' && (isMajuli || isBarpeta) && (
-              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden transition-all">
+              <div className="bg-white rounded-xl border border-border shadow-xs overflow-hidden transition-all">
                 <div
                   role="button"
                   tabIndex={0}
@@ -320,17 +320,17 @@ export default function App() {
                       setShowAdvancedScientist(!showAdvancedScientist);
                     }
                   }}
-                  className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors cursor-pointer select-none"
+                  className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-subtle transition-colors cursor-pointer select-none"
                 >
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-md bg-indigo text-teal flex items-center justify-center">
                       <Microscope className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-sm font-bold text-slate-900 block">
+                      <span className="text-sm font-semibold text-primary block">
                         Advanced Radar Scientist Diagnostics & Physics
                       </span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-muted">
                         Inspect raw backscatter decibel histograms, Otsu equations, Lee moments, and acoustic sonification.
                       </span>
                     </div>
@@ -342,27 +342,27 @@ export default function App() {
                         e.stopPropagation();
                         handleToggleSound();
                       }}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-all cursor-pointer ${
                         soundEnabled
-                          ? 'bg-sky-100 text-sky-800 border-sky-300'
-                          : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                          ? 'bg-midnight text-aqua border-indigo'
+                          : 'bg-cloud text-body border-border hover:bg-border'
                       }`}
                       title="Toggle Web Audio radar acoustic probe pitch"
                     >
-                      {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-sky-600" /> : <VolumeX className="w-3.5 h-3.5 text-slate-400" />}
+                      {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-teal" /> : <VolumeX className="w-3.5 h-3.5 text-muted" />}
                       <span>{soundEnabled ? 'Audio: ON' : 'Audio: OFF'}</span>
                     </button>
 
                     {showAdvancedScientist ? (
-                      <ChevronUp className="w-5 h-5 text-slate-400" />
+                      <ChevronUp className="w-4 h-4 text-muted" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-slate-400" />
+                      <ChevronDown className="w-4 h-4 text-muted" />
                     )}
                   </div>
                 </div>
 
                 {showAdvancedScientist && (
-                  <div className="p-5 border-t border-slate-100 space-y-4 bg-slate-50/50">
+                  <div className="p-5 border-t border-border space-y-4 bg-subtle">
                     <ScientistRadarPanel
                       comparisonData={comparisonData}
                       parameters={comparisonData.parameters}
@@ -403,16 +403,16 @@ export default function App() {
       />
 
       {/* Modern Space-Inspired Footer */}
-      <footer className="bg-white border-t border-slate-200/90 py-5 px-4 text-xs text-slate-500 mt-10 shadow-2xs">
+      <footer className="bg-white border-t border-border py-5 px-4 text-xs text-muted mt-10 shadow-2xs">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-900">Brahmaputra FloodWatch</span>
+            <span className="font-semibold text-primary">Brahmaputra FloodWatch</span>
             <span>• NASA Space Apps Challenge 2026: *Dancing with the SARs*</span>
           </div>
-          <div className="font-mono text-slate-600">
+          <div className="font-mono text-muted">
             Sensor: NASA–ISRO NISAR (L-band 24cm & S-band 9.3cm) • Track 015 & Track 019
           </div>
-          <div className="text-slate-400">
+          <div className="text-muted">
             Open Science • Apache 2.0 License
           </div>
         </div>

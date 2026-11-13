@@ -6,26 +6,26 @@ export default function WhatChangedCard({ selectedRegionId, comparisonData, base
   const isBarpeta = selectedRegionId === 'barpeta';
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-3">
+    <div className="bg-white rounded-xl border border-border p-5 shadow-xs space-y-3">
       {/* Header */}
-      <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
-        <div className="w-7 h-7 rounded-lg bg-[#1c2541] text-[#6fffe9] border border-[#3a506b] flex items-center justify-center">
-          <HelpCircle className="w-4 h-4" />
+      <div className="flex items-center gap-2 pb-2 border-b border-border">
+        <div className="w-7 h-7 rounded-md bg-indigo text-aqua border border-dusk flex items-center justify-center">
+          <HelpCircle className="w-4 h-4 text-teal" />
         </div>
-        <h3 className="text-base font-bold text-slate-900 tracking-tight">
+        <h3 className="text-base font-semibold text-primary tracking-tight">
           What Changed?
         </h3>
-        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-cloud text-muted border border-border">
           Plain-English Scientific Summary
         </span>
       </div>
 
       {/* Content for Barpeta Two-Date Comparison */}
       {isBarpeta && (
-        <div className="space-y-3 text-xs text-slate-700 leading-relaxed">
-          <div className="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200/80 text-rose-950 space-y-1.5">
-            <div className="flex items-center gap-2 font-bold text-rose-900 text-sm">
-              <TrendingUp className="w-4 h-4 text-rose-600" />
+        <div className="space-y-3 text-xs text-body leading-relaxed">
+          <div className="p-3.5 rounded-lg bg-subtle border border-border text-primary space-y-1.5">
+            <div className="flex items-center gap-2 font-semibold text-map-inundated text-sm">
+              <TrendingUp className="w-4 h-4 text-map-inundated" />
               <span>Observed +140.77% Increase in Classified Water Area (+2.337 km²)</span>
             </div>
             <p>
@@ -37,25 +37,25 @@ export default function WhatChangedCard({ selectedRegionId, comparisonData, base
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="font-semibold text-slate-900 block mb-0.5">Permanent River Channel: 1.660 km²</span>
-              <span className="text-slate-500 text-[11px]">
+            <div className="p-3 rounded-lg bg-subtle border border-border">
+              <span className="font-semibold text-primary block mb-0.5">Permanent River Channel: 1.660 km²</span>
+              <span className="text-muted text-[11px]">
                 The main braided stream of the Brahmaputra remained continuously filled with water on both observation dates.
               </span>
             </div>
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="font-semibold text-slate-900 block mb-0.5">Receded Water: 0.000 km²</span>
-              <span className="text-slate-500 text-[11px]">
+            <div className="p-3 rounded-lg bg-subtle border border-border">
+              <span className="font-semibold text-primary block mb-0.5">Receded Water: 0.000 km²</span>
+              <span className="text-muted text-[11px]">
                 No previously wet areas dried out during this period, confirming an active increase in classified water area rather than river recession.
               </span>
             </div>
           </div>
 
           {/* Scientific Disclaimer */}
-          <div className="p-2.5 rounded-lg bg-slate-100/80 border border-slate-200 text-[11px] text-slate-600 flex items-start gap-2">
-            <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+          <div className="p-2.5 rounded-lg bg-subtle border border-border text-[11px] text-body flex items-start gap-2">
+            <Info className="w-4 h-4 text-muted shrink-0 mt-0.5" />
             <div>
-              <strong className="text-slate-800">Scientific Distinction:</strong> This is an observational remote-sensing water-classification comparison based on single-polarization HHHH radar backscatter (&Delta;&gamma;⁰ &lt; -4.50 dB). It represents satellite-detected surface water extent within the 9.152 km² Barpeta reach corridor, not independently verified structural flood damage or ground-truth surveys. It does not apply to Majuli Island or the entire Brahmaputra basin.
+              <strong className="text-primary">Scientific Distinction:</strong> This is an observational remote-sensing water-classification comparison based on single-polarization HHHH radar backscatter (&Delta;&gamma;⁰ &lt; -4.50 dB). It represents satellite-detected surface water extent within the 9.152 km² Barpeta reach corridor, not independently verified structural flood damage or ground-truth surveys. It does not apply to Majuli Island or the entire Brahmaputra basin.
             </div>
           </div>
         </div>
@@ -63,10 +63,10 @@ export default function WhatChangedCard({ selectedRegionId, comparisonData, base
 
       {/* Content for Majuli Single-Date Classification */}
       {isMajuli && (
-        <div className="space-y-3 text-xs text-slate-700 leading-relaxed">
-          <div className="p-3.5 rounded-xl bg-sky-50/70 border border-sky-200/80 text-sky-950 space-y-1.5">
-            <div className="flex items-center gap-2 font-bold text-sky-900 text-sm">
-              <Waves className="w-4 h-4 text-sky-600" />
+        <div className="space-y-3 text-xs text-body leading-relaxed">
+          <div className="p-3.5 rounded-lg bg-subtle border border-border text-primary space-y-1.5">
+            <div className="flex items-center gap-2 font-semibold text-primary text-sm">
+              <Waves className="w-4 h-4 text-teal" />
               <span>Single-Date Delineation: 797.55 km² Water Extent (13,821 Polygons)</span>
             </div>
             <p>
@@ -78,25 +78,25 @@ export default function WhatChangedCard({ selectedRegionId, comparisonData, base
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="font-semibold text-slate-900 block mb-0.5">Why Single-Date?</span>
-              <span className="text-slate-500 text-[11px]">
+            <div className="p-3 rounded-lg bg-subtle border border-border">
+              <span className="font-semibold text-primary block mb-0.5">Why Single-Date?</span>
+              <span className="text-muted text-[11px]">
                 This study demonstrates high-resolution water boundary delineation. Because only one observation pass has been processed for Track 015, no multi-date comparison is claimed.
               </span>
             </div>
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="font-semibold text-slate-900 block mb-0.5">Specular Reflection Physics</span>
-              <span className="text-slate-500 text-[11px]">
+            <div className="p-3 rounded-lg bg-subtle border border-border">
+              <span className="font-semibold text-primary block mb-0.5">Specular Reflection Physics</span>
+              <span className="text-muted text-[11px]">
                 Calm water reflects radar pulses away from the satellite, producing a dark mean return of -18.63 dB contrasting sharply with rough dry land at -8.91 dB.
               </span>
             </div>
           </div>
 
           {/* Scientific Disclaimer */}
-          <div className="p-2.5 rounded-lg bg-slate-100/80 border border-slate-200 text-[11px] text-slate-600 flex items-start gap-2">
-            <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+          <div className="p-2.5 rounded-lg bg-subtle border border-border text-[11px] text-body flex items-start gap-2">
+            <Info className="w-4 h-4 text-muted shrink-0 mt-0.5" />
             <div>
-              <strong className="text-slate-800">Scientific Distinction:</strong> Majuli is an authentic single-date water extent map. It is <strong>NOT</strong> a flood-expansion result and must never be conflated with the +140.77% Barpeta expansion metric.
+              <strong className="text-primary">Scientific Distinction:</strong> Majuli is an authentic single-date water extent map. It is <strong>NOT</strong> a flood-expansion result and must never be conflated with the +140.77% Barpeta expansion metric.
             </div>
           </div>
         </div>
@@ -104,13 +104,13 @@ export default function WhatChangedCard({ selectedRegionId, comparisonData, base
 
       {/* Content for Unsupported / Custom Area */}
       {!isMajuli && !isBarpeta && (
-        <div className="space-y-2 text-xs text-amber-900">
-          <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 space-y-1">
-            <div className="font-bold text-amber-950 flex items-center gap-1.5">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
+        <div className="space-y-2 text-xs text-primary">
+          <div className="p-3.5 rounded-lg bg-subtle border border-border space-y-1">
+            <div className="font-semibold text-primary flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4 text-dusk" />
               <span>No Processed Satellite Results for this Area</span>
             </div>
-            <p>
+            <p className="text-body">
               There are currently no processed NISAR Level-2 satellite observations for this area. To inspect authentic satellite water classifications, please select <strong>Majuli River Island</strong> or <strong>Barpeta & Lower Floodplain</strong>.
             </p>
           </div>

@@ -75,46 +75,46 @@ export default function RegionSelector({ selectedRegionId, onSelectRegion, onCus
           onClick={() => onSelectRegion('majuli')}
           className={`p-4 rounded-xl border text-left transition-all relative overflow-hidden group cursor-pointer ${
             selectedRegionId === 'majuli'
-              ? 'bg-sky-50/80 border-sky-500 ring-2 ring-sky-500/20 shadow-sm'
-              : 'bg-white border-slate-200 hover:border-sky-300 hover:bg-slate-50/50'
+              ? 'bg-subtle border-teal ring-1 ring-teal shadow-xs'
+              : 'bg-white border-border hover:border-dusk/40 hover:bg-subtle'
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm text-slate-900">Majuli River Island</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
+              <span className="font-semibold text-sm text-primary">Majuli River Island</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo text-aqua border border-dusk font-mono">
                 Track 015 / Frame 3700
               </span>
             </div>
-            <span className="text-xs font-mono font-bold text-sky-600 bg-sky-100/60 px-2 py-0.5 rounded">
+            <span className="text-xs font-mono font-medium text-teal bg-indigo px-2 py-0.5 rounded">
               Single-Date Delineation
             </span>
           </div>
 
-          <p className="text-xs text-slate-600 leading-snug mb-3">
-            High-resolution water classification outlining <strong>13,821 vector water polygons</strong> across the Brahmaputra braided channel and Subansiri confluence.
+          <p className="text-xs text-body leading-snug mb-3">
+            High-resolution water classification outlining <strong>13,821 extracted water polygons</strong> across the Brahmaputra braided channel and Subansiri confluence.
           </p>
 
-          <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-slate-200/70 text-[11px]">
+          <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-border text-[11px]">
             <div>
-              <span className="text-slate-400 block text-[10px]">Observation</span>
-              <strong className="text-slate-800 font-mono">27 Aug 2026</strong>
+              <span className="text-muted block text-[10px]">Observation</span>
+              <strong className="text-primary font-mono">27 Aug 2026</strong>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px]">Water Area</span>
-              <strong className="text-sky-700 font-mono">797.55 km²</strong>
+              <span className="text-muted block text-[10px]">Water Area</span>
+              <strong className="text-primary font-mono font-semibold">797.55 km²</strong>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px]">Coverage</span>
-              <strong className="text-slate-800 font-mono">8.91% of swath</strong>
+              <span className="text-muted block text-[10px]">Coverage</span>
+              <strong className="text-primary font-mono">8.91% of swath</strong>
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="mt-2.5 pt-2 border-t border-border flex items-center justify-between text-[11px] text-muted">
             <span>● 13,821 Polygons</span>
             <span>● Single-Pol HHHH (10m)</span>
-            <span className="text-emerald-600 font-semibold flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" /> Ready
+            <span className="text-teal font-semibold flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-teal" /> Ready
             </span>
           </div>
         </button>
@@ -124,46 +124,46 @@ export default function RegionSelector({ selectedRegionId, onSelectRegion, onCus
           onClick={() => onSelectRegion('barpeta')}
           className={`p-4 rounded-xl border text-left transition-all relative overflow-hidden group cursor-pointer ${
             selectedRegionId === 'barpeta'
-              ? 'bg-rose-50/80 border-rose-500 ring-2 ring-rose-500/20 shadow-sm'
-              : 'bg-white border-slate-200 hover:border-rose-300 hover:bg-slate-50/50'
+              ? 'bg-subtle border-teal ring-1 ring-teal shadow-xs'
+              : 'bg-white border-border hover:border-dusk/40 hover:bg-subtle'
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm text-slate-900">Barpeta & Lower Floodplain</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+              <span className="font-semibold text-sm text-primary">Barpeta & Lower Floodplain</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo text-aqua border border-dusk font-mono">
                 Track 019 / Frame 075
               </span>
             </div>
-            <span className="text-xs font-mono font-bold text-rose-600 bg-rose-100/60 px-2 py-0.5 rounded">
+            <span className="text-xs font-mono font-medium text-teal bg-indigo px-2 py-0.5 rounded">
               Two-Date Comparison
             </span>
           </div>
 
-          <p className="text-xs text-slate-600 leading-snug mb-3">
+          <p className="text-xs text-body leading-snug mb-3">
             Multi-temporal water classification comparison detecting a <strong>+140.77% increase in classified water area</strong> (+2.337 km² newly inundated land) in the evaluated 9.152 km² corridor over the 12-day interval between available observations.
           </p>
 
-          <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-slate-200/70 text-[11px]">
+          <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-border text-[11px]">
             <div>
-              <span className="text-slate-400 block text-[10px]">Observations</span>
-              <strong className="text-slate-800 font-mono">27 Jun vs 09 Jul</strong>
+              <span className="text-muted block text-[10px]">Observations</span>
+              <strong className="text-primary font-mono">27 Jun vs 09 Jul</strong>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px]">Area Increase</span>
-              <strong className="text-rose-600 font-mono">+140.77%</strong>
+              <span className="text-muted block text-[10px]">Area Increase</span>
+              <strong className="text-map-inundated font-mono font-semibold">+140.77%</strong>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px]">Newly Inundated</span>
-              <strong className="text-rose-700 font-mono">+2.337 km²</strong>
+              <span className="text-muted block text-[10px]">Newly Inundated</span>
+              <strong className="text-map-inundated font-mono font-semibold">+2.337 km²</strong>
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="mt-2.5 pt-2 border-t border-border flex items-center justify-between text-[11px] text-muted">
             <span>● 1.660 → 3.997 km²</span>
             <span>● Track 019 / Frame 075</span>
-            <span className="text-emerald-600 font-semibold flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" /> Ready
+            <span className="text-teal font-semibold flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3 text-teal" /> Ready
             </span>
           </div>
         </button>

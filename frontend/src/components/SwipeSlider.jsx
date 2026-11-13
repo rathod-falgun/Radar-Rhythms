@@ -171,37 +171,39 @@ export default function SwipeSlider({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs flex flex-col justify-between">
+    <div className="bg-white rounded-xl border border-border p-4 shadow-xs flex flex-col justify-between">
       {/* Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
-          <MoveHorizontal className="w-4 h-4 text-sky-600" />
-          <h3 className="text-sm font-bold text-slate-900">
+          <div className="w-6 h-6 rounded-md bg-indigo flex items-center justify-center text-teal">
+            <MoveHorizontal className="w-3.5 h-3.5" />
+          </div>
+          <h3 className="text-sm font-semibold text-primary">
             Interactive Curtain Swipe Comparator
           </h3>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
-            12-Day Revisit
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo text-aqua border border-indigo font-medium">
+            12-day interval
           </span>
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
+        <div className="flex items-center gap-1 bg-subtle p-0.5 rounded-lg border border-border text-xs font-medium">
           <button
             onClick={() => setViewMode('radar_vs_flood')}
-            className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
               viewMode === 'radar_vs_flood'
-                ? 'bg-white text-sky-700 font-bold shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-primary font-semibold shadow-2xs border border-border'
+                : 'text-muted hover:text-primary'
             }`}
           >
             Baseline SAR vs Inundation Map
           </button>
           <button
             onClick={() => setViewMode('radar_vs_radar')}
-            className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
               viewMode === 'radar_vs_radar'
-                ? 'bg-white text-sky-700 font-bold shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-primary font-semibold shadow-2xs border border-border'
+                : 'text-muted hover:text-primary'
             }`}
           >
             Direct SAR Backscatter (HH dB)
@@ -216,7 +218,7 @@ export default function SwipeSlider({
         onMouseUp={() => setIsDragging(false)}
         onMouseLeave={() => { setIsDragging(false); setHoveredPixel(null); }}
         onMouseMove={handlePointerMove}
-        className="relative w-full aspect-video md:aspect-[2/1] rounded-xl overflow-hidden border border-slate-300 bg-slate-950 cursor-col-resize select-none shadow-inner"
+        className="relative w-full aspect-video md:aspect-[2/1] rounded-lg overflow-hidden border border-border bg-midnight cursor-col-resize select-none shadow-inner"
       >
         {/* Right Canvas (Event Scene / Inundation) */}
         <div className="absolute inset-0 w-full h-full">
@@ -226,7 +228,7 @@ export default function SwipeSlider({
             height={120}
             className="w-full h-full object-cover image-rendering-pixelated"
           />
-          <div className="absolute top-3 right-3 bg-white/95 text-rose-700 text-xs px-2.5 py-1 rounded-md font-mono border border-rose-200 shadow-sm backdrop-blur pointer-events-none font-semibold">
+          <div className="absolute top-3 right-3 bg-white/95 text-[#E11D48] text-xs px-2.5 py-1 rounded-md font-mono border border-border shadow-xs backdrop-blur-xs pointer-events-none font-semibold">
             {viewMode === 'radar_vs_flood' ? 'After: Flood Map' : `After: ${eventDate}`}
           </div>
         </div>
@@ -244,49 +246,49 @@ export default function SwipeSlider({
               className="w-full h-full object-cover image-rendering-pixelated"
             />
           </div>
-          <div className="absolute top-3 left-3 bg-white/95 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-mono border border-emerald-200 shadow-sm backdrop-blur pointer-events-none font-semibold">
+          <div className="absolute top-3 left-3 bg-white/95 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-mono border border-border shadow-xs backdrop-blur-xs pointer-events-none font-semibold">
             Before: {baselineDate}
           </div>
         </div>
 
         {/* Slider Divider Bar */}
         <div
-          className="absolute top-0 bottom-0 w-0.5 bg-sky-400 shadow-[0_0_10px_rgba(2,132,199,0.8)] cursor-col-resize"
+          className="absolute top-0 bottom-0 w-0.5 bg-teal cursor-col-resize"
           style={{ left: `${sliderPosition}%` }}
         >
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white border-2 border-sky-500 flex items-center justify-center text-sky-600 shadow-md">
-            <MoveHorizontal className="w-4 h-4" />
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white border-2 border-teal flex items-center justify-center text-midnight shadow-md">
+            <MoveHorizontal className="w-3.5 h-3.5" />
           </div>
         </div>
       </div>
 
       {/* Live Pixel Probe & Value Inspector */}
       {hoveredPixel && (
-        <div className="mt-2.5 bg-slate-50 border border-sky-200 rounded-xl p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
+        <div className="mt-2.5 bg-subtle border border-border rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
-            <Crosshair className="w-4 h-4 text-sky-600 animate-spin" />
-            <span className="font-mono text-slate-800 font-bold">
+            <Crosshair className="w-4 h-4 text-teal animate-spin" />
+            <span className="font-mono text-primary font-semibold">
               Pixel [{hoveredPixel.x}, {hoveredPixel.y}]:
             </span>
             <span
-              className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+              className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
                 hoveredPixel.cls_code === 2
-                  ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                  ? 'bg-rose-50 text-[#E11D48] border border-rose-200'
                   : hoveredPixel.cls_code === 4
-                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : hoveredPixel.cls_code === 1
-                  ? 'bg-sky-100 text-sky-800 border border-sky-300'
-                  : 'bg-slate-200 text-slate-700'
+                  ? 'bg-sky-50 text-[#06B6D4] border border-sky-200'
+                  : 'bg-white text-muted border border-border'
               }`}
             >
               {hoveredPixel.class_name}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-[11px] text-slate-700">
-            <span>Before: <strong>{hoveredPixel.base_db.toFixed(1)} dB</strong></span>
-            <span>After: <strong>{hoveredPixel.event_db.toFixed(1)} dB</strong></span>
-            <span className={hoveredPixel.delta_db < 0 ? 'text-rose-600 font-bold' : 'text-emerald-600 font-bold'}>
+          <div className="flex items-center gap-3 font-mono text-[11px] text-body">
+            <span>Before: <strong className="text-primary">{hoveredPixel.base_db.toFixed(1)} dB</strong></span>
+            <span>After: <strong className="text-primary">{hoveredPixel.event_db.toFixed(1)} dB</strong></span>
+            <span className={hoveredPixel.delta_db < 0 ? 'text-[#E11D48] font-bold' : 'text-emerald-700 font-bold'}>
               Δ: {hoveredPixel.delta_db > 0 ? '+' : ''}{hoveredPixel.delta_db.toFixed(1)} dB
             </span>
           </div>
@@ -294,40 +296,40 @@ export default function SwipeSlider({
       )}
 
       {/* Legend & Instructions */}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-slate-700 font-medium">Map Legend:</span>
+          <span className="text-primary font-medium">Map Legend:</span>
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-blue-600"></span>
+            <span className="w-3 h-3 rounded-xs bg-[#06B6D4]"></span>
             <span>Permanent Channel (1.66 km²)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-rose-500"></span>
-            <span className="text-rose-700 font-semibold">Newly Inundated (+2.34 km²)</span>
+            <span className="w-3 h-3 rounded-xs bg-[#E11D48]"></span>
+            <span className="text-[#E11D48] font-semibold">Newly Inundated (+2.34 km²)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-slate-400"></span>
+            <span className="w-3 h-3 rounded-xs bg-[#64748B]"></span>
             <span>Stable Land</span>
           </div>
         </div>
 
-        <div className="text-[11px] text-slate-400 italic">
+        <div className="text-[11px] text-muted italic">
           💡 Drag slider to compare • Hover over pixels to inspect decibels
         </div>
       </div>
 
       {/* Barpeta Verified Mathematical Proof Banner */}
       {(comparisonData?.region?.id === 'barpeta' || comparisonData?.statistics?.percentage_change === 140.77) && (
-        <div className="mt-3 p-2.5 rounded-xl bg-rose-50/80 border border-rose-200 text-xs font-mono text-rose-900 flex flex-wrap items-center justify-between gap-2">
+        <div className="mt-3 p-2.5 rounded-lg bg-subtle border border-border text-xs font-mono text-primary flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded bg-rose-200 text-rose-800 font-bold text-[10px] uppercase">
+            <span className="px-2 py-0.5 rounded-md bg-rose-50 text-[#E11D48] border border-rose-200 font-semibold text-[10px] uppercase">
               Calculation
             </span>
-            <span className="text-slate-700">
-              ((3.997 km² After - 1.660 km² Before) / 1.660 km²) × 100 = <strong className="text-rose-700 font-bold">+140.77%</strong>
+            <span className="text-body">
+              ((3.997 km² After - 1.660 km² Before) / 1.660 km²) × 100 = <strong className="text-[#E11D48] font-bold">+140.77%</strong>
             </span>
           </div>
-          <div className="text-[10px] text-slate-500">
+          <div className="text-[10px] text-muted font-mono">
             Track 019 / Frame 075 • Evaluated corridor: 9.152 km²
           </div>
         </div>
