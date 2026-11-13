@@ -11,7 +11,8 @@ export default function DateSelector({
   onSelectEvent,
   onThresholdChange,
   onToggleSpeckleFilter,
-  onApplyPreset
+  onApplyPreset,
+  selectedRegionId
 }) {
   return (
     <div className="bg-[#111827] rounded-xl border border-slate-800 p-4 shadow-xl">
@@ -33,6 +34,18 @@ export default function DateSelector({
           </button>
         </div>
       </div>
+
+      {selectedRegionId === 'majuli' && (
+        <div className="mb-3 p-2.5 rounded-lg bg-cyan-950/40 border border-cyan-800/80 text-cyan-200 text-xs flex items-center gap-2.5">
+          <AlertCircle className="w-4 h-4 text-cyan-400 shrink-0" />
+          <div className="flex-1">
+            <span className="font-bold text-white">Majuli Observation Notice:</span>{' '}
+            The 12-day timeline below shows the Track 019 flood progression.
+            The active <strong>Majuli Reach</strong> displays our verified NISAR extraction from{' '}
+            <strong>2026-08-27 (Track 015 / Frame 3700)</strong> with 13,821 real classified water polygons (797.55 km²).
+          </div>
+        </div>
+      )}
 
       {/* Revisit Sequence Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 mb-4">
@@ -116,11 +129,11 @@ export default function DateSelector({
           <span className="text-slate-600">➔</span>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-            <span className="text-slate-400">Event (Flood Peak):</span>
+            <span className="text-slate-400">Event Observation:</span>
             <span className="text-rose-300 font-mono font-bold">{eventDate}</span>
           </div>
           <div className="text-slate-500 hidden sm:inline font-mono">
-            (Exact 12-Day Revisit Matched Orbit)
+            (12-Day Inter-Observation Interval)
           </div>
         </div>
 

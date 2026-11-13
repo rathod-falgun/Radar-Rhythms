@@ -25,7 +25,7 @@ export default function PersonaSwitcher({
       icon: Microscope,
       color: 'text-cyan-400',
       activeBg: 'bg-cyan-950/80 border-cyan-600 text-white shadow-cyan-900/40',
-      description: 'Dual-pol decomposition, Otsu bimodal curves & HDF5 inspection'
+      description: 'Radar backscatter distributions, Otsu bimodal curves & HDF5 inspection'
     },
     {
       id: 'student',

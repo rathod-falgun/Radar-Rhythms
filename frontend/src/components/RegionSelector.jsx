@@ -12,7 +12,7 @@ export default function RegionSelector({ regions, selectedRegionId, onSelectRegi
           </h2>
         </div>
         <span className="text-[11px] text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-          Track 019 Swath
+          {selectedRegionId === 'majuli' ? 'NISAR Track 015 (Frame 3700)' : 'NISAR Track 019 (Frame 075)'}
         </span>
       </div>
 
@@ -44,7 +44,18 @@ export default function RegionSelector({ regions, selectedRegionId, onSelectRegi
                 />
               </div>
 
-              <div className="text-[11px] text-slate-400 truncate mb-2">{reg.district}</div>
+              <div className="text-[11px] text-slate-400 truncate mb-1">{reg.district}</div>
+
+              {reg.id === 'majuli' ? (
+                <div className="mb-2">
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                    Verified NISAR Extraction
+                  </span>
+                </div>
+              ) : (
+                <div className="mb-2 text-[10px] text-slate-500">Track 019 Model</div>
+              )}
 
               <div className="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-800/80">
                 <span className="text-slate-500 font-mono">{reg.area_km2} km²</span>

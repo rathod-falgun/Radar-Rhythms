@@ -60,3 +60,4 @@ Thumbs.db
 .vscode/
 .idea/
 rewrite_author.sh
+scratch/
