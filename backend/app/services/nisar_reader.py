@@ -18,63 +18,127 @@ class NISARGCOVReader:
     """
 
     @staticmethod
+    def inspect_open_h5(
+        h5: h5py.File,
+        source_id: str,
+        file_size_bytes: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """
+        Inspects an already-open h5py.File object (local file or remote fileobj stream).
+        Traverses CF-compliant NISAR groups, extracts dataset properties (shape, dtype, units,
+        compression, chunks, storage size, dataset offset) and metadata attributes.
+        Never reads dataset pixel arrays into memory.
+        """
+        # Determine instrument group: SSAR (ISRO S-band) or LSAR (NASA L-band)
+        science_grp = h5.get("science")
+        if science_grp is None:
+            raise ValueError("Invalid NISAR format: Root '/science' group missing.")
+
+        instrument = "SSAR" if "SSAR" in science_grp else "LSAR"
+        gcov_grp = science_grp[instrument].get("GCOV")
+        if gcov_grp is None:
+            raise ValueError(f"Invalid NISAR product: '/science/{instrument}/GCOV' missing.")
+
+        grids_grp = gcov_grp.get("grids")
+        freq_names = list(grids_grp.keys()) if grids_grp else []
+
+        bands_info: Dict[str, List[Dict[str, Any]]] = {}
+        for freq in freq_names:
+            freq_grp = grids_grp[freq]
+            bands_info[freq] = []
+            for key in freq_grp.keys():
+                item = freq_grp[key]
+                if isinstance(item, h5py.Dataset):
+                    storage_size = None
+                    try:
+                        if hasattr(item, "id") and hasattr(item.id, "get_storage_size"):
+                            storage_size = int(item.id.get_storage_size())
+                    except Exception:
+                        pass
+
+                    offset = None
+                    try:
+                        if hasattr(item, "id") and hasattr(item.id, "get_offset"):
+                            off = item.id.get_offset()
+                            if off is not None and off >= 0:
+                                offset = int(off)
+                    except Exception:
+                        pass
+
+                    compression = str(item.compression) if item.compression else None
+                    chunks = list(item.chunks) if item.chunks else None
+
+                    bands_info[freq].append({
+                        "name": key,
+                        "path": str(item.name),
+                        "shape": list(item.shape),
+                        "dtype": str(item.dtype),
+                        "units": item.attrs.get("units", "linear power (gamma-0)"),
+                        "compression": compression,
+                        "chunks": chunks,
+                        "storage_size_bytes": storage_size,
+                        "offset": offset
+                    })
+
+        # Check projection metadata
+        epsg_code = 32646  # Default UTM 46N for Assam
+        proj_attrs: Dict[str, Any] = {}
+        if grids_grp and "frequencyA" in grids_grp and "projection" in grids_grp["frequencyA"]:
+            proj_ds = grids_grp["frequencyA"]["projection"]
+            epsg_code = int(proj_ds.attrs.get("epsg_code", 32646))
+            for a_key, a_val in proj_ds.attrs.items():
+                try:
+                    proj_attrs[str(a_key)] = a_val.tolist() if hasattr(a_val, "tolist") else str(a_val)
+                except Exception:
+                    pass
+
+        # Read granule identification if present
+        ident_grp = gcov_grp.get("identification", {})
+        granule_id = os.path.basename(source_id)
+        ident_attrs: Dict[str, Any] = {}
+        if hasattr(ident_grp, "attrs"):
+            granule_id = ident_grp.attrs.get("granule_id", granule_id)
+            for a_key, a_val in ident_grp.attrs.items():
+                try:
+                    ident_attrs[str(a_key)] = a_val.tolist() if hasattr(a_val, "tolist") else str(a_val)
+                except Exception:
+                    pass
+
+        file_size_mb = (
+            round(file_size_bytes / (1024 * 1024), 2) if file_size_bytes is not None else None
+        )
+
+        return {
+            "filepath": source_id,
+            "file_size_mb": file_size_mb,
+            "instrument": instrument,
+            "product_type": "L2_GCOV (Geocoded Polarimetric Covariance)",
+            "granule_id": str(granule_id),
+            "frequencies": freq_names,
+            "bands": bands_info,
+            "epsg_code": epsg_code,
+            "projection": f"EPSG:{epsg_code} (WGS84 / UTM Zone 46N)",
+            "projection_attributes": proj_attrs,
+            "identification": ident_attrs
+        }
+
+    @staticmethod
     def inspect_hdf5_structure(filepath: str) -> Dict[str, Any]:
         """
         Inspects an actual NISAR HDF5 file, reporting available frequencies,
         polarization datasets, dimensions, projection, and metadata.
+        Preserves backward compatibility for local file paths.
         """
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"NISAR product not found at path: {filepath}")
 
+        file_size = os.path.getsize(filepath)
         with h5py.File(filepath, "r") as h5:
-            # Determine instrument group: SSAR (ISRO S-band) or LSAR (NASA L-band)
-            science_grp = h5.get("science")
-            if science_grp is None:
-                raise ValueError("Invalid NISAR format: Root '/science' group missing.")
-
-            instrument = "SSAR" if "SSAR" in science_grp else "LSAR"
-            gcov_grp = science_grp[instrument].get("GCOV")
-            if gcov_grp is None:
-                raise ValueError(f"Invalid NISAR product: '/science/{instrument}/GCOV' missing.")
-
-            grids_grp = gcov_grp.get("grids")
-            freq_names = list(grids_grp.keys()) if grids_grp else []
-
-            bands_info = {}
-            for freq in freq_names:
-                freq_grp = grids_grp[freq]
-                bands_info[freq] = []
-                for key in freq_grp.keys():
-                    item = freq_grp[key]
-                    if isinstance(item, h5py.Dataset):
-                        bands_info[freq].append({
-                            "name": key,
-                            "shape": list(item.shape),
-                            "dtype": str(item.dtype),
-                            "units": item.attrs.get("units", "linear power (gamma-0)")
-                        })
-
-            # Check projection metadata
-            epsg_code = 32646  # Default UTM 46N for Assam
-            if "frequencyA" in grids_grp and "projection" in grids_grp["frequencyA"]:
-                proj_ds = grids_grp["frequencyA"]["projection"]
-                epsg_code = int(proj_ds.attrs.get("epsg_code", 32646))
-
-            # Read granule identification if present
-            ident_grp = gcov_grp.get("identification", {})
-            granule_id = ident_grp.attrs.get("granule_id", os.path.basename(filepath))
-
-            return {
-                "filepath": filepath,
-                "file_size_mb": round(os.path.getsize(filepath) / (1024 * 1024), 2),
-                "instrument": instrument,
-                "product_type": "L2_GCOV (Geocoded Polarimetric Covariance)",
-                "granule_id": str(granule_id),
-                "frequencies": freq_names,
-                "bands": bands_info,
-                "epsg_code": epsg_code,
-                "projection": f"EPSG:{epsg_code} (WGS84 / UTM Zone 46N)"
-            }
+            return NISARGCOVReader.inspect_open_h5(
+                h5,
+                source_id=filepath,
+                file_size_bytes=file_size
+            )
 
     @staticmethod
     def read_calibrated_backscatter(

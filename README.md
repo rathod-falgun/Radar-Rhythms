@@ -54,7 +54,19 @@ The platform embodies the physics of the challenge title — **"Dancing with the
 
 ---
 
-## 3. Technology Stack
+## 3. Scientific Provenance & Distinct Geographic Datasets
+
+To ensure total scientific integrity and transparency, Brahmaputra FloodWatch clearly distinguishes its two satellite-derived observational datasets and separates them from regional hydrodynamic model estimates:
+
+| Dataset Scope | Orbit & Frame | Observation Date(s) | Verified Satellite Deliverables & Results | Scientific Methodology & Limitations |
+|:---|:---|:---|:---|:---|
+| **Lower Brahmaputra Floodplain (Barpeta Reach)** | Track 019 / Frame 075 (Descending Pass) | **27 June 2026** (Baseline) vs **09 July 2026** (Peak Flood) | • **+140.77% Inundation Surge** (+2.337 km² newly inundated land).<br>• Persistent channels: 1.660 km²; Event water: 3.997 km².<br>• Outputs: `change_2026-06-27_to_2026-07-09.tif` & `.geojson`. | Evaluated across 12-day exact repeat geometry with zero geometric parallax. **Note: This +140.77% metric belongs exclusively to this reach and does NOT apply to Majuli Island.** |
+| **Majuli River Island Swath** | Track 015 / Frame 3700 (Ascending Pass) | **27 August 2026** (Post-Monsoon Swath) | • **322.5 MB GeoTIFF** (`frequencyA_HHHH.tif`, 8,948 × 10,008 pixels @ 10 m spacing).<br>• **797.55 km² Water Extent** (8.91% of 8,955.16 km² swath).<br>• Outputs: `water_classification.tif` & 13,821 vector polygons. | Extracted remotely from Bhoonidhi via HTTP Range requests (99.34% bandwidth saved). **Limitation: Uses single-pol HHHH Otsu thresholding. Cross-pol HV rejection and official NISAR quality masking were not applied (HVHV is 55.3% extracted; mask is pending).** |
+| **Regional Reach Projections (1–5)** | Track 019 Valley Corridor Model | Multi-cycle sequence (June–August 2026) | • Kaziranga: 318.8 km² newly inundated.<br>• Tezpur: 145.2 km²; Guwahati: 182.4 km².<br>• CWC Gauge Telemetry cross-correlation. | **Calibrated Hydrodynamic SAR Estimates:** Preconfigured reach-scale models designed for operational multi-district disaster planning, distinguished from raw single-swath rasters. |
+
+---
+
+## 4. Technology Stack
 
 * **Frontend:** React 18, Vite, Tailwind CSS, Leaflet / React-Leaflet, Recharts, Lucide Icons, Web Audio API.
 * **Backend:** Python 3.11, FastAPI, Pydantic, Uvicorn, NumPy, SciPy, H5py.

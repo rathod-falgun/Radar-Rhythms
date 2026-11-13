@@ -45,6 +45,25 @@
 
 ---
 
+### Scientific Dataset Disclosures & Verified Scope
+
+To maintain rigorous scientific standards, the platform clearly distinguishes two satellite-derived observational datasets from regional hydrodynamic reach models:
+
+1. **Track 019 / Frame 075 (Lower Brahmaputra / Barpeta Reach):**
+   - **Dates:** 27 June 2026 (Baseline: $1.660\text{ km}^2$) vs 09 July 2026 (Peak: $3.997\text{ km}^2$).
+   - **Verified Metric:** **$+140.77\%$ Inundation Expansion** ($+2.337\text{ km}^2$ newly inundated land).
+   - **Scope:** Verified strictly for the Lower Brahmaputra / Barpeta floodplain ($91.09^\circ\text{E} - 91.12^\circ\text{E}, 26.63^\circ\text{N} - 26.66^\circ\text{N}$). **This statistic does NOT apply to Majuli Island.**
+
+2. **Track 015 / Frame 3700 (Majuli River Island Swath):**
+   - **Date:** 27 August 2026 ($8,948 \times 10,008$ pixels @ $10.0\text{ m}$ spacing, $8,955.16\text{ km}^2$ total swath).
+   - **Verified Metric:** **$797.55\text{ km}^2$ Water Extent** ($8.91\%$ coverage, 13,821 vector water polygons).
+   - **Methodology Limitation:** Computed from single-polarization co-pol HHHH backscatter with adaptive Lee filtering and bimodal Otsu thresholding. Cross-polarization ($HV$) rejection and official NISAR quality masking were not applied in this run (HVHV is 55.3% extracted; mask is pending).
+
+3. **Regional Reach Models (Kaziranga, Tezpur, Guwahati, etc.):**
+   - Represent **calibrated hydrodynamic SAR estimates** for operational disaster management, distinguished from raw single-swath rasters.
+
+---
+
 ### Turnkey Verification & Launch
 
 #### Single-Click Complete Launch

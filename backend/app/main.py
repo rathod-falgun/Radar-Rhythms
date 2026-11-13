@@ -49,7 +49,8 @@ def root():
             "/api/nisar/auth/test",
             "/api/nisar/scenes",
             "/api/nisar/scenes/{item_id}/details",
-            "/api/nisar/scenes/{item_id}/download-preflight"
+            "/api/nisar/scenes/{item_id}/download-preflight",
+            "/api/nisar/scenes/{item_id}/remote-inspect"
         ]
     }
 

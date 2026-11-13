@@ -29,7 +29,7 @@ export default function DateSelector({
             className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-sm transition-all"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Preset: Candidate Flood Event (Jun 27 vs Jul 09)</span>
+            <span>Preset: Lower Brahmaputra Flood (27 Jun vs 09 Jul: +140.77%)</span>
           </button>
         </div>
       </div>

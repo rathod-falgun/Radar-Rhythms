@@ -717,6 +717,14 @@ class BhoonidhiService:
     # Safe Download Preflight Inspection (GET /download?id={item_id}&collection={collection})
     # -------------------------------------------------------------------------
 
+    def get_download_rate_limiter(self):
+        """
+        Retrieves the shared global rate limiter coordinating all /download requests
+        (both preflight and Range requests) across threads within this process.
+        """
+        from .bhoonidhi_stream import global_download_rate_limiter
+        return global_download_rate_limiter
+
     def check_download_preflight(
         self,
         item_id: str,
@@ -724,10 +732,11 @@ class BhoonidhiService:
     ) -> Dict[str, Any]:
         """
         Executes a safe preflight check against Bhoonidhi's /download endpoint.
+        Enforces the shared 30-second rate limiter (max 2 downloads/minute).
         Uses HTTP stream=True, allow_redirects=False, and NEVER reads or saves the response body.
         Closes the HTTP stream immediately in a finally block.
         Inspects headers only to determine file presence, content type, length, and redirect status.
-        Never retries on failure (respecting Bhoonidhi's 2 downloads/minute policy).
+        Never retries on failure.
         """
         if not item_id or not item_id.strip():
             raise ValueError("item_id must not be empty.")
@@ -736,7 +745,21 @@ class BhoonidhiService:
         if target_collection not in settings.ALLOWED_COLLECTIONS:
             raise ValueError(f"Collection '{target_collection}' is not allowed.")
 
+        # 1. Refresh/retrieve Bearer token BEFORE claiming /download rate-limiter slot
         access_token = self.get_valid_access_token()
+
+        # 2. Acquire slot from shared global rate limiter
+        limiter = self.get_download_rate_limiter()
+        acquire_timeout = max(
+            120.0,
+            self.timeout * 2,
+            limiter.get_time_until_next_allowed()
+            + limiter.effective_window
+            + limiter.min_interval
+            + 30.0,
+        )
+        limiter.acquire(timeout=acquire_timeout)
+
         url = f"{self.base_url}/download"
         params = {"id": item_id.strip(), "collection": target_collection}
         headers = {
@@ -747,6 +770,7 @@ class BhoonidhiService:
         logger.info(f"Initiating safe download preflight for '{item_id}' (stream=True, allow_redirects=False)...")
 
         response = None
+        cooldown_applied = False
         try:
             # stream=True ensures body is not downloaded; allow_redirects=False halts on 3xx
             response = requests.get(
@@ -845,6 +869,8 @@ class BhoonidhiService:
                 )
                 success = False
             elif status_code == 429:
+                limiter.apply_http_429_cooldown(resp_headers.get("Retry-After"))
+                cooldown_applied = True
                 preflight_status = "rate_limited"
                 message = (
                     "Bhoonidhi download rate limit reached (HTTP 429). "
@@ -914,6 +940,8 @@ class BhoonidhiService:
                     response.close()
                 except Exception:
                     pass
+            if not cooldown_applied:
+                limiter.record_completion()
 
 
 # Singleton instance

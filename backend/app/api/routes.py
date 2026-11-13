@@ -1,11 +1,20 @@
+# pyrefly: ignore[missing-import]
 from fastapi import APIRouter, Query, HTTPException, UploadFile, File, Response, Body
+from fastapi.responses import FileResponse
 import os
 import io
 import csv
 import json
 import shutil
+from pathlib import Path
 from typing import Dict, Any, List, Optional
+# pyrefly: ignore[missing-import]
 from pydantic import BaseModel, Field
+import h5py
+# pyrefly: ignore[missing-import]
+import rasterio
+# pyrefly: ignore[missing-import]
+from rasterio.transform import from_origin
 from ..services.nisar_metadata import (
     NISAR_OBSERVATION_CATALOG,
     STUDY_REGIONS,
@@ -21,7 +30,77 @@ from ..services.bhoonidhi_service import (
     BhoonidhiRateLimitError,
     BhoonidhiAPIError
 )
+from ..services.bhoonidhi_stream import (
+    BhoonidhiRangeStream,
+    BhoonidhiStreamError,
+    BhoonidhiStreamRateLimitError
+)
+from ..services.nisar_subset import (
+    DEFAULT_SUBSET_CACHE_BYTES,
+    NISARSubsetError,
+    NISARSubsetValidationError
+)
+from ..services.subset_job_manager import (
+    subset_job_manager,
+    SubsetJobNotFoundError,
+    SubsetJobStateError
+)
+from ..services.water_detector import detect_water_from_geotiffs
+from ..services.flood_change_detector import compare_two_observations
 from ..core.config import settings
+
+
+class WaterDetectionRequest(BaseModel):
+    job_id: Optional[str] = Field(default=None, description="Subset job ID containing extracted GeoTIFFs")
+    hhhh_path: Optional[str] = Field(default=None, description="Direct path to HHHH GeoTIFF")
+    hvhv_path: Optional[str] = Field(default=None, description="Direct path to HVHV GeoTIFF")
+    mask_path: Optional[str] = Field(default=None, description="Direct path to mask GeoTIFF")
+    threshold_db: Optional[float] = Field(default=None, description="Optional custom decibel threshold")
+    apply_speckle_filter: bool = Field(default=True, description="Enable adaptive Lee speckle filtering")
+    min_cluster_pixels: int = Field(default=5, ge=1, description="Minimum cluster size in pixels (MMU filter)")
+
+
+class MultiDateChangeRequest(BaseModel):
+    baseline_date: str = Field(description="Baseline observation date (YYYY-MM-DD)")
+    event_date: str = Field(description="Event flood observation date (YYYY-MM-DD)")
+    baseline_job_id: Optional[str] = Field(default=None, description="Optional subset job ID for baseline date")
+    event_job_id: Optional[str] = Field(default=None, description="Optional subset job ID for event date")
+    min_cluster_pixels: int = Field(default=4, ge=1, description="Minimum cluster size in pixels for change polygons")
+
+
+class NISARRemoteSubsetRequest(BaseModel):
+    collection: Optional[str] = Field(
+        default=None,
+        description="Target STAC collection (default: NISAR_SSAR_GCOV)"
+    )
+    frequency: str = Field(
+        default="frequencyA",
+        description="NISAR frequency grid group (default: frequencyA)"
+    )
+    layers: Optional[List[str]] = Field(
+        default=None,
+        description="Explicit layers to extract (defaults to HHHH, HVHV, mask)"
+    )
+    include_exception_mask: bool = Field(
+        default=False,
+        description="Optional: include contiguous inputDataExceptionMask layer"
+    )
+    include_number_of_looks: bool = Field(
+        default=False,
+        description="Optional: include chunked numberOfLooks layer"
+    )
+    wgs84_bbox: Optional[List[float]] = Field(
+        default=None,
+        description="Bounding box [west, south, east, north] in EPSG:4326 (defaults to DEFAULT_MAJULI_BBOX)"
+    )
+    projected_bounds: Optional[List[float]] = Field(
+        default=None,
+        description="Optional projected bounds [x_min, y_min, x_max, y_max] in EPSG:32646"
+    )
+    cache_max_disk_bytes: int = Field(
+        default=DEFAULT_SUBSET_CACHE_BYTES,
+        description="Job-scoped disk cache limit in bytes (default: 2.5 GB)"
+    )
 
 class NISARSceneSearchRequest(BaseModel):
     bbox: Optional[List[float]] = Field(
@@ -462,6 +541,464 @@ def check_nisar_download_preflight(
         raise HTTPException(status_code=e.status_code, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error executing download preflight: {str(e)}")
+
+
+@router.post("/nisar/scenes/{item_id}/remote-inspect")
+def remote_inspect_nisar_scene(
+    item_id: str,
+    collection: Optional[str] = Query(None, description="STAC collection ID (default: NISAR_SSAR_GCOV)")
+) -> Dict[str, Any]:
+    """
+    Remotely inspects a NISAR Level 2 GCOV HDF5 container from ISRO Bhoonidhi
+    via HTTP byte-range requests using h5py's fileobj driver.
+    Discovers total file size dynamically from the first HTTP Range request's
+    Content-Range header without requiring a separate preflight or STAC product_size.
+    Reads metadata and dataset properties without downloading the full 12.67 GB file
+    and without loading image pixel arrays.
+    """
+    target_collection = collection or settings.DEFAULT_COLLECTION
+    if target_collection not in settings.ALLOWED_COLLECTIONS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Collection '{target_collection}' is not supported. Allowed collections: {settings.ALLOWED_COLLECTIONS}"
+        )
+
+    if not item_id or not item_id.strip():
+        raise HTTPException(status_code=422, detail="item_id must not be empty.")
+
+    stream = None
+    h5_file = None
+    try:
+        # 1. Construct BhoonidhiRangeStream with dynamic total size discovery
+        #    via a single initial Range: bytes=0-8388607 request.
+        stream = BhoonidhiRangeStream(
+            item_id=item_id,
+            collection=target_collection,
+            timeout=settings.BHOONIDHI_TIMEOUT_SECONDS
+        )
+        total_size = stream.total_size
+
+        # 2. Open stream using h5py with driver="fileobj"
+        h5_file = h5py.File(stream, "r", driver="fileobj")
+
+        # 3. Extract metadata using reusable helper without loading pixel arrays
+        metadata = NISARGCOVReader.inspect_open_h5(
+            h5_file,
+            source_id=item_id,
+            file_size_bytes=total_size
+        )
+
+        # Close handles prior to telemetry snapshot
+        h5_file.close()
+        h5_file = None
+        stream.close()
+
+        telemetry = stream.get_telemetry()
+        ident = metadata.get("identification") or {}
+        return {
+            "status": "success",
+            "item_id": item_id,
+            "collection": target_collection,
+            "file_summary": {
+                "source": "http_content_range_discovery",
+                "acquisition_datetime": ident.get("acquisition_date"),
+                "product_type": metadata.get("product_type"),
+                "content_length_bytes": total_size
+            },
+            "metadata": metadata,
+            "telemetry": telemetry
+        }
+
+    except BhoonidhiAuthError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+    except BhoonidhiStreamRateLimitError as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except BhoonidhiStreamError as e:
+        raise HTTPException(status_code=502, detail=f"Remote HDF5 stream error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Remote HDF5 metadata inspection failed: {str(e)}")
+    finally:
+        # 4. Reliable resource cleanup
+        if h5_file is not None:
+            try:
+                h5_file.close()
+            except Exception:
+                pass
+        if stream is not None:
+            try:
+                stream.close()
+            except Exception:
+                pass
+
+
+@router.post("/nisar/scenes/{item_id}/remote-subset", status_code=202)
+def start_remote_nisar_subset_job(
+    item_id: str,
+    request: Optional[NISARRemoteSubsetRequest] = Body(default=None)
+) -> Dict[str, Any]:
+    """
+    Queues a persistent background job to extract only the requested spatial window
+    (default: DEFAULT_MAJULI_BBOX) and layers (default: HHHH, HVHV, mask) from a remote
+    NISAR HDF5 file via BhoonidhiRangeStream, writing EPSG:32646 GeoTIFFs under
+    data/output/subsets/.
+    """
+    req = request or NISARRemoteSubsetRequest()
+    try:
+        proj_tuple = tuple(req.projected_bounds) if req.projected_bounds is not None else None
+        job = subset_job_manager.create_and_start_job(
+            item_id=item_id,
+            collection=req.collection,
+            frequency=req.frequency,
+            layers=req.layers,
+            include_exception_mask=req.include_exception_mask,
+            include_number_of_looks=req.include_number_of_looks,
+            wgs84_bbox=req.wgs84_bbox,
+            projected_bounds=proj_tuple,
+            cache_max_disk_bytes=req.cache_max_disk_bytes,
+        )
+        return {
+            "accepted": True,
+            "status_url": f"/api/nisar/subset-jobs/{job['job_id']}",
+            "job": job,
+        }
+    except NISARSubsetValidationError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except NISARSubsetError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed starting subset job: {str(e)}")
+
+
+@router.get("/nisar/subset-jobs")
+def list_nisar_subset_jobs(
+    limit: int = Query(50, ge=1, le=200, description="Maximum number of jobs to return")
+) -> Dict[str, Any]:
+    """Lists persisted remote NISAR subset extraction jobs."""
+    jobs = subset_job_manager.list_jobs(limit=limit)
+    return {
+        "count": len(jobs),
+        "jobs": jobs,
+    }
+
+
+@router.get("/nisar/subset-jobs/{job_id}")
+def get_nisar_subset_job_status(job_id: str) -> Dict[str, Any]:
+    """Returns persisted status, row/chunk progress, telemetry, outputs, and errors for a job."""
+    try:
+        return subset_job_manager.get_job(job_id)
+    except SubsetJobNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.post("/nisar/subset-jobs/{job_id}/resume", status_code=202)
+def resume_nisar_subset_job(job_id: str) -> Dict[str, Any]:
+    """Resumes an interrupted, failed, or cancelled subset job using persisted state and cached blocks."""
+    try:
+        job = subset_job_manager.resume_job(job_id)
+        return {
+            "accepted": True,
+            "status_url": f"/api/nisar/subset-jobs/{job['job_id']}",
+            "job": job,
+        }
+    except SubsetJobNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except SubsetJobStateError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+
+@router.post("/nisar/subset-jobs/{job_id}/cancel")
+def cancel_nisar_subset_job(job_id: str) -> Dict[str, Any]:
+    """Requests cooperative cancellation for an active subset extraction job."""
+    try:
+        return subset_job_manager.cancel_job(job_id)
+    except SubsetJobNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except SubsetJobStateError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+
+# =============================================================================
+# Phase 4: Water-Body Detection & Flood Change API Endpoints
+# =============================================================================
+
+@router.post("/water/detect")
+def detect_water_bodies(request: WaterDetectionRequest) -> Dict[str, Any]:
+    """
+    Executes Phase 2 SAR Water-Body Detection on extracted GeoTIFF rasters or a completed job.
+    Applies radiometric conversion (linear->dB), valid data masking, adaptive Lee filtering,
+    adaptive Otsu thresholding, MMU cleaning, area quantification, and GeoJSON boundary extraction.
+    """
+    hhhh_path = request.hhhh_path
+    hvhv_path = request.hvhv_path
+    mask_path = request.mask_path
+    out_dir = None
+
+    if request.job_id:
+        try:
+            job = subset_job_manager.get_job(request.job_id)
+        except SubsetJobNotFoundError as e:
+            raise HTTPException(status_code=404, detail=str(e))
+
+        outputs = job.get("outputs") or {}
+        if not outputs.get("HHHH"):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Job '{request.job_id}' does not have completed HHHH output (status: {job.get('status')})."
+            )
+
+        hhhh_path = outputs.get("HHHH")
+        hvhv_path = outputs.get("HVHV")
+        mask_path = outputs.get("mask")
+        out_dir = job.get("output_dir")
+
+        # Reuse existing result if already processed with default threshold
+        summary_file = os.path.join(out_dir, "water_summary.json") if out_dir else None
+        if summary_file and os.path.exists(summary_file) and request.threshold_db is None:
+            try:
+                with open(summary_file, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+
+    if not hhhh_path:
+        raise HTTPException(status_code=422, detail="Either 'job_id' or 'hhhh_path' must be provided.")
+
+    try:
+        summary = detect_water_from_geotiffs(
+            hhhh_path=hhhh_path,
+            hvhv_path=hvhv_path,
+            mask_path=mask_path,
+            output_dir=out_dir,
+            threshold_db=request.threshold_db,
+            apply_speckle_filter=request.apply_speckle_filter,
+            min_cluster_pixels=request.min_cluster_pixels,
+        )
+        return summary
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Water detection failed: {str(e)}")
+
+
+@router.get("/water/jobs/{job_id}")
+def get_job_water_summary(job_id: str) -> Dict[str, Any]:
+    """Retrieves or computes the water classification summary for a completed subset job."""
+    req = WaterDetectionRequest(job_id=job_id)
+    return detect_water_bodies(req)
+
+
+@router.get("/water/jobs/{job_id}/boundaries")
+def get_job_water_boundaries(job_id: str):
+    """Returns the WGS84 GeoJSON water boundary polygons for a completed subset job."""
+    try:
+        job = subset_job_manager.get_job(job_id)
+    except SubsetJobNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    out_dir = job.get("output_dir")
+    geojson_path = os.path.join(out_dir, "water_boundaries.geojson") if out_dir else None
+
+    if not geojson_path or not os.path.exists(geojson_path):
+        # Auto-compute if HHHH output is ready
+        outputs = job.get("outputs") or {}
+        if outputs.get("HHHH"):
+            detect_water_bodies(WaterDetectionRequest(job_id=job_id))
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Water boundaries not generated for job '{job_id}' (status: {job.get('status')})."
+            )
+
+    if not os.path.exists(geojson_path):
+        raise HTTPException(status_code=404, detail=f"GeoJSON file not found at {geojson_path}")
+
+    with open(geojson_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    return Response(
+        content=json.dumps(data),
+        media_type="application/geo+json",
+        headers={"Content-Disposition": f"inline; filename=water_boundaries_{job_id}.geojson"}
+    )
+
+
+@router.post("/water/compare")
+def compare_flood_dates(request: MultiDateChangeRequest) -> Dict[str, Any]:
+    """
+    Executes Phase 3 Multi-Date Flood Change Detection between baseline and event dates.
+    Quantifies newly inundated water, persistent river channels, and receded floodwaters.
+    """
+    base_date = request.baseline_date
+    evt_date = request.event_date
+
+    # Resolve output directory
+    base_out_dir = Path(__file__).resolve().parent.parent.parent.parent / "data" / "output" / "change"
+    out_dir = base_out_dir / f"{base_date}_to_{evt_date}"
+
+    # Check cached summary first
+    summary_path = out_dir / f"change_summary_{base_date}_to_{evt_date}.json"
+    if summary_path.exists():
+        try:
+            with open(summary_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+
+    # Resolve baseline and event water classification TIFFs
+    t1_tif = None
+    t2_tif = None
+
+    if request.baseline_job_id:
+        j1 = subset_job_manager.get_job(request.baseline_job_id)
+        t1_tif = os.path.join(j1["output_dir"], "water_classification.tif")
+    if request.event_job_id:
+        j2 = subset_job_manager.get_job(request.event_job_id)
+        t2_tif = os.path.join(j2["output_dir"], "water_classification.tif")
+
+    # If direct job outputs are not available, check local sample GCOV files
+    clean_base = base_date.replace("-", "")
+    clean_evt = evt_date.replace("-", "")
+
+    # Look for matching files in data/nisar_products/
+    products_dir = Path(__file__).resolve().parent.parent.parent.parent / "data" / "nisar_products"
+    if not t1_tif or not os.path.exists(t1_tif):
+        candidates = list(products_dir.glob(f"*{clean_base}*.h5"))
+        if candidates:
+            # Generate water raster from local sample
+            h5_path = candidates[0]
+            with h5py.File(h5_path, "r") as h:
+                fa = h["science/SSAR/GCOV/grids/frequencyA"]
+                hh = fa["HHHH"][:]
+                mask = fa["mask"][:]
+                x_coords = fa["xCoordinates"][:]
+                y_coords = fa["yCoordinates"][:]
+                epsg = int(fa["projection"].attrs.get("epsg_code", 32646))
+
+            dx = float(x_coords[1] - x_coords[0]) if len(x_coords) > 1 else 25.0
+            dy = float(y_coords[1] - y_coords[0]) if len(y_coords) > 1 else -25.0
+            x_min = float(x_coords[0]) - dx / 2.0
+            y_max = float(y_coords[0]) - dy / 2.0
+            transform = from_origin(x_min, y_max, abs(dx), abs(dy))
+
+            t1_dir = base_out_dir / "samples" / base_date
+            os.makedirs(t1_dir, exist_ok=True)
+            hh_tif = t1_dir / "frequencyA_HHHH.tif"
+            m_tif = t1_dir / "frequencyA_mask.tif"
+
+            with rasterio.open(hh_tif, "w", driver="GTiff", height=hh.shape[0], width=hh.shape[1], count=1, dtype="float32", crs=f"EPSG:{epsg}", transform=transform) as d:
+                d.write(hh, 1)
+            with rasterio.open(m_tif, "w", driver="GTiff", height=mask.shape[0], width=mask.shape[1], count=1, dtype="uint8", crs=f"EPSG:{epsg}", transform=transform) as d:
+                d.write(mask, 1)
+
+            det = detect_water_from_geotiffs(hhhh_path=hh_tif, mask_path=m_tif, output_dir=t1_dir)
+            t1_tif = det["outputs"]["water_mask_geotiff"]
+
+    if not t2_tif or not os.path.exists(t2_tif):
+        candidates = list(products_dir.glob(f"*{clean_evt}*.h5"))
+        if candidates:
+            h5_path = candidates[0]
+            with h5py.File(h5_path, "r") as h:
+                fa = h["science/SSAR/GCOV/grids/frequencyA"]
+                hh = fa["HHHH"][:]
+                mask = fa["mask"][:]
+                x_coords = fa["xCoordinates"][:]
+                y_coords = fa["yCoordinates"][:]
+                epsg = int(fa["projection"].attrs.get("epsg_code", 32646))
+
+            dx = float(x_coords[1] - x_coords[0]) if len(x_coords) > 1 else 25.0
+            dy = float(y_coords[1] - y_coords[0]) if len(y_coords) > 1 else -25.0
+            x_min = float(x_coords[0]) - dx / 2.0
+            y_max = float(y_coords[0]) - dy / 2.0
+            transform = from_origin(x_min, y_max, abs(dx), abs(dy))
+
+            t2_dir = base_out_dir / "samples" / evt_date
+            os.makedirs(t2_dir, exist_ok=True)
+            hh_tif = t2_dir / "frequencyA_HHHH.tif"
+            m_tif = t2_dir / "frequencyA_mask.tif"
+
+            with rasterio.open(hh_tif, "w", driver="GTiff", height=hh.shape[0], width=hh.shape[1], count=1, dtype="float32", crs=f"EPSG:{epsg}", transform=transform) as d:
+                d.write(hh, 1)
+            with rasterio.open(m_tif, "w", driver="GTiff", height=mask.shape[0], width=mask.shape[1], count=1, dtype="uint8", crs=f"EPSG:{epsg}", transform=transform) as d:
+                d.write(mask, 1)
+
+            det = detect_water_from_geotiffs(hhhh_path=hh_tif, mask_path=m_tif, output_dir=t2_dir)
+            t2_tif = det["outputs"]["water_mask_geotiff"]
+
+    if not t1_tif or not os.path.exists(t1_tif) or not t2_tif or not os.path.exists(t2_tif):
+        # Fall back to calibrated SAR grid comparison for dates where raw rasters are missing
+        sar_res = perform_sar_change_detection(region_id="majuli", baseline_date=base_date, event_date=evt_date)
+        return {
+            "status": "success",
+            "source": "calibrated_sar_grid",
+            "baseline_date": base_date,
+            "event_date": evt_date,
+            "change_metrics": sar_res["statistics"],
+            "scientific_interpretation": sar_res.get("scientific_summary", ""),
+        }
+
+    return compare_two_observations(
+        t1_date_str=base_date,
+        t1_water_tif=t1_tif,
+        t2_date_str=evt_date,
+        t2_water_tif=t2_tif,
+        output_dir=out_dir,
+        min_cluster_pixels=request.min_cluster_pixels,
+    )
+
+
+@router.get("/water/change/{baseline_date}/{event_date}/boundaries")
+def get_change_boundaries(baseline_date: str, event_date: str):
+    """Returns the WGS84 GeoJSON change polygons for the specified date pair."""
+    base_out_dir = Path(__file__).resolve().parent.parent.parent.parent / "data" / "output" / "change"
+    out_dir = base_out_dir / f"{baseline_date}_to_{event_date}"
+    geojson_path = out_dir / f"change_{baseline_date}_to_{event_date}.geojson"
+
+    if not geojson_path.exists():
+        # Auto-compute
+        compare_flood_dates(MultiDateChangeRequest(baseline_date=baseline_date, event_date=event_date))
+
+    if not geojson_path.exists():
+        # Fall back to generic export/geojson
+        res = export_geojson(region_id="majuli", baseline_date=baseline_date, event_date=event_date)
+        return res
+
+    with open(geojson_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    return Response(
+        content=json.dumps(data),
+        media_type="application/geo+json",
+        headers={"Content-Disposition": f"inline; filename=change_{baseline_date}_{event_date}.geojson"}
+    )
+
+
+@router.get("/layers/download")
+def download_layer_file(path: str = Query(..., description="Path to raster or vector output file")):
+    """Safely downloads or streams an output file (GeoTIFF, GeoJSON, JSON) from data/output/."""
+    clean_p = os.path.normpath(path)
+    # Security: ensure file is within data/output directory
+    root_data = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data", "output"))
+    req_file = os.path.abspath(clean_p)
+
+    if not req_file.startswith(root_data):
+        raise HTTPException(status_code=403, detail="Access denied: file must reside within data/output/.")
+
+    if not os.path.exists(req_file):
+        raise HTTPException(status_code=404, detail="File not found.")
+
+    media_type = "application/octet-stream"
+    if req_file.endswith(".geojson") or req_file.endswith(".json"):
+        media_type = "application/geo+json" if req_file.endswith(".geojson") else "application/json"
+    elif req_file.endswith(".tif") or req_file.endswith(".tiff"):
+        media_type = "image/tiff"
+
+    return FileResponse(
+        req_file,
+        media_type=media_type,
+        filename=os.path.basename(req_file),
+    )
+
+
 
 
 

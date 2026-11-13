@@ -1,19 +1,62 @@
-node_modules/
-dist/
+# -----------------------------------------------------------------------------
+# Brahmaputra FloodWatch — Git Ignore Rules
+# -----------------------------------------------------------------------------
+
+# Large extracted NISAR GeoTIFFs, rasters, and temporary extraction files
+*.tif
+*.tiff
+*.tmp
+*.tif.tmp
+
+# Satellite Data and HDF5 Products
+*.h5
+*.hdf5
+data/nisar_products/
+
+# Range-Block Cache and Bhoonidhi API Cache Data
+backend/app/data/cache/
+*.bin
+
+# Generated Processing Outputs & Large Deliverables
+data/output/subsets/
+data/output/change/
+
+# Python Virtual Environments & Bytecode
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and Runtime Task Outputs
+*.log
+.system_generated/
+
+# Environment and Secrets (Preserve templates)
 .env
 .env.*
 *.env
 **/.env
 **/.env.*
 !*.env.example
-.venv/
-venv/
+!.env.example
+!**/.env.example
+
+# Frontend Dependencies and Production Build
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+
+# OS and Editor Artifacts
 .DS_Store
-data/nisar_products/
-*.h5
-*.tif
+Thumbs.db
+.vscode/
+.idea/
 rewrite_author.sh
-
-

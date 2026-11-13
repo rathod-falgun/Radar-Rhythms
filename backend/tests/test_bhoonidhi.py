@@ -15,9 +15,13 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 # Configure UTF-8 stdout on Windows
-if sys.platform == "win32":
+if sys.platform == "win32" and hasattr(sys.stdout, "buffer") and not getattr(sys.stdout, "_is_utf8_wrapped", False):
     import io
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+        setattr(sys.stdout, "_is_utf8_wrapped", True)
+    except Exception:
+        pass
 
 # Add backend directory to sys.path
 backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -41,6 +45,9 @@ class TestBhoonidhiAuthenticationAndSearch(unittest.TestCase):
         bhoonidhi_service._refresh_token = None
         bhoonidhi_service._expires_at = 0.0
         bhoonidhi_service._auth_timestamps = []
+        from app.services.bhoonidhi_stream import global_download_rate_limiter
+        global_download_rate_limiter.reset()
+        global_download_rate_limiter.min_interval = 0.001
 
     # -------------------------------------------------------------------------
     # 1. Status Endpoint & Missing Credentials

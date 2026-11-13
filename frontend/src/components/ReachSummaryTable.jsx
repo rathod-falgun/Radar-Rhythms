@@ -39,7 +39,7 @@ export default function ReachSummaryTable({ selectedRegionId, onSelectRegion, ba
           </h3>
         </div>
         <span className="text-xs text-slate-400 font-mono">
-          Track 019 / Frame 075 Valley Corridor
+          Track 019 / Frame 075 Valley Corridor (Calibrated Regional Reach Projections)
         </span>
       </div>
 
