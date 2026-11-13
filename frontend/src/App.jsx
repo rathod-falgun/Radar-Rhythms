@@ -1,34 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import WorkspaceTabs from './components/WorkspaceTabs';
-import MajuliStudyHeader from './components/MajuliStudyHeader';
-import BarpetaStudyHeader from './components/BarpetaStudyHeader';
 import RegionSelector from './components/RegionSelector';
 import DateSelector from './components/DateSelector';
 import SwipeSlider from './components/SwipeSlider';
 import MapViewer from './components/MapViewer';
 import AnalyticsPanel from './components/AnalyticsPanel';
-import ScientificExplain from './components/ScientificExplain';
-import HDF5Inspector from './components/HDF5Inspector';
-import ReachSummaryTable from './components/ReachSummaryTable';
-import PresentationModal from './components/PresentationModal';
-import PersonaSwitcher from './components/PersonaSwitcher';
-import DisasterAlertPanel from './components/DisasterAlertPanel';
+import WhatChangedCard from './components/WhatChangedCard';
 import ScientistRadarPanel from './components/ScientistRadarPanel';
-import StudentCitizenPanel from './components/StudentCitizenPanel';
-import WavelengthSimulator from './components/WavelengthSimulator';
+import HowItWorksView from './components/HowItWorksView';
+import DataMethodologyView from './components/DataMethodologyView';
+import AboutProjectView from './components/AboutProjectView';
+import PresentationModal from './components/PresentationModal';
 import { toggleRadarSound, isRadarSoundEnabled } from './utils/audio';
-import { Loader2, Radio, Info, X, ShieldAlert, Sparkles, Sliders } from 'lucide-react';
+import { Loader2, Radio, Info, X, ShieldAlert, Sparkles, Sliders, Microscope, ChevronDown, ChevronUp, Volume2, VolumeX } from 'lucide-react';
 
 export default function App() {
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const initialWorkspace = params?.get('workspace') || 'majuli';
-  const initialRegion = initialWorkspace === 'barpeta' ? 'barpeta' : (params?.get('region') || 'majuli');
-  const initialPersona = params?.get('persona') || 'disaster';
+  const initialTab = params?.get('tab') || 'monitor';
+  const initialRegion = params?.get('region') || (params?.get('workspace') === 'barpeta' ? 'barpeta' : 'majuli');
 
-  // Primary Workspace: 'majuli', 'barpeta', 'overview', 'inspector', 'methodology'
-  const [activeWorkspace, setActiveWorkspace] = useState(initialWorkspace);
+  // Main 4-Section Navigation: 'monitor', 'how-it-works', 'methodology', 'about'
+  const [activeTab, setActiveTab] = useState(initialTab);
 
+  // Region & Observation State
   const [regions, setRegions] = useState([]);
   const [selectedRegionId, setSelectedRegionId] = useState(initialRegion);
   const [observations, setObservations] = useState([]);
@@ -37,39 +31,50 @@ export default function App() {
   const [thresholdDb, setThresholdDb] = useState(-4.5);
   const [speckleFilter, setSpeckleFilter] = useState(true);
 
-  // Audience Persona: 'disaster' (default), 'scientist', 'student'
-  const [persona, setPersona] = useState(initialPersona);
+  // Advanced Scientist Drawer Toggle
+  const [showAdvancedScientist, setShowAdvancedScientist] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
 
+  // Data & Modal State
   const [comparisonData, setComparisonData] = useState(null);
   const [timelineData, setTimelineData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPresentationModal, setShowPresentationModal] = useState(false);
+  const [customBoundary, setCustomBoundary] = useState(null);
 
   const handleToggleSound = () => {
     const newState = toggleRadarSound(!soundEnabled);
     setSoundEnabled(newState);
   };
 
-  // 1. Initial Load: Fetch Regions and Observations
+  // 1. Initial Load: Fetch Regions
   useEffect(() => {
     async function initData() {
       try {
-        const [regionsRes, obsRes] = await Promise.all([
-          fetch('/api/regions'),
-          fetch('/api/observations')
-        ]);
+        const regionsRes = await fetch('/api/regions');
         const regionsJson = await regionsRes.json();
-        const obsJson = await obsRes.json();
         setRegions(regionsJson);
-        setObservations(obsJson);
       } catch (err) {
-        console.error('Failed to initialize catalog:', err);
+        console.error('Failed to initialize regions:', err);
       }
     }
     initData();
   }, []);
+
+  // 1b. Fetch Data-Driven Observations whenever region changes
+  useEffect(() => {
+    if (!selectedRegionId) return;
+    async function fetchObservations() {
+      try {
+        const obsRes = await fetch(`/api/observations?region_id=${selectedRegionId}&only_processed=true`);
+        const obsJson = await obsRes.json();
+        setObservations(obsJson);
+      } catch (err) {
+        console.error('Failed to fetch observations for region:', err);
+      }
+    }
+    fetchObservations();
+  }, [selectedRegionId]);
 
   // 2. Fetch Comparison whenever region, dates, threshold or filter change
   useEffect(() => {
@@ -107,23 +112,24 @@ export default function App() {
 
   const selectedRegion = regions.find((r) => r.id === selectedRegionId) || (regions.length > 0 ? regions[0] : { id: 'majuli', name: 'Majuli River Island Reach', center: { lat: 26.901, lon: 94.104 }, zoom: 10, bounds: [[26.49561, 93.59687], [27.30636, 94.61117]] });
 
-  // Workspace Switcher Handler
-  const handleSelectWorkspace = (tabId) => {
-    setActiveWorkspace(tabId);
+  // Tab Navigation Handler
+  const handleSelectTab = (tabId) => {
+    setActiveTab(tabId);
     if (typeof window !== 'undefined') {
-      window.history.replaceState(null, '', `?workspace=${tabId}`);
+      window.history.replaceState(null, '', `?tab=${tabId}`);
     }
-    if (tabId === 'majuli') {
-      setSelectedRegionId('majuli');
-    } else if (tabId === 'barpeta') {
-      setSelectedRegionId('barpeta');
+  };
+
+  // Region Selection Handler
+  const handleSelectRegion = (regId) => {
+    setSelectedRegionId(regId);
+    if (regId === 'majuli') {
+      setBaselineDate('2026-08-27');
+      setEventDate('2026-08-27');
+    } else if (regId === 'barpeta') {
       setBaselineDate('2026-06-27');
       setEventDate('2026-07-09');
       setThresholdDb(-4.5);
-    } else if (tabId === 'overview') {
-      if (selectedRegionId === 'majuli' || selectedRegionId === 'barpeta') {
-        setSelectedRegionId('kaziranga');
-      }
     }
   };
 
@@ -132,111 +138,54 @@ export default function App() {
     setEventDate(evt);
   };
 
-  // Sync region selector clicks with workspace tabs
-  const handleSelectRegionFromCatalog = (regId) => {
-    setSelectedRegionId(regId);
-    if (regId === 'majuli') {
-      setActiveWorkspace('majuli');
-    } else if (regId === 'barpeta') {
-      setActiveWorkspace('barpeta');
-    }
+  const handleCustomBoundaryUploaded = (geojson, fileName) => {
+    setCustomBoundary({ geojson, fileName });
   };
 
+  const isMajuli = selectedRegionId === 'majuli';
+  const isBarpeta = selectedRegionId === 'barpeta';
+
   return (
-    <div className="min-h-screen bg-[#0a0e17] text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans space-dot-pattern selection:bg-sky-100 selection:text-sky-900">
+      {/* Space-Inspired Top Navbar */}
       <Navbar
-        onOpenInfo={() => setShowInfoModal(true)}
+        activeTab={activeTab}
+        onSelectTab={handleSelectTab}
         onOpenPresentation={() => setShowPresentationModal(true)}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
-        {/* Workspace Switcher: Clear distinction between the 2 Scientific Studies */}
-        <WorkspaceTabs
-          activeWorkspace={activeWorkspace}
-          onSelectWorkspace={handleSelectWorkspace}
-        />
-
-        {/* Top Header: Audience Persona Switcher & Radar Sound Synthesizer */}
-        <PersonaSwitcher
-          currentPersona={persona}
-          onSelectPersona={setPersona}
-          soundEnabled={soundEnabled}
-          onToggleSound={handleToggleSound}
-        />
-
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
         {/* ========================================================================= */}
-        {/* WORKSPACE 1: MAJULI WATER DETECTION EXPLORER */}
+        {/* TAB 1: FLOOD MONITOR (The Central User-Driven Experience)                 */}
         {/* ========================================================================= */}
-        {activeWorkspace === 'majuli' && (
-          <div className="space-y-4">
-            <MajuliStudyHeader />
-
-            {/* Interactive Visualizations (Real Majuli 13,821 Polygons) */}
-            {!loading && comparisonData && (
-              <div className="grid grid-cols-1 gap-4">
-                <MapViewer
-                  region={selectedRegion}
-                  comparisonData={comparisonData}
-                  baselineDate={baselineDate}
-                  eventDate={eventDate}
-                  persona={persona}
-                />
+        {activeTab === 'monitor' && (
+          <div className="space-y-6">
+            {/* 1. Project Heading & Short Explanation */}
+            <div className="bg-[#0b132b] text-white rounded-2xl border border-[#1c2541] p-5 sm:p-6 shadow-md space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#5bc0be] animate-pulse"></span>
+                  <h2 className="text-xl font-bold tracking-tight text-white">
+                    All-Weather Radar Flood Observation Portal
+                  </h2>
+                </div>
+                <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-full bg-[#1c2541] text-[#6fffe9] border border-[#3a506b]">
+                  NASA–ISRO SAR Earth Observation
+                </span>
               </div>
-            )}
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-4xl">
+                Monsoon clouds hide floodwaters from optical satellites. Brahmaputra FloodWatch uses NASA–ISRO SAR (Synthetic Aperture Radar) microwave pulses to penetrate clouds and rain, detecting surface water changes and tracking flood extent across the Brahmaputra River Basin.
+              </p>
+            </div>
 
-            {/* Persona Panels */}
-            {persona === 'disaster' && !loading && comparisonData && (
-              <DisasterAlertPanel
-                statistics={comparisonData.statistics}
-                regionName={selectedRegion?.name}
-                regionId={selectedRegionId}
-              />
-            )}
-            {persona === 'scientist' && !loading && comparisonData && (
-              <ScientistRadarPanel
-                comparisonData={comparisonData}
-                parameters={comparisonData.parameters}
-              />
-            )}
-            {persona === 'student' && !loading && (
-              <StudentCitizenPanel />
-            )}
-
-            {/* Quantitative Analytics */}
-            {!loading && comparisonData && (
-              <AnalyticsPanel
-                statistics={comparisonData.statistics}
-                timelineData={timelineData}
-                regionName={selectedRegion?.name}
-                regionId={selectedRegionId}
-                baselineDate={baselineDate}
-                eventDate={eventDate}
-              />
-            )}
-
-            {/* Scientific Explanation & Methodology */}
-            {!loading && comparisonData && (
-              <ScientificExplain
-                explanation={comparisonData.scientific_explanation}
-                parameters={comparisonData.parameters}
-              />
-            )}
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* WORKSPACE 2: BARPETA FLOOD CHANGE EXPLORER */}
-        {/* ========================================================================= */}
-        {activeWorkspace === 'barpeta' && (
-          <div className="space-y-4">
-            <BarpetaStudyHeader
-              thresholdDb={thresholdDb}
-              onThresholdChange={setThresholdDb}
-              speckleFilter={speckleFilter}
-              onToggleSpeckleFilter={setSpeckleFilter}
+            {/* 2. Step 1: Area Selection */}
+            <RegionSelector
+              selectedRegionId={selectedRegionId}
+              onSelectRegion={handleSelectRegion}
+              onCustomBoundaryUploaded={handleCustomBoundaryUploaded}
             />
 
-            {/* 12-Day Orbital Revisit Sequence */}
+            {/* 3. Step 2: Date Selection Based on Real Observation Availability */}
             <DateSelector
               observations={observations}
               baselineDate={baselineDate}
@@ -253,125 +202,101 @@ export default function App() {
 
             {/* Loading Indicator */}
             {loading && (
-              <div className="flex items-center justify-center p-6 bg-slate-900/60 rounded-xl border border-slate-800">
-                <Loader2 className="w-5 h-5 text-rose-400 animate-spin mr-2" />
-                <span className="text-sm text-slate-300 font-mono">
-                  Decomposing SAR Log-Ratio for Barpeta (Track 019 / Frame 075)...
+              <div className="flex items-center justify-center p-8 bg-white rounded-2xl border border-slate-200 shadow-xs">
+                <Loader2 className="w-6 h-6 text-sky-600 animate-spin mr-3" />
+                <span className="text-sm font-semibold text-slate-700">
+                  Retrieving NISAR radar observations & computing water classification...
                 </span>
               </div>
             )}
 
-            {/* Interactive Visualizations: Swipe Comparison + 4-Class Change Map */}
-            {!loading && comparisonData && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <SwipeSlider
-                  comparisonData={comparisonData}
-                  baselineDate={baselineDate}
-                  eventDate={eventDate}
-                />
-                <MapViewer
-                  region={selectedRegion}
-                  comparisonData={comparisonData}
-                  baselineDate={baselineDate}
-                  eventDate={eventDate}
-                  persona={persona}
-                />
+            {/* State when an unsupported area or date has no processed satellite results */}
+            {!loading && comparisonData && (comparisonData.status === 'UNAVAILABLE' || (!isMajuli && !isBarpeta)) && (
+              <div className="bg-white rounded-2xl border border-amber-200 p-8 shadow-xs text-center space-y-4">
+                <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
+                  <ShieldAlert className="w-6 h-6" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-slate-900">
+                    No Processed Satellite Results for this Area
+                  </h3>
+                  <p className="text-xs text-slate-600 max-w-lg mx-auto leading-relaxed">
+                    {comparisonData.message || 'No processed NISAR Level-2 satellite observations are available for this area. To inspect authentic satellite radar data, please select Majuli or Barpeta.'}
+                  </p>
+                </div>
+                <div className="pt-2 flex justify-center gap-3">
+                  <button
+                    onClick={() => handleSelectRegion('majuli')}
+                    className="px-4 py-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-semibold text-xs border border-sky-200 transition-colors cursor-pointer"
+                  >
+                    View Majuli (Single-Date Water Extent)
+                  </button>
+                  <button
+                    onClick={() => handleSelectRegion('barpeta')}
+                    className="px-4 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold text-xs border border-rose-200 transition-colors cursor-pointer"
+                  >
+                    View Barpeta (Two-Date Flood Comparison)
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* Persona Panels */}
-            {persona === 'disaster' && !loading && comparisonData && (
-              <DisasterAlertPanel
-                statistics={comparisonData.statistics}
-                regionName={selectedRegion?.name}
-                regionId={selectedRegionId}
-              />
-            )}
-            {persona === 'scientist' && !loading && comparisonData && (
-              <ScientistRadarPanel
-                comparisonData={comparisonData}
-                parameters={comparisonData.parameters}
-              />
-            )}
-            {persona === 'student' && !loading && (
-              <StudentCitizenPanel />
-            )}
+            {/* Step 3: Before-and-After Map Comparison (or Single-Date Water Map) */}
+            {!loading && comparisonData && comparisonData.status !== 'UNAVAILABLE' && (isMajuli || isBarpeta) && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-sky-600"></span>
+                    <h2 className="text-base font-bold text-slate-900 tracking-tight">
+                      3. {isBarpeta ? 'Before-and-After Flood Comparison' : 'Classified Water Extent Map'}
+                    </h2>
+                  </div>
+                  <span className="text-xs text-slate-500 font-mono">
+                    {isMajuli ? 'Track 015 / Frame 3700 • 13,821 Extracted Polygons' : 'Track 019 / Frame 075 • 12-Day Interval (27 Jun vs 09 Jul 2026)'}
+                  </span>
+                </div>
 
-            {/* Quantitative Analytics */}
-            {!loading && comparisonData && (
-              <AnalyticsPanel
-                statistics={comparisonData.statistics}
-                timelineData={timelineData}
-                regionName={selectedRegion?.name}
-                regionId={selectedRegionId}
-                baselineDate={baselineDate}
-                eventDate={eventDate}
-              />
-            )}
-
-            {/* Scientific Explanation & Methodology */}
-            {!loading && comparisonData && (
-              <ScientificExplain
-                explanation={comparisonData.scientific_explanation}
-                parameters={comparisonData.parameters}
-              />
-            )}
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* WORKSPACE 3: BASIN OVERVIEW & REGIONAL REACHES */}
-        {/* ========================================================================= */}
-        {activeWorkspace === 'overview' && (
-          <div className="space-y-4">
-            <RegionSelector
-              regions={regions}
-              selectedRegionId={selectedRegionId}
-              onSelectRegion={handleSelectRegionFromCatalog}
-            />
-
-            <DateSelector
-              observations={observations}
-              baselineDate={baselineDate}
-              eventDate={eventDate}
-              thresholdDb={thresholdDb}
-              speckleFilter={speckleFilter}
-              onSelectBaseline={setBaselineDate}
-              onSelectEvent={setEventDate}
-              onThresholdChange={setThresholdDb}
-              onToggleSpeckleFilter={setSpeckleFilter}
-              onApplyPreset={handleApplyPreset}
-              selectedRegionId={selectedRegionId}
-            />
-
-            {!loading && comparisonData && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <SwipeSlider
-                  comparisonData={comparisonData}
-                  baselineDate={baselineDate}
-                  eventDate={eventDate}
-                />
-                <MapViewer
-                  region={selectedRegion}
-                  comparisonData={comparisonData}
-                  baselineDate={baselineDate}
-                  eventDate={eventDate}
-                  persona={persona}
-                />
+                {isBarpeta ? (
+                  /* Barpeta Two-Date Comparison: Swipe Comparator + Map */
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <SwipeSlider
+                      comparisonData={comparisonData}
+                      baselineDate={baselineDate}
+                      eventDate={eventDate}
+                    />
+                    <MapViewer
+                      region={selectedRegion}
+                      comparisonData={comparisonData}
+                      baselineDate={baselineDate}
+                      eventDate={eventDate}
+                    />
+                  </div>
+                ) : (
+                  /* Majuli Single-Date: High-Resolution Leaflet Canvas Map */
+                  <div className="grid grid-cols-1 gap-4">
+                    <MapViewer
+                      region={selectedRegion}
+                      comparisonData={comparisonData}
+                      baselineDate={baselineDate}
+                      eventDate={eventDate}
+                    />
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Phase 6: Multi-Reach Regional Flood Risk & Inundation Matrix */}
-            {!loading && (
-              <ReachSummaryTable
+            {/* Step 4: "What Changed?" (Plain-English Scientific Summary) */}
+            {!loading && comparisonData && comparisonData.status !== 'UNAVAILABLE' && (isMajuli || isBarpeta) && (
+              <WhatChangedCard
                 selectedRegionId={selectedRegionId}
-                onSelectRegion={handleSelectRegionFromCatalog}
+                comparisonData={comparisonData}
                 baselineDate={baselineDate}
                 eventDate={eventDate}
               />
             )}
 
-            {!loading && comparisonData && (
+            {/* Step 5: Real Data Exports & KPI Analytics */}
+            {!loading && comparisonData && comparisonData.status !== 'UNAVAILABLE' && (isMajuli || isBarpeta) && (
               <AnalyticsPanel
                 statistics={comparisonData.statistics}
                 timelineData={timelineData}
@@ -381,109 +306,117 @@ export default function App() {
                 eventDate={eventDate}
               />
             )}
-          </div>
-        )}
 
-        {/* ========================================================================= */}
-        {/* WORKSPACE 4: NISAR OBSERVATION & HDF5 PRODUCT INSPECTOR */}
-        {/* ========================================================================= */}
-        {activeWorkspace === 'inspector' && (
-          <div className="space-y-4">
-            <HDF5Inspector dateStr={eventDate} />
-          </div>
-        )}
+            {/* Optional Collapsible Drawer: Advanced Radar Scientist Diagnostics */}
+            {!loading && comparisonData && comparisonData.status !== 'UNAVAILABLE' && (isMajuli || isBarpeta) && (
+              <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden transition-all">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setShowAdvancedScientist(!showAdvancedScientist)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setShowAdvancedScientist(!showAdvancedScientist);
+                    }
+                  }}
+                  className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors cursor-pointer select-none"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                      <Microscope className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-bold text-slate-900 block">
+                        Advanced Radar Scientist Diagnostics & Physics
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        Inspect raw backscatter decibel histograms, Otsu equations, Lee moments, and acoustic sonification.
+                      </span>
+                    </div>
+                  </div>
 
-        {/* ========================================================================= */}
-        {/* WORKSPACE 5: ABOUT METHODOLOGY & SAR PHYSICS */}
-        {/* ========================================================================= */}
-        {activeWorkspace === 'methodology' && (
-          <div className="space-y-4">
-            <WavelengthSimulator />
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleSound();
+                      }}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                        soundEnabled
+                          ? 'bg-sky-100 text-sky-800 border-sky-300'
+                          : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                      }`}
+                      title="Toggle Web Audio radar acoustic probe pitch"
+                    >
+                      {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-sky-600" /> : <VolumeX className="w-3.5 h-3.5 text-slate-400" />}
+                      <span>{soundEnabled ? 'Audio: ON' : 'Audio: OFF'}</span>
+                    </button>
 
-            {!loading && comparisonData && (
-              <ScientificExplain
-                explanation={comparisonData.scientific_explanation}
-                parameters={comparisonData.parameters}
-              />
+                    {showAdvancedScientist ? (
+                      <ChevronUp className="w-5 h-5 text-slate-400" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-slate-400" />
+                    )}
+                  </div>
+                </div>
+
+                {showAdvancedScientist && (
+                  <div className="p-5 border-t border-slate-100 space-y-4 bg-slate-50/50">
+                    <ScientistRadarPanel
+                      comparisonData={comparisonData}
+                      parameters={comparisonData.parameters}
+                    />
+                  </div>
+                )}
+              </div>
             )}
           </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 2: HOW IT WORKS                                                      */}
+        {/* ========================================================================= */}
+        {activeTab === 'how-it-works' && (
+          <HowItWorksView />
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 3: DATA & METHODOLOGY                                                */}
+        {/* ========================================================================= */}
+        {activeTab === 'methodology' && (
+          <DataMethodologyView />
+        )}
+
+        {/* ========================================================================= */}
+        {/* TAB 4: ABOUT THE PROJECT                                                 */}
+        {/* ========================================================================= */}
+        {activeTab === 'about' && (
+          <AboutProjectView onOpenPresentation={() => setShowPresentationModal(true)} />
         )}
       </main>
 
-      {/* Presentation Modal */}
+      {/* Presentation Modal (Pitch Deck) */}
       <PresentationModal
         isOpen={showPresentationModal}
         onClose={() => setShowPresentationModal(false)}
       />
 
-      {/* Footer */}
-      <footer className="bg-[#080c14] border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <span>Brahmaputra FloodWatch • NASA Space Apps Challenge 2026</span>
-          <span className="font-mono">Sensor: NASA-ISRO NISAR (L-band & S-band SAR) • Track 015 & Track 019</span>
-          <span>Open-Source Science Implementation</span>
-        </div>
-      </footer>
-
-      {/* Mission & Physics Info Modal */}
-      {showInfoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-[#111827] border border-cyan-500/40 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl shadow-cyan-500/10 relative">
-            <button
-              onClick={() => setShowInfoModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg bg-slate-800"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-cyan-950 text-cyan-400 border border-cyan-800">
-                <Radio className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white">NISAR Radar Physics & Mission Architecture</h3>
-                <p className="text-xs text-slate-400">NASA Space Apps Challenge 2026 — Dancing with the SARs</p>
-              </div>
-            </div>
-
-            <div className="space-y-4 text-xs text-slate-300 leading-relaxed">
-              <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
-                <h4 className="font-semibold text-cyan-300 mb-1">Study 1: Single-Date Water Detection (Majuli Island)</h4>
-                <p>
-                  Uses NISAR Track 015 / Frame 3700 from 27 August 2026. Demonstrates high-resolution single-polarization
-                  HHHH water classification (797.55 km² detected water, 13,821 vector polygons) using specular microwave attenuation.
-                </p>
-              </div>
-
-              <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
-                <h4 className="font-semibold text-rose-300 mb-1">Study 2: Multi-Temporal Flood Inundation Change (Barpeta)</h4>
-                <p>
-                  Uses NISAR Track 019 / Frame 075 across a 12-day orbital repeat interval (27 June vs 09 July 2026) using single-polarization HHHH backscatter.
-                  Minimal geometric parallax enables log-ratio backscatter subtraction, detecting a +140.77% flood surge (+2.337 km² newly inundated land).
-                </p>
-              </div>
-
-              <div className="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
-                <h4 className="font-semibold text-cyan-300 mb-1">Level 2 GCOV Data (Geocoded Polarimetric Covariance)</h4>
-                <p>
-                  Our application uses NISAR Level-2 GCOV products. In this data level, Radiometric Terrain Correction (RTC)
-                  and map projection (UTM Zone 46N) are already applied. We preserve data integrity by not applying calibration
-                  or terrain corrections twice.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-slate-800 flex justify-end">
-              <button
-                onClick={() => setShowInfoModal(false)}
-                className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs transition-colors"
-              >
-                Close & Return to Dashboard
-              </button>
-            </div>
+      {/* Modern Space-Inspired Footer */}
+      <footer className="bg-white border-t border-slate-200/90 py-5 px-4 text-xs text-slate-500 mt-10 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-900">Brahmaputra FloodWatch</span>
+            <span>• NASA Space Apps Challenge 2026: *Dancing with the SARs*</span>
+          </div>
+          <div className="font-mono text-slate-600">
+            Sensor: NASA–ISRO NISAR (L-band 24cm & S-band 9.3cm) • Track 015 & Track 019
+          </div>
+          <div className="text-slate-400">
+            Open Science • Apache 2.0 License
           </div>
         </div>
-      )}
+      </footer>
     </div>
   );
 }

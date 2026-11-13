@@ -19,7 +19,8 @@ from ..services.nisar_metadata import (
     NISAR_OBSERVATION_CATALOG,
     STUDY_REGIONS,
     get_region_by_id,
-    get_observation_by_date
+    get_observation_by_date,
+    get_observations_for_region
 )
 from ..services.change_detector import perform_sar_change_detection
 from ..services.sar_processing import generate_calibrated_sar_grid
@@ -145,8 +146,13 @@ def get_regions() -> List[Dict[str, Any]]:
     return STUDY_REGIONS
 
 @router.get("/observations")
-def get_observations() -> List[Dict[str, Any]]:
-    """Returns the 12-day NISAR orbital repeat observation catalog for Track 019, Frame 075."""
+def get_observations(
+    region_id: Optional[str] = Query(None, description="Optional study region ID"),
+    only_processed: bool = Query(True, description="Return only observations with processed data available")
+) -> List[Dict[str, Any]]:
+    """Returns the observation catalog. If region_id is provided, returns data-driven observations for that area."""
+    if region_id:
+        return get_observations_for_region(region_id, only_processed=only_processed)
     return NISAR_OBSERVATION_CATALOG
 
 @router.get("/observations/{date_str}")
@@ -316,7 +322,7 @@ def compare_observations(
         res["statistics"]["percentage_change"] = 140.77
         res["statistics"]["region_total_area_km2"] = 9.152
         res["statistics"]["water_polygons"] = 3
-        res["statistics"]["methodology_note"] = "Multi-temporal SAR change detection across identical 12-day repeat orbit (Track 019 / Frame 075). Log-ratio decomposition with 4-class change accounting (+140.77% surge)."
+        res["statistics"]["methodology_note"] = "Multi-temporal SAR change detection across 12-day interval between available observations (Track 019 / Frame 075). Log-ratio decomposition with 4-class change accounting (+140.77% increase in classified water area in evaluated 9.152 km² corridor)."
         res["raster_stats"] = {
             "reach": "Lower Brahmaputra / Barpeta Reach",
             "orbit_track": "019",
@@ -387,16 +393,37 @@ def compare_observations(
         }
         return res
 
-    result = perform_sar_change_detection(
-        region_id=region_id,
-        baseline_date=baseline_date,
-        event_date=event_date,
-        threshold_db=threshold_db,
-        apply_speckle_filter=apply_speckle_filter,
-        filter_window=filter_window,
-        use_adaptive_otsu=use_adaptive_otsu
-    )
-    return result
+    # For regions without verified NISAR extractions (e.g. unmonitored or custom bounds)
+    reg_info = get_region_by_id(region_id)
+    return {
+        "status": "UNAVAILABLE",
+        "has_processed_data": False,
+        "region": reg_info,
+        "message": f"No processed NISAR satellite observation is available for region '{region_id}'. Verified processed satellite datasets are currently available for Majuli (27 August 2026) and Barpeta (27 June 2026 vs 09 July 2026). Custom and unmonitored reaches require background satellite data extraction.",
+        "statistics": {
+            "region_total_area_km2": reg_info.get("area_km2", 0.0),
+            "permanent_water_km2": 0.0,
+            "newly_inundated_km2": 0.0,
+            "receded_water_km2": 0.0,
+            "total_water_affected_km2": 0.0,
+            "percentage_change": 0.0,
+            "water_polygons": 0,
+            "methodology_note": "No satellite data processed for this area."
+        },
+        "parameters": {
+            "threshold_db": threshold_db,
+            "speckle_filter_applied": apply_speckle_filter
+        },
+        "scientific_explanation": {
+            "summary": f"No processed satellite observations are available for {reg_info.get('name', region_id)}. To view verified satellite flood observations, select Majuli or Barpeta.",
+            "physical_drivers": [],
+            "radar_signature_analysis": "No satellite radar observations processed for this area.",
+            "scientific_limitations": [
+                "Arbitrary or unmonitored reaches have not undergone NISAR Level-2 GCOV extraction.",
+                "No synthetic or fabricated flood extent is displayed for unprocessed areas."
+            ]
+        }
+    }
 
 @router.get("/export/geojson")
 def export_geojson(
@@ -1360,7 +1387,7 @@ def get_barpeta_raster_stats() -> Dict[str, Any]:
                 "pixels": 0,
                 "area_km2": 0.0,
                 "percentage_of_corridor": 0.0,
-                "scattering_mechanism": "None detected during peak flood surge period"
+                "scattering_mechanism": "None detected during the 09 July 2026 event observation"
             }
         },
         "surge_summary": {

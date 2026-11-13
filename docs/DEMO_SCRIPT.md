@@ -120,3 +120,4 @@ timeline
 ### Q4: "How does your platform handle speckle noise without losing fine water channels?"
 **Answer:**
 > "We implement an adaptive Lee speckle filter with a 3×3 moving kernel. Unlike a simple boxcar or Gaussian blur which washes out narrow braided streams, the Lee filter calculates local spatial variance. In homogeneous open water or flat land, it strongly smooths speckle noise; near sharp water-land boundaries, the local variance is high, so the filter preserves the exact high-contrast edge of the river bank."
+

@@ -37,8 +37,8 @@ Satellite-derived flood extents presented in this project are **observational re
 - **Scene Status:** In the active Majuli and Barpeta operational rasters, local ENL was **not independently measured** from homogeneous open-water test regions.
 - **Lee Filter Formulation:** The speckle suppression algorithm utilizes adaptive Lee spatial window weighting based on local variance ($\hat{I} = \bar{I} + W(I - \bar{I})$). The filtering formulation assumes fully developed Rayleigh speckle statistics. In the UI Scientist Panel, ENL is accurately identified as **"Nominal / Not Independently Measured"**.
 
-#### 2.3 Radiometric Stability Assumption Across 12-Day Revisit
-- For the Barpeta change detection (27 June vs 09 July 2026), zero geometric parallax is guaranteed by the identical orbital track (Track 019 / Frame 075).
+#### 2.3 Radiometric Stability Assumption Across 12-Day Interval
+- For the Barpeta change detection (27 June vs 09 July 2026), geometric parallax is minimized by pairing identical orbital tracks and look angles (Track 019 / Frame 075).
 - However, absolute radiometric calibration stability across the 12-day inter-observation interval has **not been independently ground-calibrated** using corner reflectors or active transponders in the Brahmaputra valley.
 - Environmental variables such as ionospheric scintillation (common at low geomagnetic latitudes for L-band) and subtle soil moisture baseline drift outside the flood corridor are assumed to be second-order compared to the large specular attenuation ($\Delta\gamma^0 < -4.50\text{ dB}$).
 
@@ -95,3 +95,4 @@ Satellite-derived flood extents presented in this project are **observational re
 1. **No Data Fabrication:** All metrics displayed in the Majuli and Barpeta workspaces derive directly from actual raster pixel counts and GeoJSON polygon integrations.
 2. **Clear UI Disclosures:** Every workspace header, analytics card, and scientist panel explicitly labels single-pol HHHH processing, nominal ENL status, and precise geographic boundaries.
 3. **Transparent Export Metadata:** Downloaded GeoTIFFs preserve native EPSG:32646 georeferencing, floating-point units, and nodata headers; GeoJSON files preserve WGS84 coordinates and precise feature properties.
+

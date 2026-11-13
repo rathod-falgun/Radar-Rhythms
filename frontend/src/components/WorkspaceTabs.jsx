@@ -15,11 +15,11 @@ export default function WorkspaceTabs({ activeWorkspace, onSelectWorkspace }) {
     {
       id: 'barpeta',
       title: 'Barpeta: Flood Change',
-      subtitle: 'Track 019 • 12-Day Interval (27 Jun vs 09 Jul: +140.77% Surge)',
+      subtitle: 'Track 019 • 12-Day Interval (27 Jun vs 09 Jul: +140.77% Water Increase)',
       icon: TrendingUp,
       accentColor: 'text-rose-400',
       activeBg: 'bg-rose-950/70 border-rose-500 shadow-md shadow-rose-500/20 text-white ring-1 ring-rose-500/50',
-      badge: '+140.77% Flood Surge'
+      badge: '+140.77% Water Increase'
     },
     {
       id: 'overview',
@@ -73,11 +73,10 @@ export default function WorkspaceTabs({ activeWorkspace, onSelectWorkspace }) {
             <button
               key={tab.id}
               onClick={() => onSelectWorkspace(tab.id)}
-              className={`text-left p-2.5 rounded-lg border transition-all relative group flex flex-col justify-between ${
-                isActive
+              className={`text-left p-2.5 rounded-lg border transition-all relative group flex flex-col justify-between ${isActive
                   ? tab.activeBg
                   : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900 text-slate-300'
-              }`}
+                }`}
             >
               <div className="flex items-center justify-between gap-1 mb-1">
                 <div className="flex items-center gap-1.5">
@@ -85,11 +84,10 @@ export default function WorkspaceTabs({ activeWorkspace, onSelectWorkspace }) {
                   <span className="text-xs font-bold leading-tight">{tab.title}</span>
                 </div>
                 <span
-                  className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-semibold shrink-0 ${
-                    isActive
+                  className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-semibold shrink-0 ${isActive
                       ? 'bg-black/40 text-white'
                       : 'bg-slate-800 text-slate-400 border border-slate-700'
-                  }`}
+                    }`}
                 >
                   {tab.badge}
                 </span>

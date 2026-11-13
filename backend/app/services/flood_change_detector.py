@@ -114,10 +114,16 @@ def vectorize_change_raster(
         if not coords or len(coords[0]) < 3:
             continue
 
-        ring = np.asarray(coords[0])
-        x = ring[:, 0]
-        y = ring[:, 1]
+        ext_ring = np.asarray(coords[0])
+        x = ext_ring[:, 0]
+        y = ext_ring[:, 1]
         raw_area_m2 = 0.5 * abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
+        # Subtract interior holes (e.g. unflooded sandbars/islands within channels)
+        for hole in coords[1:]:
+            h_ring = np.asarray(hole)
+            hx = h_ring[:, 0]
+            hy = h_ring[:, 1]
+            raw_area_m2 -= 0.5 * abs(np.dot(hx, np.roll(hy, 1)) - np.dot(hy, np.roll(hx, 1)))
 
         if raw_area_m2 < (px_area_m2 * min_pixels):
             continue

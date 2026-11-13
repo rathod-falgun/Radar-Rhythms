@@ -4,7 +4,7 @@
 ---
 
 ### One-Sentence Hook
-> **When optical satellites are blinded by monsoon clouds, Brahmaputra FloodWatch unleashes NASA-ISRO NISAR radar to cut through storms 24/7, tracking flood surges with zero geometric parallax and pinpointing inundation across 79,000+ hectares of the world's most vulnerable river basin.**
+> **When optical satellites are blinded by monsoon clouds, Brahmaputra FloodWatch unleashes NASA-ISRO NISAR radar to cut through storms 24/7, tracking floodwater changes with consistent orbital geometry and pinpointing inundation across 79,000+ hectares of the world's most vulnerable river basin.**
 
 ---
 
@@ -26,9 +26,9 @@ The **NASA-ISRO Synthetic Aperture Radar (NISAR)** observatory fundamentally cha
    - Transmitting active microwave radar pulses (L-band 24 cm and S-band 9.3 cm), NISAR penetrates heavy monsoonal rain, dense clouds, and total nighttime darkness.
    - Smooth standing water acts as a specular reflector, bouncing radar pulses away from the antenna into space, creating high-contrast, jet-black signatures (mean backscatter -18.63 dB vs. -8.91 dB for dry land).
 
-2. **Exact 12-Day Orbital Invariance (Zero Geometric Parallax):**
+2. **Consistent Repeat-Pass Orbital Geometry:**
    - Traditional satellite change detection struggles with variable look angles that distort terrain and create false flood detections along steep river bluffs.
-   - NISAR flies an exact 12-day repeat orbit. By pairing **Track 019 / Frame 075** acquisitions across a 12-day interval (27 June vs. 09 July 2026), FloodWatch achieves **0.0-pixel geometric parallax**, unlocking direct decibel log-ratio subtraction ($\Delta\gamma^0 = 10 \log_{10}(\gamma^0_{evt} / \gamma^0_{base})$).
+   - NISAR flies a repeat orbit with matched ground tracks. By pairing **Track 019 / Frame 075** acquisitions across a 12-day interval (27 June vs. 09 July 2026), FloodWatch minimizes geometric parallax, unlocking direct decibel log-ratio subtraction ($\Delta\gamma^0 = 10 \log_{10}(\gamma^0_{evt} / \gamma^0_{base})$).
 
 3. **Remote Bandwidth Revolution (99.34% Data Savings):**
    - NISAR Level-2 GCOV containers are massive (up to 30 GB per HDF5 file). Downloading complete granules during an active disaster overwhelms emergency internet bandwidth in rural Assam.
@@ -80,3 +80,4 @@ While calibrated on the Brahmaputra, the FloodWatch engine is globally generaliz
 - **100%** all-weather operational capability — rain, clouds, night, or storm.
 
 **Brahmaputra FloodWatch brings the power of NASA-ISRO NISAR down to the ground where lives are saved.**
+

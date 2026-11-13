@@ -15,6 +15,13 @@ export default {
           neon: '#39ff14',
           crimson: '#ff3366',
           amber: '#ffb703',
+        },
+        brand: {
+          prussian: '#0b132b',
+          space: '#1c2541',
+          dusk: '#3a506b',
+          teal: '#5bc0be',
+          aqua: '#6fffe9',
         }
       }
     },

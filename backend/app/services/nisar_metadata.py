@@ -51,6 +51,8 @@ NISAR_OBSERVATION_CATALOG: List[Dict[str, Any]] = [
         "flood_extent_level": "Moderate (Pre-Inundation)",
         "is_candidate": False,
         "recommended_baseline": True,
+        "is_processed": True,
+        "status": "PROCESSED_AVAILABLE",
         "sensor": "ISRO S-band SAR (Level 2 GCOV)",
         "polarizations": ["HHHH", "HVHV", "CRNA"],
         "mean_river_discharge_est": "38,200 m3/s",
@@ -67,6 +69,8 @@ NISAR_OBSERVATION_CATALOG: List[Dict[str, Any]] = [
         "flood_extent_level": "Critical / Severe Regional Inundation",
         "is_candidate": True,
         "recommended_baseline": False,
+        "is_processed": True,
+        "status": "PROCESSED_AVAILABLE",
         "sensor": "ISRO S-band SAR (Level 2 GCOV)",
         "polarizations": ["HHHH", "HVHV", "CRNA"],
         "mean_river_discharge_est": "56,400 m3/s",
@@ -134,6 +138,8 @@ STUDY_REGIONS: List[Dict[str, Any]] = [
         "description": "Crucial UNESCO World Heritage wetland habitat. Annually submerged by Brahmaputra floodwaves, driving wildlife to Karbi Anglong highlands.",
         "vulnerability": "Extreme Ecological Vulnerability",
         "key_features": ["Kaziranga National Park", "Diphlu River Confluence", "Mora Dhansiri River", "Brahmaputra Southern Embankment"],
+        "has_processed_data": False,
+        "is_model_baseline": True,
     },
     {
         "id": "tezpur",
@@ -146,6 +152,8 @@ STUDY_REGIONS: List[Dict[str, Any]] = [
         "description": "Key urban, agricultural and military transport corridor with acute braided riverbank erosion along Kaliabhomora bridge corridor.",
         "vulnerability": "High Urban / Embankment Erosion Risk",
         "key_features": ["Kolia Bhomora Setu", "Bhairabi Temple Bluff", "Brahmaputra Braided Chars", "Jiabharali River Confluence"],
+        "has_processed_data": False,
+        "is_model_baseline": True,
     },
     {
         "id": "majuli",
@@ -160,6 +168,7 @@ STUDY_REGIONS: List[Dict[str, Any]] = [
         "key_features": ["Kamalabari Ghat", "Garambur Embankment", "Subansiri River Confluence", "Kherkatia Suti"],
         "track": "015",
         "frame": "3700",
+        "has_processed_data": True,
         "is_real_extraction": True,
     },
     {
@@ -170,11 +179,12 @@ STUDY_REGIONS: List[Dict[str, Any]] = [
         "zoom": 13,
         "bounds": [[26.63, 91.09], [26.66, 91.12]],
         "area_km2": 9.152,
-        "description": "Lower Brahmaputra floodplain corridor within Track 019 / Frame 075, evaluated across 12-day repeat cycle (27 Jun vs 09 Jul 2026) showing +140.77% flood surge.",
+        "description": "Lower Brahmaputra floodplain corridor within Track 019 / Frame 075, evaluated across 12-day interval between available observations (27 Jun vs 09 Jul 2026) showing +140.77% increase in classified water area.",
         "vulnerability": "Severe Embankment Breach & Active Inundation",
         "key_features": ["Manas River Outfall", "Barpeta Embankment", "Brahmaputra South Floodplain", "Braided Lowland Chars"],
         "track": "019",
         "frame": "075",
+        "has_processed_data": True,
         "is_real_change_detection": True,
     },
     {
@@ -188,6 +198,8 @@ STUDY_REGIONS: List[Dict[str, Any]] = [
         "description": "Major economic hub where the Brahmaputra narrows through granite hills; acute flash flood and backflow risk in tributary channels.",
         "vulnerability": "High Urban & Industrial Infrastructure Exposure",
         "key_features": ["Saraighat Bridges", "Deepor Beel Ramsar Wetland", "Bharalu River Outfall", "North Guwahati Floodplains"],
+        "has_processed_data": False,
+        "is_model_baseline": True,
     },
     {
         "id": "full_swath",
@@ -200,8 +212,81 @@ STUDY_REGIONS: List[Dict[str, Any]] = [
         "description": "Full spatial swath of the NISAR descending acquisition, covering approximately 240 km wide radar imaging corridor across Assam.",
         "vulnerability": "Regional Valley-Scale Hazard",
         "key_features": ["240 km NISAR Swath", "Brahmaputra Main Stem", "Tributary Junctions", "Himalayan Foothills Buffer"],
+        "has_processed_data": False,
+        "is_model_baseline": True,
     },
 ]
+
+# Dedicated processed observation catalogs per verified study area
+MAJULI_OBSERVATIONS: List[Dict[str, Any]] = [
+    {
+        "cycle": 29,
+        "cycle_str": "029",
+        "date": "2026-08-27",
+        "start_time_utc": "2026-08-27T23:05:26Z",
+        "end_time_utc": "2026-08-27T23:06:02Z",
+        "granule_id": "NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001",
+        "stage": "Post-Monsoon Swath Acquisition",
+        "orbit_track": "015",
+        "frame": "3700",
+        "polarization": "HHHH (Single-Pol)",
+        "status": "PROCESSED_AVAILABLE",
+        "is_processed": True,
+        "mode": "single_date",
+        "water_area_km2": 797.55,
+        "water_coverage_percent": 8.91,
+        "polygon_count": 13821,
+        "description": "Single-date high-resolution water boundary delineation (797.55 km² water mapped across 13,821 polygons)",
+    }
+]
+
+BARPETA_OBSERVATIONS: List[Dict[str, Any]] = [
+    {
+        "cycle": 24,
+        "cycle_str": "024",
+        "date": "2026-06-27",
+        "start_time_utc": "2026-06-27T12:42:08Z",
+        "end_time_utc": "2026-06-27T12:42:45Z",
+        "granule_id": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001",
+        "stage": "Pre-Flood High Flow (Baseline Observation)",
+        "orbit_track": "019",
+        "frame": "075",
+        "polarization": "HHHH (Single-Pol)",
+        "status": "PROCESSED_AVAILABLE",
+        "is_processed": True,
+        "role": "baseline",
+        "water_area_km2": 1.660,
+        "description": "Pre-flood baseline observation in 9.152 km² corridor",
+    },
+    {
+        "cycle": 25,
+        "cycle_str": "025",
+        "date": "2026-07-09",
+        "start_time_utc": "2026-07-09T12:42:08Z",
+        "end_time_utc": "2026-07-09T12:42:45Z",
+        "granule_id": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001",
+        "stage": "Event Observation (09 July 2026)",
+        "orbit_track": "019",
+        "frame": "075",
+        "polarization": "HHHH (Single-Pol)",
+        "status": "PROCESSED_AVAILABLE",
+        "is_processed": True,
+        "role": "event",
+        "water_area_km2": 3.997,
+        "description": "Event observation (09 July 2026) showing +140.77% increase in classified water area (+2.337 km² newly inundated in evaluated corridor)",
+    }
+]
+
+def get_observations_for_region(region_id: str, only_processed: bool = True) -> List[Dict[str, Any]]:
+    """Returns data-driven observations for the given region."""
+    if region_id == "majuli":
+        return MAJULI_OBSERVATIONS
+    elif region_id == "barpeta":
+        return BARPETA_OBSERVATIONS
+    elif only_processed:
+        return []
+    else:
+        return NISAR_OBSERVATION_CATALOG
 
 def get_observation_by_date(date_str: str) -> Dict[str, Any]:
     for obs in NISAR_OBSERVATION_CATALOG:

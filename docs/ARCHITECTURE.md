@@ -159,3 +159,4 @@ flowchart TD
 - **Read-Only Data Integrity:** Satellite rasters, cache files, and GeoTIFFs are read-only.
 - **Zero Secrets / Client Hygiene:** No API keys, passwords, or personal credentials exist in the codebase.
 - **Cross-Platform Compatibility:** Runs on Windows (PowerShell / cmd), Linux, and macOS with standard Python 3.11 and Node.js LTS runtimes.
+

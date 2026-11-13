@@ -32,7 +32,7 @@ export default function BarpetaStudyHeader({ thresholdDb, onThresholdChange, spe
                 Study 2: Barpeta Floodplain — Multi-Temporal NISAR Flood Change
               </h2>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-800">
-                +140.77% Flood Surge
+                +140.77% Water Increase
               </span>
             </div>
             <p className="text-xs text-slate-400">
@@ -105,7 +105,7 @@ export default function BarpetaStudyHeader({ thresholdDb, onThresholdChange, spe
 
         <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1">
           <div className="flex items-center justify-between text-cyan-400 font-bold">
-            <span>Zero Parallax Geometry</span>
+            <span>Consistent Orbital Geometry</span>
             <span className="text-[10px] font-mono bg-cyan-950 px-1.5 py-0.2 rounded border border-cyan-800">Δt = 12 Days</span>
           </div>
           <p className="text-slate-300 leading-relaxed text-[11px]">
@@ -126,7 +126,7 @@ export default function BarpetaStudyHeader({ thresholdDb, onThresholdChange, spe
             +2.337 <span className="text-xs font-normal text-rose-400">km²</span>
           </div>
           <div className="text-[10px] text-rose-300/80 font-bold mt-0.5">
-            +140.77% Flood Expansion
+            +140.77% Water Expansion
           </div>
         </div>
 
@@ -154,7 +154,7 @@ export default function BarpetaStudyHeader({ thresholdDb, onThresholdChange, spe
             0.000 <span className="text-xs font-normal text-amber-400">km²</span>
           </div>
           <div className="text-[10px] text-amber-400/80 mt-0.5">
-            Zero recession during surge
+            Zero recession during 09 July event
           </div>
         </div>
 
@@ -185,7 +185,8 @@ export default function BarpetaStudyHeader({ thresholdDb, onThresholdChange, spe
       <div className="p-2.5 rounded-lg bg-rose-950/60 border border-rose-700/80 text-[11px] text-rose-200 flex items-center gap-2">
         <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
         <div>
-          <strong className="text-white">Scientific Attribution Guardrail:</strong> This <strong>+140.77% flood surge</strong> (+2.337 km² newly inundated land) was measured strictly for the <strong>Lower Brahmaputra / Barpeta reach</strong> (91.09°E–91.12°E, 26.63°N–26.66°N) across Track 019 / Frame 075 using single-polarization HHHH backscatter (Δγ° &lt; -4.50 dB threshold exceedance margin). Dual-pol (HVHV) cross-polarization was not utilized. It does <strong>NOT</strong> apply to Majuli Island (Track 015 / Frame 3700).
+          <strong className="text-white">Scientific Attribution Guardrail:</strong> This <strong>+140.77% water increase</strong> (+2.337 km² newly inundated land) was measured strictly for the <strong>Lower Brahmaputra / Barpeta reach</strong> (91.09°E–91.12°E, 26.63°N–26.66°N) across Track 019 / Frame 075 using single-polarization HHHH backscatter (Δγ° &lt; -4.50 dB threshold exceedance margin). Dual-pol (HVHV) cross-polarization was not utilized. It does <strong>NOT</strong> apply to Majuli Island (Track 015 / Frame 3700).
+        </div> (+2.337 km² newly inundated land) was measured strictly for the <strong>Lower Brahmaputra / Barpeta reach</strong> (91.09°E–91.12°E, 26.63°N–26.66°N) across Track 019 / Frame 075 using single-polarization HHHH backscatter (Δγ° &lt; -4.50 dB threshold exceedance margin). Dual-pol (HVHV) cross-polarization was not utilized. It does <strong>NOT</strong> apply to Majuli Island (Track 015 / Frame 3700).
         </div>
       </div>
     </div>
