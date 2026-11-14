@@ -61,3 +61,6 @@ Thumbs.db
 .idea/
 rewrite_author.sh
 scratch/
+
+# Accidental duplicate/nested directories
+backend/backend/

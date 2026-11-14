@@ -614,15 +614,12 @@ def export_geojson(
     event_date: str = Query("2026-07-09")
 ):
     """Exports detected flood extent as standard RFC 7946 GeoJSON FeatureCollection."""
-    # Coerce Query defaults if invoked directly in Python
-    if not isinstance(filter_window, int):
-        filter_window = getattr(filter_window, "default", 5)
-    if not isinstance(threshold_db, (int, float)):
-        threshold_db = getattr(threshold_db, "default", -4.5)
-    if not isinstance(apply_speckle_filter, bool):
-        apply_speckle_filter = getattr(apply_speckle_filter, "default", True)
-    if not isinstance(use_adaptive_otsu, bool):
-        use_adaptive_otsu = getattr(use_adaptive_otsu, "default", True)
+    if not isinstance(region_id, str):
+        region_id = getattr(region_id, "default", "kaziranga")
+    if not isinstance(baseline_date, str):
+        baseline_date = getattr(baseline_date, "default", "2026-06-27")
+    if not isinstance(event_date, str):
+        event_date = getattr(event_date, "default", "2026-07-09")
 
     if region_id == "majuli":
         return get_majuli_water_boundaries()
