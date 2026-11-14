@@ -249,86 +249,84 @@ export default function MapViewer({
   }
 
   const tileUrls = {
-    satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    street: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    satellite: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    street: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    light: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
   };
 
   const tileAttributions = {
     satellite: '&copy; Esri &mdash; Earthstar Geographics',
     street: '&copy; OpenStreetMap contributors',
-    light: '&copy; OpenStreetMap contributors &copy; CARTO',
+    light: '&copy; OpenStreetMap contributors, HOT',
   };
 
   return (
-    <div className="bg-white rounded-xl border border-border p-4 shadow-xs flex flex-col h-full font-sans">
+    <div className="bg-[#1a1f3d] rounded-xl border border-[#587ebb]/40 p-4 shadow-lg flex flex-col h-full font-sans">
       {/* Map Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-teal" />
-          <h3 className="text-sm font-semibold text-primary">
+          <h3 className="text-sm font-semibold text-[#c6e9f1]">
             {isMajuli
               ? 'Real NISAR Water Classification Layer (Majuli Island)'
               : isBarpeta
               ? 'Multi-Temporal NISAR Water Change Vector Layer (+140.77% Increase in Corridor)'
               : 'Interactive SAR Satellite Flood Map'}
           </h3>
-          <span className="text-[10px] font-mono text-aqua bg-indigo px-2.5 py-0.5 rounded-md border border-dusk font-semibold">
+          <span className="text-[10px] font-mono text-[#87b8e8] bg-[#222950] px-2.5 py-0.5 rounded-md border border-[#3b4a8c] font-semibold">
             {isMajuli ? 'Track 015 / Frame 3700' : 'Track 019 / Frame 075'}
           </span>
         </div>
 
         {/* Layer Controls */}
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs">
           {/* Base Layer Switcher */}
-          <div className="bg-cloud border border-border rounded-md p-0.5 flex items-center">
+          <div className="bg-[#222950] border border-[#587ebb]/40 rounded-md p-0.5 flex items-center">
             <button
               onClick={() => setBaseLayer('satellite')}
-              className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
-                baseLayer === 'satellite' ? 'bg-white text-primary font-semibold shadow-2xs' : 'text-muted hover:text-primary'
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded font-medium transition-colors cursor-pointer text-[11px] sm:text-xs ${
+                baseLayer === 'satellite' ? 'bg-[#3b4a8c] text-[#c6e9f1] font-medium shadow-xs' : 'text-[#87b8e8] hover:text-white'
               }`}
             >
               Satellite
             </button>
             <button
               onClick={() => setBaseLayer('street')}
-              className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
-                baseLayer === 'street' ? 'bg-white text-primary font-semibold shadow-2xs' : 'text-muted hover:text-primary'
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded font-medium transition-colors cursor-pointer text-[11px] sm:text-xs ${
+                baseLayer === 'street' ? 'bg-[#3b4a8c] text-[#c6e9f1] font-medium shadow-xs' : 'text-[#87b8e8] hover:text-white'
               }`}
             >
               Streets
             </button>
             <button
               onClick={() => setBaseLayer('light')}
-              className={`px-2.5 py-1 rounded font-medium transition-colors cursor-pointer ${
-                baseLayer === 'light' ? 'bg-white text-primary font-semibold shadow-2xs' : 'text-muted hover:text-primary'
+              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded font-medium transition-colors cursor-pointer text-[11px] sm:text-xs ${
+                baseLayer === 'light' ? 'bg-[#3b4a8c] text-[#c6e9f1] font-medium shadow-xs' : 'text-[#87b8e8] hover:text-white'
               }`}
             >
-              Light
+              Terrain
             </button>
           </div>
 
           {/* Toggle Flood Layer */}
           <button
             onClick={() => setShowInundationLayer(!showInundationLayer)}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-md border font-medium transition-colors cursor-pointer ${
+            className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-md border font-medium transition-colors cursor-pointer text-[11px] sm:text-xs ${
               showInundationLayer
-                ? 'bg-subtle text-primary border-teal'
-                : 'bg-cloud text-muted border-border'
+                ? 'bg-[#3b4a8c] text-[#c6e9f1] border-[#587ebb]'
+                : 'bg-[#222950] text-[#87b8e8] border-[#3b4a8c]'
             }`}
           >
-            {showInundationLayer ? <Eye className="w-3.5 h-3.5 text-teal" /> : <EyeOff className="w-3.5 h-3.5 text-muted" />}
             <span>{isMajuli ? 'NISAR Water Layer' : isBarpeta ? 'Change Vectors' : 'Flood Overlay'}</span>
           </button>
 
           {isBarpeta && showInundationLayer && (
-            <div className="flex items-center gap-1 bg-cloud border border-border rounded-md p-0.5 text-[11px]">
+            <div className="flex items-center gap-1 bg-[#222950] border border-[#587ebb]/40 rounded-md p-0.5 text-[10px] sm:text-[11px]">
               <button
                 onClick={() => setShowNewlyInundated(!showNewlyInundated)}
                 className={`px-2 py-0.5 rounded font-medium transition-colors cursor-pointer ${
                   showNewlyInundated
-                    ? 'bg-map-inundated text-white font-semibold'
-                    : 'text-muted hover:text-primary'
+                    ? 'bg-[#E11D48] text-white font-semibold'
+                    : 'text-[#87b8e8] hover:text-white'
                 }`}
                 title="Toggle Newly Inundated active floodwater (+2.337 km²)"
               >
@@ -338,8 +336,8 @@ export default function MapViewer({
                 onClick={() => setShowPersistentWater(!showPersistentWater)}
                 className={`px-2 py-0.5 rounded font-medium transition-colors cursor-pointer ${
                   showPersistentWater
-                    ? 'bg-map-persistent text-white font-semibold'
-                    : 'text-muted hover:text-primary'
+                    ? 'bg-[#587ebb] text-white font-semibold'
+                    : 'text-[#87b8e8] hover:text-white'
                 }`}
                 title="Toggle Permanent braided river channel (1.660 km²)"
               >
@@ -351,7 +349,7 @@ export default function MapViewer({
       </div>
 
       {/* Leaflet Map */}
-      <div className="w-full h-[460px] rounded-lg overflow-hidden border border-border relative z-10 shadow-inner">
+      <div className="w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[560px] rounded-lg overflow-hidden border border-[#587ebb]/50 relative z-10 shadow-inner">
         <MapContainer
           center={centerCoords}
           zoom={region.zoom || 11}
@@ -552,9 +550,8 @@ export default function MapViewer({
 
         {/* Floating Opacity Slider */}
         {showInundationLayer && (
-          <div className="absolute top-3 left-3 bg-white/95 border border-border rounded-lg p-2 text-xs text-primary font-sans z-[1000] backdrop-blur flex items-center gap-2 shadow-xs">
-            <Sliders className="w-3.5 h-3.5 text-teal" />
-            <span className="text-[11px] text-muted font-medium">Opacity:</span>
+          <div className="absolute top-3 left-3 bg-[#1a1f3d]/90 border border-[#587ebb]/50 rounded-lg p-2 text-xs text-[#c6e9f1] font-sans z-[1000] backdrop-blur-md flex items-center gap-2 shadow-lg">
+            <span className="text-[11px] text-[#87b8e8] font-medium">Opacity:</span>
             <input
               type="range"
               min="0.2"
@@ -562,20 +559,20 @@ export default function MapViewer({
               step="0.05"
               value={layerOpacity}
               onChange={(e) => setLayerOpacity(parseFloat(e.target.value))}
-              className="w-20 h-1 bg-border rounded-lg appearance-none cursor-pointer accent-teal"
+              className="w-20 h-1 bg-[#222950] rounded-lg appearance-none cursor-pointer accent-[#87b8e8]"
             />
-            <span className="font-mono text-[10px] text-primary font-semibold">{Math.round(layerOpacity * 100)}%</span>
+            <span className="font-mono text-[10px] text-[#c6e9f1] font-semibold">{Math.round(layerOpacity * 100)}%</span>
           </div>
         )}
 
         {/* Loading Overlay */}
         {((isMajuli && loadingMajuli) || (isBarpeta && loadingBarpeta)) && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-xs z-[1000] flex flex-col items-center justify-center p-6 text-center">
-            <Loader2 className="w-8 h-8 text-teal animate-spin mb-3" />
-            <span className="text-sm font-semibold text-primary">
+          <div className="absolute inset-0 bg-[#1a1f3d]/85 backdrop-blur-sm z-[1000] flex flex-col items-center justify-center p-6 text-center">
+            <Loader2 className="w-8 h-8 text-[#87b8e8] animate-spin mb-3" />
+            <span className="text-sm font-semibold text-[#c6e9f1]">
               {isMajuli ? 'Rendering 13,821 Classified Water Polygons...' : 'Rendering Barpeta Flood Change Vectors...'}
             </span>
-            <span className="text-xs text-muted font-mono mt-1">
+            <span className="text-xs text-[#87b8e8] font-mono mt-1">
               {isMajuli
                 ? 'Track 015 / Frame 3700 • 797.55 km² Water Extent'
                 : 'Track 019 / Frame 075 • +140.77% Water Area Increase'}
@@ -585,72 +582,66 @@ export default function MapViewer({
 
         {/* Floating Real Majuli Scientific Legend */}
         {isMajuli && !loadingMajuli && (
-          <div className="absolute bottom-8 right-3 bg-white/95 border border-border rounded-xl p-3 text-xs text-primary z-[1000] shadow-sm backdrop-blur max-w-xs space-y-1.5 font-sans pointer-events-auto">
-            <div className="flex items-center justify-between pb-1.5 border-b border-border">
-              <div className="flex items-center gap-1.5 text-teal font-semibold">
-                <Sparkles className="w-3.5 h-3.5 text-teal" />
-                <span>Verified NISAR Water Extent</span>
-              </div>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo text-aqua border border-dusk font-semibold">
+          <div className="absolute bottom-8 right-3 bg-[#1a1f3d]/95 border border-[#587ebb]/60 rounded-xl p-3 text-xs text-[#c6e9f1] z-[1000] shadow-xl backdrop-blur-md max-w-xs space-y-1.5 font-sans pointer-events-auto">
+            <div className="flex items-center justify-between pb-1.5 border-b border-[#3b4a8c]/50">
+              <span className="text-[#87b8e8] font-semibold">Verified NISAR Water Extent</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#222950] text-[#c6e9f1] border border-[#587ebb]/50 font-semibold">
                 Track 015
               </span>
             </div>
             <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-muted">Water Extent:</span>
-              <span className="text-primary font-semibold">797.55 km²</span>
+              <span className="text-slate-400">Water Extent:</span>
+              <span className="text-[#87b8e8] font-semibold">797.55 km²</span>
             </div>
             <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-muted">Water Polygons:</span>
-              <span className="text-primary font-semibold">13,821 Features</span>
+              <span className="text-slate-400">Water Polygons:</span>
+              <span className="text-[#c6e9f1] font-semibold">13,821 Features</span>
             </div>
             <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-muted">Swath Coverage:</span>
-              <span className="text-primary font-semibold">8.91% of 8,955.16 km²</span>
+              <span className="text-slate-400">Swath Coverage:</span>
+              <span className="text-[#c6e9f1] font-semibold">8.91% of 8,955.16 km²</span>
             </div>
             <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-muted">Observation Date:</span>
-              <span className="text-body">2026-08-27 (Post-Peak)</span>
+              <span className="text-slate-400">Observation Date:</span>
+              <span className="text-slate-300">2026-08-27</span>
             </div>
           </div>
         )}
 
         {/* Floating Real Barpeta Scientific Legend */}
         {isBarpeta && !loadingBarpeta && (
-          <div className="absolute bottom-8 right-3 bg-white/95 border border-border rounded-xl p-3 text-xs text-primary z-[1000] shadow-sm backdrop-blur max-w-xs space-y-1.5 font-sans pointer-events-auto">
-            <div className="flex items-center justify-between pb-1.5 border-b border-border">
-              <div className="flex items-center gap-1.5 text-map-inundated font-semibold">
-                <TrendingUp className="w-3.5 h-3.5 text-map-inundated" />
-                <span>Water Area Increase (+140.77%)</span>
-              </div>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo text-aqua border border-dusk font-semibold">
+          <div className="absolute bottom-8 right-3 bg-[#1a1f3d]/95 border border-[#587ebb]/60 rounded-xl p-3 text-xs text-[#c6e9f1] z-[1000] shadow-xl backdrop-blur-md max-w-xs space-y-1.5 font-sans pointer-events-auto">
+            <div className="flex items-center justify-between pb-1.5 border-b border-[#3b4a8c]/50">
+              <span className="text-[#f43f5e] font-semibold">Water Area Change (+140.77%)</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#222950] text-[#c6e9f1] border border-[#587ebb]/50 font-semibold">
                 Track 019
               </span>
             </div>
             <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-muted">Before (27 Jun):</span>
-              <span className="text-map-persistent font-semibold">1.660 km²</span>
+              <span className="text-slate-400">Baseline (27 Jun):</span>
+              <span className="text-[#87b8e8] font-semibold">1.660 km²</span>
             </div>
             <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-muted">After (09 Jul):</span>
-              <span className="text-map-inundated font-semibold">3.997 km²</span>
+              <span className="text-slate-400">Event (09 Jul):</span>
+              <span className="text-[#f43f5e] font-semibold">3.997 km²</span>
             </div>
             <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-muted">Newly Inundated:</span>
-              <span className="text-map-inundated font-semibold">+2.337 km² (+140.77%)</span>
+              <span className="text-slate-400">Newly Inundated:</span>
+              <span className="text-[#f43f5e] font-semibold">+2.337 km²</span>
             </div>
             <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-muted">Persistent Channel:</span>
-              <span className="text-map-persistent font-semibold">1.660 km²</span>
+              <span className="text-slate-400">Persistent Channel:</span>
+              <span className="text-[#87b8e8] font-semibold">1.660 km²</span>
             </div>
           </div>
         )}
 
         {/* Floating Telemetry Badge */}
-        <div className="absolute bottom-2 left-2 bg-white/90 border border-slate-200 rounded-lg px-2.5 py-1 text-[10px] text-slate-600 font-mono z-[1000] backdrop-blur pointer-events-none shadow-2xs">
+        <div className="absolute bottom-2 left-2 bg-[#1a1f3d]/90 border border-[#587ebb]/50 rounded-md px-2.5 py-1 text-[10px] text-[#c6e9f1] font-mono z-[1000] backdrop-blur-md pointer-events-none shadow-md">
           {isMajuli
             ? 'NISAR Track 015 / Frame 3700 • UTM Zone 46N (EPSG:32646) • Pixel: 10 m • 8,955.16 km² Swath'
             : isBarpeta
-            ? 'NISAR Track 019 / Frame 075 • 12-Day Interval (27 Jun vs 09 Jul) • Single-Pol HHHH • +140.77%'
+            ? 'NISAR Track 019 / Frame 075 • 12-Day Interval (27 Jun vs 09 Jul) • Single-Pol HHHH'
             : 'NISAR Track 019 / Frame 075 • UTM Zone 46N (EPSG:32646) • Pixel: 25 m • 240 km Swath'}
         </div>
       </div>

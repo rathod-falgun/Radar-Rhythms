@@ -1,0 +1,37 @@
+{
+  "transition_interval": "Cycle_25_to_Cycle_26",
+  "baseline_cycle": 25,
+  "baseline_date": "2026-07-09",
+  "baseline_utc": "2026-07-09T12:42:08Z",
+  "baseline_granule": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001",
+  "event_cycle": 26,
+  "event_date": "2026-07-21",
+  "event_utc": "2026-07-21T12:42:08Z",
+  "event_granule": "NISAR_S2_PR_GCOV_026_019_D_075_2500_CRNA_A_20260721T124208_20260721T124245_P00500_M_F_I_001",
+  "observation_interval_days": 12.0,
+  "accounting_metrics": {
+    "common_valid_pixels": 14400,
+    "common_valid_km2": 9.1519,
+    "nodata_pixels": 0,
+    "nodata_km2": 0.0,
+    "reconciliation_passed": true
+  },
+  "class_metrics": {
+    "stable_land_pixels": 7968,
+    "stable_land_km2": 5.064,
+    "stable_land_ha": 506.4,
+    "persistent_water_pixels": 4144,
+    "persistent_water_km2": 2.6337,
+    "persistent_water_ha": 263.37,
+    "newly_inundated_pixels": 143,
+    "newly_inundated_km2": 0.0909,
+    "newly_inundated_ha": 9.09,
+    "receded_water_pixels": 2145,
+    "receded_water_km2": 1.3633,
+    "receded_water_ha": 136.33,
+    "net_water_change_km2": -1.2724,
+    "percentage_change": -31.83,
+    "baseline_water_km2": 3.997,
+    "event_water_km2": 2.7246
+  }
+}

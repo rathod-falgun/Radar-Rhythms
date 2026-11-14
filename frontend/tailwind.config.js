@@ -11,24 +11,44 @@ export default {
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       colors: {
-        // Midnight Atlas Brand Identity
-        midnight: '#0B132B',
-        indigo: '#1C2541',
-        dusk: '#3A506B',
-        teal: '#5BC0BE',
-        aqua: '#6FFFE9',
-        cloud: '#F4F6F8',
-        surface: '#FFFFFF',
+        // Astro Color Theme (Port Gore, Chambray, Steel Blue, Cornflower, Link Water)
+        portgore: '#1a1f3d',
+        chambray: '#3b4a8c',
+        steelblue: '#587ebb',
+        cornflower: '#87b8e8',
+        linkwater: '#c6e9f1',
 
-        // Neutrals
-        primary: '#0B132B',
-        body: '#475569',
-        muted: '#64748B',
-        border: '#E2E8F0',
-        subtle: '#F8FAFC',
-        disabled: '#CBD5E1',
+        astro: {
+          base: '#1a1f3d',
+          gradient: '#3b4a8c',
+          box: '#222950',
+          border: '#587ebb',
+          highlight: '#87b8e8',
+          accent: '#c6e9f1',
+        },
 
-        // Scientific Map Semantic Colors (PRESERVED)
+        // Theme compatibility tokens mapped to Astro palette
+        midnight: '#1a1f3d',
+        indigo: '#222950',
+        panel: '#283262',
+        dusk: '#3b4a8c',
+        teal: '#587ebb',
+        aqua: '#87b8e8',
+        cloud: '#c6e9f1',
+
+        // Semantic Role Tokens
+        space: {
+          bg: '#1a1f3d',
+          card: '#222950',
+          panel: '#283262',
+          border: 'rgba(88, 126, 187, 0.45)',
+          borderStrong: '#587ebb',
+          text: '#c6e9f1',
+          muted: '#87b8e8',
+          dim: '#587ebb',
+        },
+
+        // Scientific Map Semantic Colors (ABSOLUTELY PRESERVED)
         map: {
           persistent: '#06B6D4',
           inundated: '#E11D48',

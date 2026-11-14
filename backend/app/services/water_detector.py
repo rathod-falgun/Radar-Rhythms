@@ -21,16 +21,18 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
-# pyrefly: ignore[missing-import]
-import rasterio
-# pyrefly: ignore[missing-import]
-from rasterio.crs import CRS
-# pyrefly: ignore[missing-import]
-from rasterio.features import shapes
-# pyrefly: ignore[missing-import]
-from rasterio.transform import Affine
-# pyrefly: ignore[missing-import]
-from rasterio.warp import transform_geom
+try:
+    import rasterio
+    from rasterio.crs import CRS
+    from rasterio.features import shapes
+    from rasterio.transform import Affine
+    from rasterio.warp import transform_geom
+except ImportError:
+    rasterio = None
+    CRS = None
+    shapes = None
+    Affine = None
+    transform_geom = None
 from scipy.ndimage import binary_closing, binary_opening, label, uniform_filter
 
 logger = logging.getLogger("water_detector")

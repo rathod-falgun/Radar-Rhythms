@@ -1,0 +1,18 @@
+{
+  "reference_granule": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001.h5",
+  "crs_epsg": 32646,
+  "crs_name": "WGS 84 / UTM zone 46N",
+  "dimensions": [
+    120,
+    120
+  ],
+  "pixel_spacing_x_m": 25.21008403360611,
+  "pixel_spacing_y_m": -25.210084033664316,
+  "pixel_area_m2": 635.5483369829491,
+  "total_pixels": 14400,
+  "total_area_km2": 9.151896052554468,
+  "x_origin_m": 310000.0,
+  "x_end_m": 313000.0,
+  "y_origin_m": 2950000.0,
+  "y_end_m": 2947000.0
+}

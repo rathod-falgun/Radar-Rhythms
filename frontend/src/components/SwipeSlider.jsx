@@ -170,30 +170,36 @@ export default function SwipeSlider({
     }
   };
 
+  const handleTouchMove = (e) => {
+    if (e.touches && e.touches[0]) {
+      handlePointerMove(e.touches[0]);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-xl border border-border p-4 shadow-xs flex flex-col justify-between">
+    <div className="bg-[#1a1f3d] rounded-xl border border-[#587ebb]/40 p-4 shadow-lg flex flex-col justify-between">
       {/* Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-indigo flex items-center justify-center text-teal">
+          <div className="w-6 h-6 rounded-md bg-[#222950] border border-[#587ebb]/50 flex items-center justify-center text-[#87b8e8]">
             <MoveHorizontal className="w-3.5 h-3.5" />
           </div>
-          <h3 className="text-sm font-semibold text-primary">
+          <h3 className="text-sm font-semibold text-white">
             Interactive Curtain Swipe Comparator
           </h3>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-indigo text-aqua border border-indigo font-medium">
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#222950] text-[#87b8e8] border border-[#3b4a8c] font-medium">
             12-day interval
           </span>
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center gap-1 bg-subtle p-0.5 rounded-lg border border-border text-xs font-medium">
+        <div className="flex items-center gap-1 bg-[#222950] p-0.5 rounded-lg border border-[#587ebb]/40 text-xs font-medium">
           <button
             onClick={() => setViewMode('radar_vs_flood')}
             className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
               viewMode === 'radar_vs_flood'
-                ? 'bg-white text-primary font-semibold shadow-2xs border border-border'
-                : 'text-muted hover:text-primary'
+                ? 'bg-[#3b4a8c] text-white font-medium shadow-xs'
+                : 'text-slate-300 hover:text-white'
             }`}
           >
             Baseline SAR vs Inundation Map
@@ -202,8 +208,8 @@ export default function SwipeSlider({
             onClick={() => setViewMode('radar_vs_radar')}
             className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
               viewMode === 'radar_vs_radar'
-                ? 'bg-white text-primary font-semibold shadow-2xs border border-border'
-                : 'text-muted hover:text-primary'
+                ? 'bg-[#3b4a8c] text-white font-medium shadow-xs'
+                : 'text-slate-300 hover:text-white'
             }`}
           >
             Direct SAR Backscatter (HH dB)
@@ -211,14 +217,19 @@ export default function SwipeSlider({
         </div>
       </div>
 
-      {/* Swipe Container */}
+      {/* Swipe Container (Supports both mouse drag & touch drag) */}
       <div
         ref={containerRef}
         onMouseDown={() => setIsDragging(true)}
         onMouseUp={() => setIsDragging(false)}
         onMouseLeave={() => { setIsDragging(false); setHoveredPixel(null); }}
         onMouseMove={handlePointerMove}
-        className="relative w-full aspect-video md:aspect-[2/1] rounded-lg overflow-hidden border border-border bg-midnight cursor-col-resize select-none shadow-inner"
+        onTouchStart={() => setIsDragging(true)}
+        onTouchEnd={() => { setIsDragging(false); setHoveredPixel(null); }}
+        onTouchCancel={() => { setIsDragging(false); setHoveredPixel(null); }}
+        onTouchMove={handleTouchMove}
+        className="relative w-full aspect-[4/3] sm:aspect-video md:aspect-[2/1] rounded-lg overflow-hidden border border-[#587ebb]/50 bg-[#1a1f3d] cursor-col-resize select-none shadow-inner"
+        style={{ touchAction: 'none' }}
       >
         {/* Right Canvas (Event Scene / Inundation) */}
         <div className="absolute inset-0 w-full h-full">
@@ -228,7 +239,7 @@ export default function SwipeSlider({
             height={120}
             className="w-full h-full object-cover image-rendering-pixelated"
           />
-          <div className="absolute top-3 right-3 bg-white/95 text-[#E11D48] text-xs px-2.5 py-1 rounded-md font-mono border border-border shadow-xs backdrop-blur-xs pointer-events-none font-semibold">
+          <div className="absolute top-3 right-3 bg-[#1C2541]/90 text-[#E11D48] text-xs px-2.5 py-1 rounded-md font-mono border border-[#3A506B]/70 shadow-md backdrop-blur-md pointer-events-none font-semibold">
             {viewMode === 'radar_vs_flood' ? 'After: Flood Map' : `After: ${eventDate}`}
           </div>
         </div>
@@ -246,17 +257,17 @@ export default function SwipeSlider({
               className="w-full h-full object-cover image-rendering-pixelated"
             />
           </div>
-          <div className="absolute top-3 left-3 bg-white/95 text-emerald-700 text-xs px-2.5 py-1 rounded-md font-mono border border-border shadow-xs backdrop-blur-xs pointer-events-none font-semibold">
+          <div className="absolute top-3 left-3 bg-[#1C2541]/90 text-[#6FFFE9] text-xs px-2.5 py-1 rounded-md font-mono border border-[#3A506B]/70 shadow-md backdrop-blur-md pointer-events-none font-semibold">
             Before: {baselineDate}
           </div>
         </div>
 
         {/* Slider Divider Bar */}
         <div
-          className="absolute top-0 bottom-0 w-0.5 bg-teal cursor-col-resize"
+          className="absolute top-0 bottom-0 w-0.5 bg-[#5BC0BE] cursor-col-resize"
           style={{ left: `${sliderPosition}%` }}
         >
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white border-2 border-teal flex items-center justify-center text-midnight shadow-md">
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-[#1C2541] border-2 border-[#5BC0BE] flex items-center justify-center text-[#6FFFE9] shadow-lg">
             <MoveHorizontal className="w-3.5 h-3.5" />
           </div>
         </div>
@@ -264,31 +275,31 @@ export default function SwipeSlider({
 
       {/* Live Pixel Probe & Value Inspector */}
       {hoveredPixel && (
-        <div className="mt-2.5 bg-subtle border border-border rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
+        <div className="mt-2.5 bg-[#0B132B]/80 border border-[#3A506B]/60 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
-            <Crosshair className="w-4 h-4 text-teal animate-spin" />
-            <span className="font-mono text-primary font-semibold">
+            <Crosshair className="w-4 h-4 text-[#5BC0BE] animate-spin" />
+            <span className="font-mono text-[#F4F6F8] font-semibold">
               Pixel [{hoveredPixel.x}, {hoveredPixel.y}]:
             </span>
             <span
               className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
                 hoveredPixel.cls_code === 2
-                  ? 'bg-rose-50 text-[#E11D48] border border-rose-200'
+                  ? 'bg-rose-950/70 text-[#E11D48] border border-rose-800'
                   : hoveredPixel.cls_code === 4
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-800'
                   : hoveredPixel.cls_code === 1
-                  ? 'bg-sky-50 text-[#06B6D4] border border-sky-200'
-                  : 'bg-white text-muted border border-border'
+                  ? 'bg-sky-950/70 text-[#06B6D4] border border-sky-800'
+                  : 'bg-[#24314D] text-slate-300 border border-[#3A506B]'
               }`}
             >
               {hoveredPixel.class_name}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-[11px] text-body">
-            <span>Before: <strong className="text-primary">{hoveredPixel.base_db.toFixed(1)} dB</strong></span>
-            <span>After: <strong className="text-primary">{hoveredPixel.event_db.toFixed(1)} dB</strong></span>
-            <span className={hoveredPixel.delta_db < 0 ? 'text-[#E11D48] font-bold' : 'text-emerald-700 font-bold'}>
+          <div className="flex items-center gap-3 font-mono text-[11px] text-slate-300">
+            <span>Before: <strong className="text-[#F4F6F8]">{hoveredPixel.base_db.toFixed(1)} dB</strong></span>
+            <span>After: <strong className="text-[#F4F6F8]">{hoveredPixel.event_db.toFixed(1)} dB</strong></span>
+            <span className={hoveredPixel.delta_db < 0 ? 'text-[#E11D48] font-bold' : 'text-emerald-400 font-bold'}>
               Δ: {hoveredPixel.delta_db > 0 ? '+' : ''}{hoveredPixel.delta_db.toFixed(1)} dB
             </span>
           </div>
@@ -296,12 +307,12 @@ export default function SwipeSlider({
       )}
 
       {/* Legend & Instructions */}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-primary font-medium">Map Legend:</span>
+          <span className="text-[#F4F6F8] font-medium">Map Legend:</span>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-xs bg-[#06B6D4]"></span>
-            <span>Permanent Channel (1.66 km²)</span>
+            <span className="text-slate-300">Permanent Channel (1.66 km²)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-xs bg-[#E11D48]"></span>
@@ -309,27 +320,27 @@ export default function SwipeSlider({
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-xs bg-[#64748B]"></span>
-            <span>Stable Land</span>
+            <span className="text-slate-300">Stable Land</span>
           </div>
         </div>
 
-        <div className="text-[11px] text-muted italic">
+        <div className="text-[11px] text-slate-400 italic">
           💡 Drag slider to compare • Hover over pixels to inspect decibels
         </div>
       </div>
 
       {/* Barpeta Verified Mathematical Proof Banner */}
       {(comparisonData?.region?.id === 'barpeta' || comparisonData?.statistics?.percentage_change === 140.77) && (
-        <div className="mt-3 p-2.5 rounded-lg bg-subtle border border-border text-xs font-mono text-primary flex flex-wrap items-center justify-between gap-2">
+        <div className="mt-3 p-2.5 rounded-lg bg-[#0B132B]/60 border border-[#3A506B]/50 text-xs font-mono text-slate-300 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-md bg-rose-50 text-[#E11D48] border border-rose-200 font-semibold text-[10px] uppercase">
+            <span className="px-2 py-0.5 rounded-md bg-rose-950/70 text-[#E11D48] border border-rose-800 font-semibold text-[10px] uppercase">
               Calculation
             </span>
-            <span className="text-body">
+            <span className="text-slate-300">
               ((3.997 km² After - 1.660 km² Before) / 1.660 km²) × 100 = <strong className="text-[#E11D48] font-bold">+140.77%</strong>
             </span>
           </div>
-          <div className="text-[10px] text-muted font-mono">
+          <div className="text-[10px] text-slate-400 font-mono">
             Track 019 / Frame 075 • Evaluated corridor: 9.152 km²
           </div>
         </div>

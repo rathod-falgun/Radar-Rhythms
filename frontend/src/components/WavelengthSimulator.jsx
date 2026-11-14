@@ -61,35 +61,35 @@ export default function WavelengthSimulator() {
   };
 
   return (
-    <div className="bg-white border border-border rounded-xl p-5 shadow-xs">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-border">
+    <div className="bg-[#1C2541] border border-[#3A506B]/50 rounded-xl p-5 shadow-lg">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[#3A506B]/40">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo flex items-center justify-center text-teal">
+          <div className="w-8 h-8 rounded-lg bg-[#0B132B] text-[#5BC0BE] border border-[#3A506B]/60 flex items-center justify-center">
             <Waves className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[#F4F6F8] flex items-center gap-2">
               Dancing with the SARs: Microwave Penetration Physics
-              <span className="text-[10px] px-2 py-0.5 rounded-md bg-indigo text-aqua font-mono font-medium">
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#0B132B] text-[#6FFFE9] font-mono border border-[#3A506B] font-medium">
                 L vs S vs C Band
               </span>
             </h3>
-            <p className="text-xs text-muted">
+            <p className="text-xs text-slate-300">
               Interactive canopy penetration cross-section modeled for Assam's riverine wetlands
             </p>
           </div>
         </div>
 
         {/* Band Selector Tabs */}
-        <div className="flex items-center gap-1.5 bg-subtle p-1 rounded-lg border border-border text-xs font-medium">
+        <div className="flex items-center gap-1.5 bg-[#0B132B] p-1 rounded-lg border border-[#3A506B]/50 text-xs font-medium">
           {bands.map((band) => (
             <button
               key={band.id}
               onClick={() => handleSelectBand(band.id)}
               className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeBand === band.id
-                  ? 'bg-white text-primary shadow-2xs border border-border font-semibold'
-                  : 'text-muted hover:text-primary'
+                  ? 'bg-[#24314D] text-[#6FFFE9] shadow-xs border border-[#5BC0BE]/50 font-semibold'
+                  : 'text-slate-300 hover:text-[#F4F6F8]'
               }`}
             >
               <span
@@ -104,7 +104,7 @@ export default function WavelengthSimulator() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
         {/* Interactive Physics Cross-Section SVG Diagram */}
-        <div className="lg:col-span-7 bg-midnight border border-indigo rounded-xl p-3 relative overflow-hidden shadow-inner">
+        <div className="lg:col-span-7 bg-[#0B132B] border border-[#3A506B]/60 rounded-xl p-3 relative overflow-hidden shadow-inner">
           <div className="text-[11px] font-mono text-slate-300 mb-1 flex items-center justify-between">
             <span>MICROWAVE RADAR INTERACTION PROFILE</span>
             <span style={{ color: current.color }}>λ = {current.wavelength} ({current.frequency})</span>
@@ -180,9 +180,9 @@ export default function WavelengthSimulator() {
 
         {/* Physics Explanations Card */}
         <div className="lg:col-span-5 space-y-3 text-xs">
-          <div className="p-3.5 rounded-lg bg-subtle border border-border">
+          <div className="p-3.5 rounded-lg bg-[#24314D] border border-[#3A506B]/50">
             <div className="flex items-center justify-between mb-1">
-              <span className="font-semibold text-primary text-sm">{current.name}</span>
+              <span className="font-semibold text-[#F4F6F8] text-sm">{current.name}</span>
               <span
                 className="px-2 py-0.5 rounded text-[10px] font-medium text-white"
                 style={{ backgroundColor: current.color }}
@@ -190,24 +190,24 @@ export default function WavelengthSimulator() {
                 {current.agency}
               </span>
             </div>
-            <p className="text-body leading-relaxed mt-1">
+            <p className="text-slate-300 leading-relaxed mt-1">
               {current.summary}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <div className="p-2.5 rounded-md bg-subtle border border-border">
-              <span className="text-muted block mb-0.5">Canopy Penetration:</span>
-              <strong className="text-primary">{current.canopyPenetration}</strong>
+            <div className="p-2.5 rounded-md bg-[#0B132B]/60 border border-[#3A506B]/50">
+              <span className="text-slate-400 block mb-0.5">Canopy Penetration:</span>
+              <strong className="text-[#F4F6F8]">{current.canopyPenetration}</strong>
             </div>
-            <div className="p-2.5 rounded-md bg-subtle border border-border">
-              <span className="text-muted block mb-0.5">Sub-Canopy Flood:</span>
-              <strong className="text-primary">{current.subCanopyFloodDetection}</strong>
+            <div className="p-2.5 rounded-md bg-[#0B132B]/60 border border-[#3A506B]/50">
+              <span className="text-slate-400 block mb-0.5">Sub-Canopy Flood:</span>
+              <strong className="text-[#F4F6F8]">{current.subCanopyFloodDetection}</strong>
             </div>
           </div>
 
-          <div className="p-3 rounded-md bg-subtle border border-border text-primary text-[11px] leading-relaxed">
-            <strong className="text-midnight">Why it matters for NASA Space Apps:</strong> During the monsoon, dense elephant grass and jungle canopies hide vast floodwaters from optical and short-wave radar. NISAR's 24 cm L-band wave easily penetrates this canopy, creating a double-bounce return that reveals submerged ground.
+          <div className="p-3 rounded-md bg-[#222950] border border-[#587ebb]/40 text-[#c6e9f1] text-[11px] leading-relaxed">
+            <strong className="text-[#87b8e8]">Why it matters for radar Earth observation:</strong> During the monsoon, dense elephant grass and jungle canopies hide vast floodwaters from optical and short-wave radar. NISAR's 24 cm L-band wave easily penetrates this canopy, creating a double-bounce return that reveals submerged ground.
           </div>
         </div>
       </div>

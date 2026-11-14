@@ -3,27 +3,44 @@
 @tailwind utilities;
 
 :root {
-  --color-midnight: #0B132B;
-  --color-indigo: #1C2541;
-  --color-dusk: #3A506B;
-  --color-teal: #5BC0BE;
-  --color-aquamarine: #6FFFE9;
+  --color-portgore: #1a1f3d;
+  --color-chambray: #3b4a8c;
+  --color-steelblue: #587ebb;
+  --color-cornflower: #87b8e8;
+  --color-linkwater: #c6e9f1;
 
-  --color-background: #F4F6F8;
-  --color-surface: #FFFFFF;
-  --color-text: #0B132B;
-  --color-body: #475569;
-  --color-muted: #64748B;
-  --color-border: #E2E8F0;
+  --color-midnight: #1a1f3d;
+  --color-indigo: #222950;
+  --color-panel: #283262;
+  --color-dusk: #3b4a8c;
+  --color-teal: #587ebb;
+  --color-aqua: #87b8e8;
+  --color-cloud: #c6e9f1;
+
+  --color-background: #1a1f3d;
+  --color-surface: #222950;
+  --color-text: #c6e9f1;
+  --color-muted: #87b8e8;
+  --color-border: rgba(88, 126, 187, 0.45);
 
   --radius-card: 10px;
   --radius-button: 7px;
 }
 
 body {
-  background-color: #F4F6F8;
-  color: #0B132B;
+  background-color: #1a1f3d;
+  color: #c6e9f1;
   font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Professional Space Gradient with Port Gore & Chambray */
+.bg-space-gradient {
+  background: linear-gradient(135deg, #1a1f3d 0%, #252e5d 50%, #3b4a8c 100%);
+}
+
+.bg-space-radial {
+  background: radial-gradient(circle at 50% 0%, rgba(59, 74, 140, 0.35) 0%, rgba(26, 31, 61, 0.85) 60%, #1a1f3d 100%);
 }
 
 /* Restrained custom scrollbars */
@@ -32,29 +49,36 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4F6F8;
+  background: #1a1f3d;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #3b4a8c;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3A506B;
+  background: #587ebb;
 }
 
-/* Leaflet Clean Theme Customization */
+/* Leaflet Dark Space Customization */
 .leaflet-container {
-  background-color: #F4F6F8 !important;
+  background-color: #1a1f3d !important;
   font-family: 'Inter', sans-serif;
 }
 
+.leaflet-control-zoom {
+  border: 1px solid rgba(88, 126, 187, 0.5) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
 .leaflet-control-zoom a {
-  background-color: #FFFFFF !important;
-  color: #0B132B !important;
-  border-color: #E2E8F0 !important;
+  background-color: #222950 !important;
+  color: #c6e9f1 !important;
+  border-bottom: 1px solid rgba(88, 126, 187, 0.4) !important;
 }
 
 .leaflet-control-zoom a:hover {
-  background-color: #F4F6F8 !important;
-  color: #5BC0BE !important;
+  background-color: #283262 !important;
+  color: #87b8e8 !important;
 }

@@ -1,0 +1,1258 @@
+[
+  {
+    "filename": "NISAR_S2_PR_GCOV_022_019_D_075_2500_CRNA_A_20260603T124208_20260603T124245_P00500_M_F_I_001.h5",
+    "file_size_bytes": 126104,
+    "file_readable": true,
+    "root_attrs": {
+      "Conventions": "CF-1.8",
+      "institution": "NASA JPL / ISRO SAC",
+      "mission_name": "NISAR",
+      "title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)"
+    },
+    "groups": {
+      "science": {
+        "attrs": {}
+      },
+      "science/SSAR": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/identification": {
+        "attrs": {
+          "acquisition_date": "2026-06-03",
+          "cycle_number": "22",
+          "frame_number": "75",
+          "granule_id": "NISAR_S2_PR_GCOV_022_019_D_075_2500_CRNA_A_20260603T124208_20260603T124245_P00500_M_F_I_001",
+          "look_direction": "Right",
+          "pass_direction": "Descending",
+          "track_number": "19"
+        }
+      }
+    },
+    "datasets": {
+      "science/SSAR/GCOV/grids/frequencyA/HHHH": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Co-polarized HH gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/HVHV": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Cross-polarized HV gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/mask": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "uint8",
+        "attrs": {
+          "long_name": "Data validity / shadow mask"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/projection": {
+        "shape": [
+          1
+        ],
+        "dtype": "int32",
+        "attrs": {
+          "epsg_code": "32646",
+          "spatial_ref": "WGS 84 / UTM zone 46N"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/xCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA/yCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      }
+    },
+    "x_coords": {
+      "min": 310000.0,
+      "max": 313000.0,
+      "step": 25.21008403360611,
+      "length": 120
+    },
+    "y_coords": {
+      "min": 2947000.0,
+      "max": 2950000.0,
+      "step": -25.210084033664316,
+      "length": 120
+    },
+    "mask_distribution": {
+      "0": 14400
+    },
+    "mask_attrs": {
+      "long_name": "Data validity / shadow mask"
+    },
+    "hh_raw_stats": {
+      "min": 0.002571487333625555,
+      "max": 0.19973385334014893,
+      "mean": 0.06466978043317795,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400,
+      "total_elements": 14400
+    },
+    "hh_attrs": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "hv_raw_stats": {
+      "min": 0.00039181901956908405,
+      "max": 0.04061093181371689,
+      "mean": 0.011576510965824127,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400
+    },
+    "hv_attrs": {
+      "long_name": "Cross-polarized HV gamma-0 backscatter power",
+      "units": "1"
+    },
+    "projection_attrs": {
+      "epsg_code": "32646",
+      "spatial_ref": "WGS 84 / UTM zone 46N"
+    },
+    "identification": {
+      "acquisition_date": "2026-06-03",
+      "cycle_number": "22",
+      "frame_number": "75",
+      "granule_id": "NISAR_S2_PR_GCOV_022_019_D_075_2500_CRNA_A_20260603T124208_20260603T124245_P00500_M_F_I_001",
+      "look_direction": "Right",
+      "pass_direction": "Descending",
+      "track_number": "19"
+    }
+  },
+  {
+    "filename": "NISAR_S2_PR_GCOV_023_019_D_075_2500_CRNA_A_20260615T124208_20260615T124245_P00500_M_F_I_001.h5",
+    "file_size_bytes": 127044,
+    "file_readable": true,
+    "root_attrs": {
+      "Conventions": "CF-1.8",
+      "institution": "NASA JPL / ISRO SAC",
+      "mission_name": "NISAR",
+      "title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)"
+    },
+    "groups": {
+      "science": {
+        "attrs": {}
+      },
+      "science/SSAR": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/identification": {
+        "attrs": {
+          "acquisition_date": "2026-06-15",
+          "cycle_number": "23",
+          "frame_number": "75",
+          "granule_id": "NISAR_S2_PR_GCOV_023_019_D_075_2500_CRNA_A_20260615T124208_20260615T124245_P00500_M_F_I_001",
+          "look_direction": "Right",
+          "pass_direction": "Descending",
+          "track_number": "19"
+        }
+      }
+    },
+    "datasets": {
+      "science/SSAR/GCOV/grids/frequencyA/HHHH": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Co-polarized HH gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/HVHV": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Cross-polarized HV gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/mask": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "uint8",
+        "attrs": {
+          "long_name": "Data validity / shadow mask"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/projection": {
+        "shape": [
+          1
+        ],
+        "dtype": "int32",
+        "attrs": {
+          "epsg_code": "32646",
+          "spatial_ref": "WGS 84 / UTM zone 46N"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/xCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA/yCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      }
+    },
+    "x_coords": {
+      "min": 310000.0,
+      "max": 313000.0,
+      "step": 25.21008403360611,
+      "length": 120
+    },
+    "y_coords": {
+      "min": 2947000.0,
+      "max": 2950000.0,
+      "step": -25.210084033664316,
+      "length": 120
+    },
+    "mask_distribution": {
+      "0": 14400
+    },
+    "mask_attrs": {
+      "long_name": "Data validity / shadow mask"
+    },
+    "hh_raw_stats": {
+      "min": 0.002746438141912222,
+      "max": 0.5582664012908936,
+      "mean": 0.07094668596982956,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400,
+      "total_elements": 14400
+    },
+    "hh_attrs": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "hv_raw_stats": {
+      "min": 0.00038636644603684545,
+      "max": 0.12766316533088684,
+      "mean": 0.012681083753705025,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400
+    },
+    "hv_attrs": {
+      "long_name": "Cross-polarized HV gamma-0 backscatter power",
+      "units": "1"
+    },
+    "projection_attrs": {
+      "epsg_code": "32646",
+      "spatial_ref": "WGS 84 / UTM zone 46N"
+    },
+    "identification": {
+      "acquisition_date": "2026-06-15",
+      "cycle_number": "23",
+      "frame_number": "75",
+      "granule_id": "NISAR_S2_PR_GCOV_023_019_D_075_2500_CRNA_A_20260615T124208_20260615T124245_P00500_M_F_I_001",
+      "look_direction": "Right",
+      "pass_direction": "Descending",
+      "track_number": "19"
+    }
+  },
+  {
+    "filename": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001.h5",
+    "file_size_bytes": 97311,
+    "file_readable": true,
+    "root_attrs": {
+      "Conventions": "CF-1.8",
+      "institution": "NASA JPL / ISRO SAC",
+      "mission_name": "NISAR",
+      "title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)"
+    },
+    "groups": {
+      "science": {
+        "attrs": {}
+      },
+      "science/SSAR": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/identification": {
+        "attrs": {
+          "acquisition_date": "2026-06-27",
+          "cycle_number": "24",
+          "frame_number": "75",
+          "granule_id": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001",
+          "look_direction": "Right",
+          "pass_direction": "Descending",
+          "track_number": "19"
+        }
+      }
+    },
+    "datasets": {
+      "science/SSAR/GCOV/grids/frequencyA/HHHH": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Co-polarized HH gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/HVHV": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Cross-polarized HV gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/mask": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "uint8",
+        "attrs": {
+          "long_name": "Data validity / shadow mask"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/projection": {
+        "shape": [
+          1
+        ],
+        "dtype": "int32",
+        "attrs": {
+          "epsg_code": "32646",
+          "spatial_ref": "WGS 84 / UTM zone 46N"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/xCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA/yCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      }
+    },
+    "x_coords": {
+      "min": 310000.0,
+      "max": 313000.0,
+      "step": 25.21008403360611,
+      "length": 120
+    },
+    "y_coords": {
+      "min": 2947000.0,
+      "max": 2950000.0,
+      "step": -25.210084033664316,
+      "length": 120
+    },
+    "mask_distribution": {
+      "0": 14400
+    },
+    "mask_attrs": {
+      "long_name": "Data validity / shadow mask"
+    },
+    "hh_raw_stats": {
+      "min": 0.0028973445296287537,
+      "max": 0.24378105998039246,
+      "mean": 0.05900447070598602,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400,
+      "total_elements": 14400
+    },
+    "hh_attrs": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "hv_raw_stats": {
+      "min": 0.0003019951982423663,
+      "max": 0.04864072427153587,
+      "mean": 0.010574131272733212,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400
+    },
+    "hv_attrs": {
+      "long_name": "Cross-polarized HV gamma-0 backscatter power",
+      "units": "1"
+    },
+    "projection_attrs": {
+      "epsg_code": "32646",
+      "spatial_ref": "WGS 84 / UTM zone 46N"
+    },
+    "identification": {
+      "acquisition_date": "2026-06-27",
+      "cycle_number": "24",
+      "frame_number": "75",
+      "granule_id": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001",
+      "look_direction": "Right",
+      "pass_direction": "Descending",
+      "track_number": "19"
+    }
+  },
+  {
+    "filename": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001.h5",
+    "file_size_bytes": 100127,
+    "file_readable": true,
+    "root_attrs": {
+      "Conventions": "CF-1.8",
+      "institution": "NASA JPL / ISRO SAC",
+      "mission_name": "NISAR",
+      "title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)"
+    },
+    "groups": {
+      "science": {
+        "attrs": {}
+      },
+      "science/SSAR": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/identification": {
+        "attrs": {
+          "acquisition_date": "2026-07-09",
+          "cycle_number": "25",
+          "frame_number": "75",
+          "granule_id": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001",
+          "look_direction": "Right",
+          "pass_direction": "Descending",
+          "track_number": "19"
+        }
+      }
+    },
+    "datasets": {
+      "science/SSAR/GCOV/grids/frequencyA/HHHH": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Co-polarized HH gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/HVHV": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Cross-polarized HV gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/mask": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "uint8",
+        "attrs": {
+          "long_name": "Data validity / shadow mask"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/projection": {
+        "shape": [
+          1
+        ],
+        "dtype": "int32",
+        "attrs": {
+          "epsg_code": "32646",
+          "spatial_ref": "WGS 84 / UTM zone 46N"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/xCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA/yCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      }
+    },
+    "x_coords": {
+      "min": 310000.0,
+      "max": 313000.0,
+      "step": 25.21008403360611,
+      "length": 120
+    },
+    "y_coords": {
+      "min": 2947000.0,
+      "max": 2950000.0,
+      "step": -25.210084033664316,
+      "length": 120
+    },
+    "mask_distribution": {
+      "0": 14400
+    },
+    "mask_attrs": {
+      "long_name": "Data validity / shadow mask"
+    },
+    "hh_raw_stats": {
+      "min": 0.0028707801830023527,
+      "max": 0.7533555626869202,
+      "mean": 0.06174090877175331,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400,
+      "total_elements": 14400
+    },
+    "hh_attrs": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "hv_raw_stats": {
+      "min": 0.000338844140060246,
+      "max": 0.1216186136007309,
+      "mean": 0.010927468538284302,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400
+    },
+    "hv_attrs": {
+      "long_name": "Cross-polarized HV gamma-0 backscatter power",
+      "units": "1"
+    },
+    "projection_attrs": {
+      "epsg_code": "32646",
+      "spatial_ref": "WGS 84 / UTM zone 46N"
+    },
+    "identification": {
+      "acquisition_date": "2026-07-09",
+      "cycle_number": "25",
+      "frame_number": "75",
+      "granule_id": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001",
+      "look_direction": "Right",
+      "pass_direction": "Descending",
+      "track_number": "19"
+    }
+  },
+  {
+    "filename": "NISAR_S2_PR_GCOV_026_019_D_075_2500_CRNA_A_20260721T124208_20260721T124245_P00500_M_F_I_001.h5",
+    "file_size_bytes": 127740,
+    "file_readable": true,
+    "root_attrs": {
+      "Conventions": "CF-1.8",
+      "institution": "NASA JPL / ISRO SAC",
+      "mission_name": "NISAR",
+      "title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)"
+    },
+    "groups": {
+      "science": {
+        "attrs": {}
+      },
+      "science/SSAR": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/identification": {
+        "attrs": {
+          "acquisition_date": "2026-07-21",
+          "cycle_number": "26",
+          "frame_number": "75",
+          "granule_id": "NISAR_S2_PR_GCOV_026_019_D_075_2500_CRNA_A_20260721T124208_20260721T124245_P00500_M_F_I_001",
+          "look_direction": "Right",
+          "pass_direction": "Descending",
+          "track_number": "19"
+        }
+      }
+    },
+    "datasets": {
+      "science/SSAR/GCOV/grids/frequencyA/HHHH": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Co-polarized HH gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/HVHV": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Cross-polarized HV gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/mask": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "uint8",
+        "attrs": {
+          "long_name": "Data validity / shadow mask"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/projection": {
+        "shape": [
+          1
+        ],
+        "dtype": "int32",
+        "attrs": {
+          "epsg_code": "32646",
+          "spatial_ref": "WGS 84 / UTM zone 46N"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/xCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA/yCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      }
+    },
+    "x_coords": {
+      "min": 310000.0,
+      "max": 313000.0,
+      "step": 25.21008403360611,
+      "length": 120
+    },
+    "y_coords": {
+      "min": 2947000.0,
+      "max": 2950000.0,
+      "step": -25.210084033664316,
+      "length": 120
+    },
+    "mask_distribution": {
+      "0": 14400
+    },
+    "mask_attrs": {
+      "long_name": "Data validity / shadow mask"
+    },
+    "hh_raw_stats": {
+      "min": 0.00297402311116457,
+      "max": 0.7420675754547119,
+      "mean": 0.06737656146287918,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400,
+      "total_elements": 14400
+    },
+    "hh_attrs": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "hv_raw_stats": {
+      "min": 0.00036959219141863286,
+      "max": 0.13831081986427307,
+      "mean": 0.011938265524804592,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400
+    },
+    "hv_attrs": {
+      "long_name": "Cross-polarized HV gamma-0 backscatter power",
+      "units": "1"
+    },
+    "projection_attrs": {
+      "epsg_code": "32646",
+      "spatial_ref": "WGS 84 / UTM zone 46N"
+    },
+    "identification": {
+      "acquisition_date": "2026-07-21",
+      "cycle_number": "26",
+      "frame_number": "75",
+      "granule_id": "NISAR_S2_PR_GCOV_026_019_D_075_2500_CRNA_A_20260721T124208_20260721T124245_P00500_M_F_I_001",
+      "look_direction": "Right",
+      "pass_direction": "Descending",
+      "track_number": "19"
+    }
+  },
+  {
+    "filename": "NISAR_S2_PR_GCOV_027_019_D_075_2500_CRNA_A_20260802T124208_20260802T124245_P00500_M_F_I_001.h5",
+    "file_size_bytes": 127492,
+    "file_readable": true,
+    "root_attrs": {
+      "Conventions": "CF-1.8",
+      "institution": "NASA JPL / ISRO SAC",
+      "mission_name": "NISAR",
+      "title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)"
+    },
+    "groups": {
+      "science": {
+        "attrs": {}
+      },
+      "science/SSAR": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/identification": {
+        "attrs": {
+          "acquisition_date": "2026-08-02",
+          "cycle_number": "27",
+          "frame_number": "75",
+          "granule_id": "NISAR_S2_PR_GCOV_027_019_D_075_2500_CRNA_A_20260802T124208_20260802T124245_P00500_M_F_I_001",
+          "look_direction": "Right",
+          "pass_direction": "Descending",
+          "track_number": "19"
+        }
+      }
+    },
+    "datasets": {
+      "science/SSAR/GCOV/grids/frequencyA/HHHH": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Co-polarized HH gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/HVHV": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Cross-polarized HV gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/mask": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "uint8",
+        "attrs": {
+          "long_name": "Data validity / shadow mask"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/projection": {
+        "shape": [
+          1
+        ],
+        "dtype": "int32",
+        "attrs": {
+          "epsg_code": "32646",
+          "spatial_ref": "WGS 84 / UTM zone 46N"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/xCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA/yCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      }
+    },
+    "x_coords": {
+      "min": 310000.0,
+      "max": 313000.0,
+      "step": 25.21008403360611,
+      "length": 120
+    },
+    "y_coords": {
+      "min": 2947000.0,
+      "max": 2950000.0,
+      "step": -25.210084033664316,
+      "length": 120
+    },
+    "mask_distribution": {
+      "0": 14400
+    },
+    "mask_attrs": {
+      "long_name": "Data validity / shadow mask"
+    },
+    "hh_raw_stats": {
+      "min": 0.00297402311116457,
+      "max": 0.6430934071540833,
+      "mean": 0.06959117949008942,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400,
+      "total_elements": 14400
+    },
+    "hh_attrs": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "hv_raw_stats": {
+      "min": 0.0003752624324988574,
+      "max": 0.11504488438367844,
+      "mean": 0.012427532114088535,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400
+    },
+    "hv_attrs": {
+      "long_name": "Cross-polarized HV gamma-0 backscatter power",
+      "units": "1"
+    },
+    "projection_attrs": {
+      "epsg_code": "32646",
+      "spatial_ref": "WGS 84 / UTM zone 46N"
+    },
+    "identification": {
+      "acquisition_date": "2026-08-02",
+      "cycle_number": "27",
+      "frame_number": "75",
+      "granule_id": "NISAR_S2_PR_GCOV_027_019_D_075_2500_CRNA_A_20260802T124208_20260802T124245_P00500_M_F_I_001",
+      "look_direction": "Right",
+      "pass_direction": "Descending",
+      "track_number": "19"
+    }
+  },
+  {
+    "filename": "NISAR_S2_PR_GCOV_028_019_D_075_2500_CRNA_A_20260814T124208_20260814T124245_P00500_M_F_I_001.h5",
+    "file_size_bytes": 127642,
+    "file_readable": true,
+    "root_attrs": {
+      "Conventions": "CF-1.8",
+      "institution": "NASA JPL / ISRO SAC",
+      "mission_name": "NISAR",
+      "title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)"
+    },
+    "groups": {
+      "science": {
+        "attrs": {}
+      },
+      "science/SSAR": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/identification": {
+        "attrs": {
+          "acquisition_date": "2026-08-14",
+          "cycle_number": "28",
+          "frame_number": "75",
+          "granule_id": "NISAR_S2_PR_GCOV_028_019_D_075_2500_CRNA_A_20260814T124208_20260814T124245_P00500_M_F_I_001",
+          "look_direction": "Right",
+          "pass_direction": "Descending",
+          "track_number": "19"
+        }
+      }
+    },
+    "datasets": {
+      "science/SSAR/GCOV/grids/frequencyA/HHHH": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Co-polarized HH gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/HVHV": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Cross-polarized HV gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/mask": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "uint8",
+        "attrs": {
+          "long_name": "Data validity / shadow mask"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/projection": {
+        "shape": [
+          1
+        ],
+        "dtype": "int32",
+        "attrs": {
+          "epsg_code": "32646",
+          "spatial_ref": "WGS 84 / UTM zone 46N"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/xCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA/yCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      }
+    },
+    "x_coords": {
+      "min": 310000.0,
+      "max": 313000.0,
+      "step": 25.21008403360611,
+      "length": 120
+    },
+    "y_coords": {
+      "min": 2947000.0,
+      "max": 2950000.0,
+      "step": -25.210084033664316,
+      "length": 120
+    },
+    "mask_distribution": {
+      "0": 14400
+    },
+    "mask_attrs": {
+      "long_name": "Data validity / shadow mask"
+    },
+    "hh_raw_stats": {
+      "min": 0.002410429297015071,
+      "max": 0.7534216642379761,
+      "mean": 0.0696161761879921,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400,
+      "total_elements": 14400
+    },
+    "hh_attrs": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "hv_raw_stats": {
+      "min": 0.0004100079240743071,
+      "max": 0.1886943131685257,
+      "mean": 0.012405825778841972,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400
+    },
+    "hv_attrs": {
+      "long_name": "Cross-polarized HV gamma-0 backscatter power",
+      "units": "1"
+    },
+    "projection_attrs": {
+      "epsg_code": "32646",
+      "spatial_ref": "WGS 84 / UTM zone 46N"
+    },
+    "identification": {
+      "acquisition_date": "2026-08-14",
+      "cycle_number": "28",
+      "frame_number": "75",
+      "granule_id": "NISAR_S2_PR_GCOV_028_019_D_075_2500_CRNA_A_20260814T124208_20260814T124245_P00500_M_F_I_001",
+      "look_direction": "Right",
+      "pass_direction": "Descending",
+      "track_number": "19"
+    }
+  },
+  {
+    "filename": "NISAR_S2_PR_GCOV_029_019_D_075_2500_CRNA_A_20260826T124208_20260826T124245_P00500_M_F_I_001.h5",
+    "file_size_bytes": 96549,
+    "file_readable": true,
+    "root_attrs": {
+      "Conventions": "CF-1.8",
+      "institution": "NASA JPL / ISRO SAC",
+      "mission_name": "NISAR",
+      "title": "NISAR Level 2 Geocoded Polarimetric Covariance (GCOV)"
+    },
+    "groups": {
+      "science": {
+        "attrs": {}
+      },
+      "science/SSAR": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA": {
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/identification": {
+        "attrs": {
+          "acquisition_date": "2026-08-26",
+          "cycle_number": "29",
+          "frame_number": "75",
+          "granule_id": "NISAR_S2_PR_GCOV_029_019_D_075_2500_CRNA_A_20260826T124208_20260826T124245_P00500_M_F_I_001",
+          "look_direction": "Right",
+          "pass_direction": "Descending",
+          "track_number": "19"
+        }
+      }
+    },
+    "datasets": {
+      "science/SSAR/GCOV/grids/frequencyA/HHHH": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Co-polarized HH gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/HVHV": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "float32",
+        "attrs": {
+          "long_name": "Cross-polarized HV gamma-0 backscatter power",
+          "units": "1"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/mask": {
+        "shape": [
+          120,
+          120
+        ],
+        "dtype": "uint8",
+        "attrs": {
+          "long_name": "Data validity / shadow mask"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/projection": {
+        "shape": [
+          1
+        ],
+        "dtype": "int32",
+        "attrs": {
+          "epsg_code": "32646",
+          "spatial_ref": "WGS 84 / UTM zone 46N"
+        }
+      },
+      "science/SSAR/GCOV/grids/frequencyA/xCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      },
+      "science/SSAR/GCOV/grids/frequencyA/yCoordinates": {
+        "shape": [
+          120
+        ],
+        "dtype": "float64",
+        "attrs": {}
+      }
+    },
+    "x_coords": {
+      "min": 310000.0,
+      "max": 313000.0,
+      "step": 25.21008403360611,
+      "length": 120
+    },
+    "y_coords": {
+      "min": 2947000.0,
+      "max": 2950000.0,
+      "step": -25.210084033664316,
+      "length": 120
+    },
+    "mask_distribution": {
+      "0": 14400
+    },
+    "mask_attrs": {
+      "long_name": "Data validity / shadow mask"
+    },
+    "hh_raw_stats": {
+      "min": 0.0028707801830023527,
+      "max": 0.21086281538009644,
+      "mean": 0.06499163806438446,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400,
+      "total_elements": 14400
+    },
+    "hh_attrs": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "hv_raw_stats": {
+      "min": 0.0003531830443535,
+      "max": 0.041879355907440186,
+      "mean": 0.011672013439238071,
+      "nan_count": 0,
+      "inf_count": 0,
+      "zero_count": 0,
+      "negative_count": 0,
+      "finite_count": 14400
+    },
+    "hv_attrs": {
+      "long_name": "Cross-polarized HV gamma-0 backscatter power",
+      "units": "1"
+    },
+    "projection_attrs": {
+      "epsg_code": "32646",
+      "spatial_ref": "WGS 84 / UTM zone 46N"
+    },
+    "identification": {
+      "acquisition_date": "2026-08-26",
+      "cycle_number": "29",
+      "frame_number": "75",
+      "granule_id": "NISAR_S2_PR_GCOV_029_019_D_075_2500_CRNA_A_20260826T124208_20260826T124245_P00500_M_F_I_001",
+      "look_direction": "Right",
+      "pass_direction": "Descending",
+      "track_number": "19"
+    }
+  }
+]

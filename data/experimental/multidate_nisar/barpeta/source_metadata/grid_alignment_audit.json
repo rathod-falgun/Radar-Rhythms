@@ -1,0 +1,82 @@
+[
+  {
+    "cycle": 22,
+    "date": "2026-06-03",
+    "granule_id": "NISAR_S2_PR_GCOV_022_019_D_075_2500_CRNA_A_20260603T124208_20260603T124245_P00500_M_F_I_001",
+    "max_coord_difference_m": 0.0,
+    "spatial_overlap_percent": 100.0,
+    "crs_match": true,
+    "dimension_match": true,
+    "alignment_status": "PASS (Exact Grid Registration)"
+  },
+  {
+    "cycle": 23,
+    "date": "2026-06-15",
+    "granule_id": "NISAR_S2_PR_GCOV_023_019_D_075_2500_CRNA_A_20260615T124208_20260615T124245_P00500_M_F_I_001",
+    "max_coord_difference_m": 0.0,
+    "spatial_overlap_percent": 100.0,
+    "crs_match": true,
+    "dimension_match": true,
+    "alignment_status": "PASS (Exact Grid Registration)"
+  },
+  {
+    "cycle": 24,
+    "date": "2026-06-27",
+    "granule_id": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001",
+    "max_coord_difference_m": 0.0,
+    "spatial_overlap_percent": 100.0,
+    "crs_match": true,
+    "dimension_match": true,
+    "alignment_status": "PASS (Exact Grid Registration)"
+  },
+  {
+    "cycle": 25,
+    "date": "2026-07-09",
+    "granule_id": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001",
+    "max_coord_difference_m": 0.0,
+    "spatial_overlap_percent": 100.0,
+    "crs_match": true,
+    "dimension_match": true,
+    "alignment_status": "PASS (Exact Grid Registration)"
+  },
+  {
+    "cycle": 26,
+    "date": "2026-07-21",
+    "granule_id": "NISAR_S2_PR_GCOV_026_019_D_075_2500_CRNA_A_20260721T124208_20260721T124245_P00500_M_F_I_001",
+    "max_coord_difference_m": 0.0,
+    "spatial_overlap_percent": 100.0,
+    "crs_match": true,
+    "dimension_match": true,
+    "alignment_status": "PASS (Exact Grid Registration)"
+  },
+  {
+    "cycle": 27,
+    "date": "2026-08-02",
+    "granule_id": "NISAR_S2_PR_GCOV_027_019_D_075_2500_CRNA_A_20260802T124208_20260802T124245_P00500_M_F_I_001",
+    "max_coord_difference_m": 0.0,
+    "spatial_overlap_percent": 100.0,
+    "crs_match": true,
+    "dimension_match": true,
+    "alignment_status": "PASS (Exact Grid Registration)"
+  },
+  {
+    "cycle": 28,
+    "date": "2026-08-14",
+    "granule_id": "NISAR_S2_PR_GCOV_028_019_D_075_2500_CRNA_A_20260814T124208_20260814T124245_P00500_M_F_I_001",
+    "max_coord_difference_m": 0.0,
+    "spatial_overlap_percent": 100.0,
+    "crs_match": true,
+    "dimension_match": true,
+    "alignment_status": "PASS (Exact Grid Registration)"
+  },
+  {
+    "cycle": 29,
+    "date": "2026-08-26",
+    "granule_id": "NISAR_S2_PR_GCOV_029_019_D_075_2500_CRNA_A_20260826T124208_20260826T124245_P00500_M_F_I_001",
+    "max_coord_difference_m": 0.0,
+    "spatial_overlap_percent": 100.0,
+    "crs_match": true,
+    "dimension_match": true,
+    "alignment_status": "PASS (Exact Grid Registration)"
+  }
+]

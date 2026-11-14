@@ -29,16 +29,18 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import h5py
 import numpy as np
-# pyrefly: ignore[missing-import]
-import rasterio
-# pyrefly: ignore[missing-import]
-from rasterio.crs import CRS
-# pyrefly: ignore[missing-import]
-from rasterio.transform import from_origin
-# pyrefly: ignore[missing-import]
-from rasterio.warp import transform_bounds
-# pyrefly: ignore[missing-import]
-from rasterio.windows import Window
+try:
+    import rasterio
+    from rasterio.crs import CRS
+    from rasterio.transform import from_origin
+    from rasterio.warp import transform_bounds
+    from rasterio.windows import Window
+except ImportError:
+    rasterio = None
+    CRS = None
+    from_origin = None
+    transform_bounds = None
+    Window = None
 
 from ..core.config import settings
 from .bhoonidhi_stream import (

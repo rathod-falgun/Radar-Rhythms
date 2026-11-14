@@ -1,0 +1,69 @@
+{
+  "execution_timestamp_utc": "2026-11-14T08:38:01.495989Z",
+  "environment": {
+    "python_version": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "numpy_version": "2.4.6",
+    "scipy_version": "1.17.1",
+    "h5py_version": "3.16.0"
+  },
+  "study_area_definition": {
+    "region": "Barpeta / Lower Brahmaputra Corridor",
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "crs": "EPSG:32646",
+    "raster_dimensions": [
+      120,
+      120
+    ],
+    "pixel_area_m2": 635.5483369829491,
+    "total_corridor_area_km2": 9.151896052554468
+  },
+  "processing_parameters": {
+    "polarization_layer_used": "HHHH (Co-polarized HH gamma-0 backscatter power)",
+    "cross_polarization_layer_status": "HVHV preserved in raw format; excluded from automated classification pending compact-pol disambiguation",
+    "input_validity_rules": "mask == 0 AND isfinite(HH) AND HH > 0",
+    "linear_to_db_formula": "10 * log10(HH_linear)",
+    "speckle_filter": {
+      "algorithm": "adaptive_lee",
+      "domain": "decibels (empirical damping heuristic)",
+      "window_size": 5,
+      "noise_variance": 0.25
+    },
+    "water_classification": {
+      "algorithm": "adaptive_bimodal_otsu",
+      "histogram_bins": 120,
+      "histogram_range_db": [
+        -31.0,
+        0.0
+      ],
+      "threshold_clamping_db": [
+        -26.0,
+        -15.0
+      ]
+    },
+    "morphological_mmu": {
+      "structuring_element": "3x3 square",
+      "operations": "binary_opening -> binary_closing -> data_valid_remask -> connected_component_label -> min_cluster_filter -> final_remask",
+      "min_cluster_pixels": 5,
+      "min_cluster_area_m2": 3177.7416849147453
+    },
+    "change_detection": {
+      "classes": {
+        "0": "Stable Land (~W1 & ~W2 & both_valid)",
+        "1": "Persistent Water (W1 & W2 & both_valid)",
+        "2": "Newly Inundated Water (~W1 & W2 & both_valid)",
+        "3": "Receded Water (W1 & ~W2 & both_valid)",
+        "255": "NoData (~both_valid)"
+      },
+      "interval_calculation": "dynamic UTC timestamp subtraction (exact days)"
+    }
+  },
+  "verification_status": {
+    "all_scenes_aligned": true,
+    "max_coordinate_difference_m": 0.0,
+    "zero_invalid_pixels_labeled_land": true,
+    "exact_reconciliation_with_production_pair": true
+  }
+}

@@ -1,0 +1,362 @@
+[
+  {
+    "granule_id": "NISAR_S2_PR_GCOV_022_019_D_075_2500_CRNA_A_20260603T124208_20260603T124245_P00500_M_F_I_001",
+    "filename": "NISAR_S2_PR_GCOV_022_019_D_075_2500_CRNA_A_20260603T124208_20260603T124245_P00500_M_F_I_001.h5",
+    "cycle_number": 22,
+    "acquisition_date": "2026-06-03",
+    "utc_start": "2026-06-03T12:42:08Z",
+    "utc_stop": "2026-06-03T12:42:45Z",
+    "duration_seconds": 37.0,
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "look_direction": "Right",
+    "file_size_bytes": 126104,
+    "crs_epsg": 32646,
+    "grid_dimensions": [
+      120,
+      120
+    ],
+    "max_coord_diff_m": 0.0,
+    "alignment_verified": true,
+    "polarization_layers": [
+      "HHHH",
+      "HVHV"
+    ],
+    "hhhh_metadata": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "mask_metadata": {
+      "long_name": "Data validity / shadow mask",
+      "distribution": {
+        "0": 14400
+      }
+    },
+    "validity_accounting": {
+      "total_pixels": 14400,
+      "mask_zero_pixels": 14400,
+      "mask_nonzero_pixels": 0,
+      "nan_pixels": 0,
+      "inf_pixels": 0,
+      "non_positive_pixels": 0,
+      "combined_valid_pixels": 14400,
+      "excluded_pixels": 0
+    }
+  },
+  {
+    "granule_id": "NISAR_S2_PR_GCOV_023_019_D_075_2500_CRNA_A_20260615T124208_20260615T124245_P00500_M_F_I_001",
+    "filename": "NISAR_S2_PR_GCOV_023_019_D_075_2500_CRNA_A_20260615T124208_20260615T124245_P00500_M_F_I_001.h5",
+    "cycle_number": 23,
+    "acquisition_date": "2026-06-15",
+    "utc_start": "2026-06-15T12:42:08Z",
+    "utc_stop": "2026-06-15T12:42:45Z",
+    "duration_seconds": 37.0,
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "look_direction": "Right",
+    "file_size_bytes": 127044,
+    "crs_epsg": 32646,
+    "grid_dimensions": [
+      120,
+      120
+    ],
+    "max_coord_diff_m": 0.0,
+    "alignment_verified": true,
+    "polarization_layers": [
+      "HHHH",
+      "HVHV"
+    ],
+    "hhhh_metadata": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "mask_metadata": {
+      "long_name": "Data validity / shadow mask",
+      "distribution": {
+        "0": 14400
+      }
+    },
+    "validity_accounting": {
+      "total_pixels": 14400,
+      "mask_zero_pixels": 14400,
+      "mask_nonzero_pixels": 0,
+      "nan_pixels": 0,
+      "inf_pixels": 0,
+      "non_positive_pixels": 0,
+      "combined_valid_pixels": 14400,
+      "excluded_pixels": 0
+    }
+  },
+  {
+    "granule_id": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001",
+    "filename": "NISAR_S2_PR_GCOV_024_019_D_075_2500_CRNA_A_20260627T124208_20260627T124245_P00500_M_F_I_001.h5",
+    "cycle_number": 24,
+    "acquisition_date": "2026-06-27",
+    "utc_start": "2026-06-27T12:42:08Z",
+    "utc_stop": "2026-06-27T12:42:45Z",
+    "duration_seconds": 37.0,
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "look_direction": "Right",
+    "file_size_bytes": 97311,
+    "crs_epsg": 32646,
+    "grid_dimensions": [
+      120,
+      120
+    ],
+    "max_coord_diff_m": 0.0,
+    "alignment_verified": true,
+    "polarization_layers": [
+      "HHHH",
+      "HVHV"
+    ],
+    "hhhh_metadata": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "mask_metadata": {
+      "long_name": "Data validity / shadow mask",
+      "distribution": {
+        "0": 14400
+      }
+    },
+    "validity_accounting": {
+      "total_pixels": 14400,
+      "mask_zero_pixels": 14400,
+      "mask_nonzero_pixels": 0,
+      "nan_pixels": 0,
+      "inf_pixels": 0,
+      "non_positive_pixels": 0,
+      "combined_valid_pixels": 14400,
+      "excluded_pixels": 0
+    }
+  },
+  {
+    "granule_id": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001",
+    "filename": "NISAR_S2_PR_GCOV_025_019_D_075_2500_CRNA_A_20260709T124208_20260709T124245_P00500_M_F_I_001.h5",
+    "cycle_number": 25,
+    "acquisition_date": "2026-07-09",
+    "utc_start": "2026-07-09T12:42:08Z",
+    "utc_stop": "2026-07-09T12:42:45Z",
+    "duration_seconds": 37.0,
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "look_direction": "Right",
+    "file_size_bytes": 100127,
+    "crs_epsg": 32646,
+    "grid_dimensions": [
+      120,
+      120
+    ],
+    "max_coord_diff_m": 0.0,
+    "alignment_verified": true,
+    "polarization_layers": [
+      "HHHH",
+      "HVHV"
+    ],
+    "hhhh_metadata": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "mask_metadata": {
+      "long_name": "Data validity / shadow mask",
+      "distribution": {
+        "0": 14400
+      }
+    },
+    "validity_accounting": {
+      "total_pixels": 14400,
+      "mask_zero_pixels": 14400,
+      "mask_nonzero_pixels": 0,
+      "nan_pixels": 0,
+      "inf_pixels": 0,
+      "non_positive_pixels": 0,
+      "combined_valid_pixels": 14400,
+      "excluded_pixels": 0
+    }
+  },
+  {
+    "granule_id": "NISAR_S2_PR_GCOV_026_019_D_075_2500_CRNA_A_20260721T124208_20260721T124245_P00500_M_F_I_001",
+    "filename": "NISAR_S2_PR_GCOV_026_019_D_075_2500_CRNA_A_20260721T124208_20260721T124245_P00500_M_F_I_001.h5",
+    "cycle_number": 26,
+    "acquisition_date": "2026-07-21",
+    "utc_start": "2026-07-21T12:42:08Z",
+    "utc_stop": "2026-07-21T12:42:45Z",
+    "duration_seconds": 37.0,
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "look_direction": "Right",
+    "file_size_bytes": 127740,
+    "crs_epsg": 32646,
+    "grid_dimensions": [
+      120,
+      120
+    ],
+    "max_coord_diff_m": 0.0,
+    "alignment_verified": true,
+    "polarization_layers": [
+      "HHHH",
+      "HVHV"
+    ],
+    "hhhh_metadata": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "mask_metadata": {
+      "long_name": "Data validity / shadow mask",
+      "distribution": {
+        "0": 14400
+      }
+    },
+    "validity_accounting": {
+      "total_pixels": 14400,
+      "mask_zero_pixels": 14400,
+      "mask_nonzero_pixels": 0,
+      "nan_pixels": 0,
+      "inf_pixels": 0,
+      "non_positive_pixels": 0,
+      "combined_valid_pixels": 14400,
+      "excluded_pixels": 0
+    }
+  },
+  {
+    "granule_id": "NISAR_S2_PR_GCOV_027_019_D_075_2500_CRNA_A_20260802T124208_20260802T124245_P00500_M_F_I_001",
+    "filename": "NISAR_S2_PR_GCOV_027_019_D_075_2500_CRNA_A_20260802T124208_20260802T124245_P00500_M_F_I_001.h5",
+    "cycle_number": 27,
+    "acquisition_date": "2026-08-02",
+    "utc_start": "2026-08-02T12:42:08Z",
+    "utc_stop": "2026-08-02T12:42:45Z",
+    "duration_seconds": 37.0,
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "look_direction": "Right",
+    "file_size_bytes": 127492,
+    "crs_epsg": 32646,
+    "grid_dimensions": [
+      120,
+      120
+    ],
+    "max_coord_diff_m": 0.0,
+    "alignment_verified": true,
+    "polarization_layers": [
+      "HHHH",
+      "HVHV"
+    ],
+    "hhhh_metadata": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "mask_metadata": {
+      "long_name": "Data validity / shadow mask",
+      "distribution": {
+        "0": 14400
+      }
+    },
+    "validity_accounting": {
+      "total_pixels": 14400,
+      "mask_zero_pixels": 14400,
+      "mask_nonzero_pixels": 0,
+      "nan_pixels": 0,
+      "inf_pixels": 0,
+      "non_positive_pixels": 0,
+      "combined_valid_pixels": 14400,
+      "excluded_pixels": 0
+    }
+  },
+  {
+    "granule_id": "NISAR_S2_PR_GCOV_028_019_D_075_2500_CRNA_A_20260814T124208_20260814T124245_P00500_M_F_I_001",
+    "filename": "NISAR_S2_PR_GCOV_028_019_D_075_2500_CRNA_A_20260814T124208_20260814T124245_P00500_M_F_I_001.h5",
+    "cycle_number": 28,
+    "acquisition_date": "2026-08-14",
+    "utc_start": "2026-08-14T12:42:08Z",
+    "utc_stop": "2026-08-14T12:42:45Z",
+    "duration_seconds": 37.0,
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "look_direction": "Right",
+    "file_size_bytes": 127642,
+    "crs_epsg": 32646,
+    "grid_dimensions": [
+      120,
+      120
+    ],
+    "max_coord_diff_m": 0.0,
+    "alignment_verified": true,
+    "polarization_layers": [
+      "HHHH",
+      "HVHV"
+    ],
+    "hhhh_metadata": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "mask_metadata": {
+      "long_name": "Data validity / shadow mask",
+      "distribution": {
+        "0": 14400
+      }
+    },
+    "validity_accounting": {
+      "total_pixels": 14400,
+      "mask_zero_pixels": 14400,
+      "mask_nonzero_pixels": 0,
+      "nan_pixels": 0,
+      "inf_pixels": 0,
+      "non_positive_pixels": 0,
+      "combined_valid_pixels": 14400,
+      "excluded_pixels": 0
+    }
+  },
+  {
+    "granule_id": "NISAR_S2_PR_GCOV_029_019_D_075_2500_CRNA_A_20260826T124208_20260826T124245_P00500_M_F_I_001",
+    "filename": "NISAR_S2_PR_GCOV_029_019_D_075_2500_CRNA_A_20260826T124208_20260826T124245_P00500_M_F_I_001.h5",
+    "cycle_number": 29,
+    "acquisition_date": "2026-08-26",
+    "utc_start": "2026-08-26T12:42:08Z",
+    "utc_stop": "2026-08-26T12:42:45Z",
+    "duration_seconds": 37.0,
+    "track": 19,
+    "frame": 75,
+    "pass_direction": "Descending",
+    "look_direction": "Right",
+    "file_size_bytes": 96549,
+    "crs_epsg": 32646,
+    "grid_dimensions": [
+      120,
+      120
+    ],
+    "max_coord_diff_m": 0.0,
+    "alignment_verified": true,
+    "polarization_layers": [
+      "HHHH",
+      "HVHV"
+    ],
+    "hhhh_metadata": {
+      "long_name": "Co-polarized HH gamma-0 backscatter power",
+      "units": "1"
+    },
+    "mask_metadata": {
+      "long_name": "Data validity / shadow mask",
+      "distribution": {
+        "0": 14400
+      }
+    },
+    "validity_accounting": {
+      "total_pixels": 14400,
+      "mask_zero_pixels": 14400,
+      "mask_nonzero_pixels": 0,
+      "nan_pixels": 0,
+      "inf_pixels": 0,
+      "non_positive_pixels": 0,
+      "combined_valid_pixels": 14400,
+      "excluded_pixels": 0
+    }
+  }
+]

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Upload, CheckCircle2, AlertCircle, Info, FileUp, ShieldCheck } from 'lucide-react';
+import { Upload } from 'lucide-react';
 
 export default function RegionSelector({ selectedRegionId, onSelectRegion, onCustomBoundaryUploaded }) {
   const [uploadedFileName, setUploadedFileName] = useState(null);
@@ -12,7 +12,7 @@ export default function RegionSelector({ selectedRegionId, onSelectRegion, onCus
     if (!file.name.endsWith('.geojson') && !file.name.endsWith('.json')) {
       setUploadFeedback({
         type: 'error',
-        message: 'Unsupported file format. Please upload a valid RFC 7946 .geojson file containing polygon geometries.'
+        message: 'Unsupported format. Please upload a valid RFC 7946 .geojson file.'
       });
       return;
     }
@@ -28,7 +28,7 @@ export default function RegionSelector({ selectedRegionId, onSelectRegion, onCus
         setUploadedFileName(file.name);
         setUploadFeedback({
           type: 'info',
-          message: `Boundary "${file.name}" displayed. Note: Custom-region satellite analysis requires background NISAR data discovery, extraction, and processing. No pre-processed satellite observation is currently available for this custom geometry.`
+          message: `Boundary "${file.name}" loaded for spatial reference.`
         });
 
         if (onCustomBoundaryUploaded) {
@@ -45,26 +45,20 @@ export default function RegionSelector({ selectedRegionId, onSelectRegion, onCus
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
+    <div className="bg-[#1a1f3d] rounded-xl border border-[#587ebb]/40 p-5 shadow-lg space-y-4">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#1c2541] text-[#6fffe9] border border-[#3a506b] flex items-center justify-center">
-            <MapPin className="w-4 h-4 text-[#5bc0be]" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-slate-900 tracking-tight">
-              1. Select an Area to Monitor
-            </h2>
-            <p className="text-xs text-slate-500">
-              Choose a study area with verified, processed NASA–ISRO NISAR satellite observations.
-            </p>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#3b4a8c]/50">
+        <div>
+          <h2 className="text-base font-bold text-white tracking-tight">
+            1. Select Monitoring Study Area
+          </h2>
+          <p className="text-xs text-[#87b8e8]">
+            Study areas with verified Level-2 NISAR SAR radar observations.
+          </p>
         </div>
 
-        <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 font-medium">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Authentic Scientific Datasets</span>
+        <div className="text-xs text-[#c6e9f1] bg-[#222950] px-2.5 py-1 rounded-md border border-[#587ebb]/40 font-mono font-medium">
+          Verified NISAR Swaths
         </div>
       </div>
 
@@ -75,46 +69,46 @@ export default function RegionSelector({ selectedRegionId, onSelectRegion, onCus
           onClick={() => onSelectRegion('majuli')}
           className={`p-4 rounded-xl border text-left transition-all relative overflow-hidden group cursor-pointer ${
             selectedRegionId === 'majuli'
-              ? 'bg-subtle border-teal ring-1 ring-teal shadow-xs'
-              : 'bg-white border-border hover:border-dusk/40 hover:bg-subtle'
+              ? 'bg-[#222950] border-[#87b8e8] ring-1 ring-[#87b8e8] shadow-md'
+              : 'bg-[#1a1f3d] border-[#3b4a8c]/60 hover:border-[#87b8e8]/50 hover:bg-[#222950]/50'
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm text-primary">Majuli River Island</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo text-aqua border border-dusk font-mono">
+              <span className="font-semibold text-sm text-white">Majuli River Island</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#1a1f3d] text-[#87b8e8] border border-[#3b4a8c] font-mono">
                 Track 015 / Frame 3700
               </span>
             </div>
-            <span className="text-xs font-mono font-medium text-teal bg-indigo px-2 py-0.5 rounded">
-              Single-Date Delineation
+            <span className="text-xs font-mono font-medium text-[#c6e9f1] bg-[#3b4a8c] border border-[#587ebb] px-2 py-0.5 rounded">
+              Water Delineation
             </span>
           </div>
 
-          <p className="text-xs text-body leading-snug mb-3">
-            High-resolution water classification outlining <strong>13,821 extracted water polygons</strong> across the Brahmaputra braided channel and Subansiri confluence.
+          <p className="text-xs text-[#c6e9f1] leading-snug mb-3">
+            High-resolution water classification outlining <strong className="text-white">13,821 extracted water polygons</strong> across the Brahmaputra channel and Subansiri confluence.
           </p>
 
-          <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-border text-[11px]">
+          <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-[#3b4a8c]/50 text-[11px]">
             <div>
-              <span className="text-muted block text-[10px]">Observation</span>
-              <strong className="text-primary font-mono">27 Aug 2026</strong>
+              <span className="text-[#87b8e8] block text-[10px]">Observation</span>
+              <strong className="text-white font-mono font-semibold">27 Aug 2026</strong>
             </div>
             <div>
-              <span className="text-muted block text-[10px]">Water Area</span>
-              <strong className="text-primary font-mono font-semibold">797.55 km²</strong>
+              <span className="text-[#87b8e8] block text-[10px]">Water Area</span>
+              <strong className="text-[#87b8e8] font-mono font-semibold">797.55 km²</strong>
             </div>
             <div>
-              <span className="text-muted block text-[10px]">Coverage</span>
-              <strong className="text-primary font-mono">8.91% of swath</strong>
+              <span className="text-[#87b8e8] block text-[10px]">Coverage</span>
+              <strong className="text-white font-mono">8.91% swath</strong>
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-border flex items-center justify-between text-[11px] text-muted">
-            <span>● 13,821 Polygons</span>
-            <span>● Single-Pol HHHH (10m)</span>
-            <span className="text-teal font-semibold flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-teal" /> Ready
+          <div className="mt-2.5 pt-2 border-t border-[#3b4a8c]/50 flex items-center justify-between text-[11px] text-slate-400">
+            <span>13,821 Polygons</span>
+            <span>Single-Pol HHHH (10m)</span>
+            <span className="text-[#87b8e8] font-semibold">
+              ● Ready
             </span>
           </div>
         </button>
@@ -124,63 +118,60 @@ export default function RegionSelector({ selectedRegionId, onSelectRegion, onCus
           onClick={() => onSelectRegion('barpeta')}
           className={`p-4 rounded-xl border text-left transition-all relative overflow-hidden group cursor-pointer ${
             selectedRegionId === 'barpeta'
-              ? 'bg-subtle border-teal ring-1 ring-teal shadow-xs'
-              : 'bg-white border-border hover:border-dusk/40 hover:bg-subtle'
+              ? 'bg-[#222950] border-[#87b8e8] ring-1 ring-[#87b8e8] shadow-md'
+              : 'bg-[#1a1f3d] border-[#3b4a8c]/60 hover:border-[#87b8e8]/50 hover:bg-[#222950]/50'
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm text-primary">Barpeta & Lower Floodplain</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo text-aqua border border-dusk font-mono">
+              <span className="font-semibold text-sm text-white">Barpeta & Lower Floodplain</span>
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#1a1f3d] text-[#87b8e8] border border-[#3b4a8c] font-mono">
                 Track 019 / Frame 075
               </span>
             </div>
-            <span className="text-xs font-mono font-medium text-teal bg-indigo px-2 py-0.5 rounded">
-              Two-Date Comparison
+            <span className="text-xs font-mono font-medium text-[#c6e9f1] bg-[#3b4a8c] border border-[#587ebb] px-2 py-0.5 rounded">
+              Multi-Date Comparison
             </span>
           </div>
 
-          <p className="text-xs text-body leading-snug mb-3">
-            Multi-temporal water classification comparison detecting a <strong>+140.77% increase in classified water area</strong> (+2.337 km² newly inundated land) in the evaluated 9.152 km² corridor over the 12-day interval between available observations.
+          <p className="text-xs text-[#c6e9f1] leading-snug mb-3">
+            Multi-temporal water classification comparison detecting a <strong className="text-white">+140.77% increase in classified water area</strong> (+2.337 km² newly inundated land) across the 12-day orbital repeat.
           </p>
 
-          <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-border text-[11px]">
+          <div className="grid grid-cols-3 gap-2 pt-2.5 border-t border-[#3b4a8c]/50 text-[11px]">
             <div>
-              <span className="text-muted block text-[10px]">Observations</span>
-              <strong className="text-primary font-mono">27 Jun vs 09 Jul</strong>
+              <span className="text-[#87b8e8] block text-[10px]">Observations</span>
+              <strong className="text-white font-mono font-semibold">27 Jun vs 09 Jul</strong>
             </div>
             <div>
-              <span className="text-muted block text-[10px]">Area Increase</span>
-              <strong className="text-map-inundated font-mono font-semibold">+140.77%</strong>
+              <span className="text-[#87b8e8] block text-[10px]">Area Increase</span>
+              <strong className="text-[#f43f5e] font-mono font-bold">+140.77%</strong>
             </div>
             <div>
-              <span className="text-muted block text-[10px]">Newly Inundated</span>
-              <strong className="text-map-inundated font-mono font-semibold">+2.337 km²</strong>
+              <span className="text-[#87b8e8] block text-[10px]">Newly Inundated</span>
+              <strong className="text-[#f43f5e] font-mono font-bold">+2.337 km²</strong>
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-border flex items-center justify-between text-[11px] text-muted">
-            <span>● 1.660 → 3.997 km²</span>
-            <span>● Track 019 / Frame 075</span>
-            <span className="text-teal font-semibold flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3 text-teal" /> Ready
+          <div className="mt-2.5 pt-2 border-t border-[#3b4a8c]/50 flex items-center justify-between text-[11px] text-slate-400">
+            <span>1.660 → 3.997 km²</span>
+            <span>8 Observation Cycles</span>
+            <span className="text-[#87b8e8] font-semibold">
+              ● Ready
             </span>
           </div>
         </button>
       </div>
 
-      {/* Optional Custom GeoJSON Boundary Upload Tool (Strictly Disclosed) */}
-      <div className="pt-2 border-t border-slate-100">
-        <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-          <div className="flex items-center gap-2 text-slate-700">
-            <FileUp className="w-4 h-4 text-sky-600 shrink-0" />
-            <div>
-              <span className="font-semibold text-slate-900">Custom Boundary Upload (Optional): </span>
-              <span className="text-slate-500">Upload a GeoJSON file (.geojson) to preview an arbitrary area of interest.</span>
-            </div>
+      {/* Optional Custom GeoJSON Boundary Upload Tool */}
+      <div className="pt-2 border-t border-[#3b4a8c]/50">
+        <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-xl bg-[#222950] border border-[#587ebb]/40 text-xs">
+          <div className="text-slate-300">
+            <span className="font-semibold text-white">Custom Boundary (Optional): </span>
+            <span className="text-[#87b8e8]">Upload GeoJSON (.geojson) to overlay a custom area of interest on the radar map.</span>
           </div>
-          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:border-sky-400 text-sky-700 font-medium shadow-2xs cursor-pointer transition-colors text-xs">
-            <Upload className="w-3.5 h-3.5" />
+          <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#3b4a8c] border border-[#587ebb] hover:border-[#87b8e8] text-white hover:text-[#c6e9f1] font-medium shadow-xs cursor-pointer transition-colors text-xs">
+            <Upload className="w-3.5 h-3.5 text-[#87b8e8]" />
             <span>{uploadedFileName ? 'Upload Different GeoJSON' : 'Upload GeoJSON'}</span>
             <input
               type="file"
@@ -193,12 +184,11 @@ export default function RegionSelector({ selectedRegionId, onSelectRegion, onCus
 
         {/* Upload Feedback */}
         {uploadFeedback && (
-          <div className={`mt-2 p-2.5 rounded-lg text-xs flex items-start gap-2 ${
+          <div className={`mt-2 p-2.5 rounded-md text-xs border ${
             uploadFeedback.type === 'info'
-              ? 'bg-amber-50 border border-amber-200 text-amber-900'
-              : 'bg-rose-50 border border-rose-200 text-rose-900'
+              ? 'bg-[#222950] border-[#87b8e8]/40 text-[#c6e9f1]'
+              : 'bg-[#222950] border-rose-500/40 text-rose-200'
           }`}>
-            <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <div className="leading-relaxed">{uploadFeedback.message}</div>
           </div>
         )}

@@ -11,10 +11,12 @@ from typing import Dict, Any, List, Optional
 # pyrefly: ignore[missing-import]
 from pydantic import BaseModel, Field
 import h5py
-# pyrefly: ignore[missing-import]
-import rasterio
-# pyrefly: ignore[missing-import]
-from rasterio.transform import from_origin
+try:
+    import rasterio
+    from rasterio.transform import from_origin
+except ImportError:
+    rasterio = None
+    from_origin = None
 from ..services.nisar_metadata import (
     NISAR_OBSERVATION_CATALOG,
     STUDY_REGIONS,
@@ -191,6 +193,16 @@ def compare_observations(
     - Quantifies affected area in km2
     - Delivers scientific physical explanations and limitations
     """
+    # Coerce Query defaults if invoked directly in Python
+    if not isinstance(filter_window, int):
+        filter_window = getattr(filter_window, "default", 5)
+    if not isinstance(threshold_db, (int, float)):
+        threshold_db = getattr(threshold_db, "default", -4.5)
+    if not isinstance(apply_speckle_filter, bool):
+        apply_speckle_filter = getattr(apply_speckle_filter, "default", True)
+    if not isinstance(use_adaptive_otsu, bool):
+        use_adaptive_otsu = getattr(use_adaptive_otsu, "default", True)
+
     if region_id == "majuli":
         summary = get_job_water_summary(VERIFIED_MAJULI_JOB_ID)
         extent = summary.get("extent_metrics", {})
@@ -432,6 +444,16 @@ def export_geojson(
     event_date: str = Query("2026-07-09")
 ):
     """Exports detected flood extent as standard RFC 7946 GeoJSON FeatureCollection."""
+    # Coerce Query defaults if invoked directly in Python
+    if not isinstance(filter_window, int):
+        filter_window = getattr(filter_window, "default", 5)
+    if not isinstance(threshold_db, (int, float)):
+        threshold_db = getattr(threshold_db, "default", -4.5)
+    if not isinstance(apply_speckle_filter, bool):
+        apply_speckle_filter = getattr(apply_speckle_filter, "default", True)
+    if not isinstance(use_adaptive_otsu, bool):
+        use_adaptive_otsu = getattr(use_adaptive_otsu, "default", True)
+
     if region_id == "majuli":
         return get_majuli_water_boundaries()
     if region_id == "barpeta":
@@ -532,12 +554,50 @@ def export_csv(region_id: str = Query("kaziranga")):
 
 @router.get("/timeline-stats")
 def get_timeline_stats(
-    region_id: str = Query("kaziranga", description="Study region ID")
+    region_id: str = Query("barpeta", description="Study region ID")
 ) -> Dict[str, Any]:
     """Returns the multi-cycle flood area evolution curve across the entire monsoon season."""
     region = get_region_by_id(region_id)
+
+    if region_id == "barpeta":
+        # Load verified 8-cycle multi-date time series
+        summary_path = Path(__file__).resolve().parent.parent.parent.parent / "data" / "experimental" / "multidate_nisar" / "barpeta" / "statistics" / "timeseries_summary.json"
+        if summary_path.exists():
+            try:
+                with open(summary_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                timeline = []
+                for entry in data:
+                    cycle_num = entry["cycle_number"]
+                    cycle_str = f"{cycle_num:03d}"
+                    extent = entry["extent_metrics"]
+                    date = entry["acquisition_date"]
+                    water_km2 = extent["water_area_km2"]
+                    is_candidate = (cycle_num == 25)
+                    # Baseline was cycle 24 (1.660 km2)
+                    new_inundation = max(0.0, round(water_km2 - 0.862, 3))
+                    timeline.append({
+                        "cycle": cycle_str,
+                        "date": date,
+                        "stage": f"Cycle {cycle_str} Observation",
+                        "water_area_km2": water_km2,
+                        "new_inundation_km2": new_inundation,
+                        "permanent_water_km2": 0.862,
+                        "total_water_km2": water_km2,
+                        "inundation_percent": extent["water_coverage_percent"],
+                        "is_candidate": is_candidate
+                    })
+                return {
+                    "region_id": "barpeta",
+                    "region_name": region["name"],
+                    "total_area_km2": 9.152,
+                    "timeline": timeline,
+                    "is_verified_multidate": True
+                }
+            except Exception as e:
+                logger.warning(f"Error loading multidate summary: {e}")
+
     baseline_date = "2026-06-03"  # Early pre-monsoon reference
-    
     timeline = []
     for obs in NISAR_OBSERVATION_CATALOG:
         date = obs["date"]

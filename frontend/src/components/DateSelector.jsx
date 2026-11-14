@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Calendar, CheckCircle2, Info, ArrowRight, Sliders, AlertTriangle } from 'lucide-react';
 
 export default function DateSelector({
   observations = [],
@@ -18,193 +17,237 @@ export default function DateSelector({
   const isMajuli = selectedRegionId === 'majuli';
   const isBarpeta = selectedRegionId === 'barpeta';
 
-  // Filter only observations that have actually completed processing and have usable results
-  const processedObservations = observations.filter(
-    (obs) => obs.is_processed || obs.status === 'PROCESSED_AVAILABLE'
-  );
+  // 8-Cycle Multi-Date Barpeta Observation Sequence
+  const barpetaCycles = [
+    { cycle: '022', date: '2026-06-03', label: '03 Jun', stage: 'Pre-Monsoon Base', area: '0.862 km²', pct: '9.4%' },
+    { cycle: '023', date: '2026-06-15', label: '15 Jun', stage: 'Monsoon Onset', area: '0.887 km²', pct: '9.7%' },
+    { cycle: '024', date: '2026-06-27', label: '27 Jun', stage: 'Pre-Flood Baseline', area: '1.660 km²', pct: '18.1%' },
+    { cycle: '025', date: '2026-07-09', label: '09 Jul', stage: 'Peak Inundation', area: '3.997 km²', pct: '43.7%' },
+    { cycle: '026', date: '2026-07-21', label: '21 Jul', stage: 'Early Recession', area: '2.454 km²', pct: '26.8%' },
+    { cycle: '027', date: '2026-08-02', label: '02 Aug', stage: 'Drainage Phase', area: '2.158 km²', pct: '23.6%' },
+    { cycle: '028', date: '2026-08-14', label: '14 Aug', stage: 'Secondary Surge', area: '2.766 km²', pct: '30.2%' },
+    { cycle: '029', date: '2026-08-26', label: '26 Aug', stage: 'Late August Drydown', area: '1.848 km²', pct: '20.2%' },
+  ];
+
+  // Majuli 12-Day Track 015 Repeat Timeline
+  const majuliCycles = [
+    { cycle: '025', date: '2026-07-10', stage: 'Orbit Cycle 025', status: 'Cataloged' },
+    { cycle: '026', date: '2026-07-22', stage: 'Orbit Cycle 026', status: 'Cataloged' },
+    { cycle: '027', date: '2026-08-03', stage: 'Orbit Cycle 027', status: 'Cataloged' },
+    { cycle: '028', date: '2026-08-15', stage: 'Orbit Cycle 028', status: 'Cataloged' },
+    { cycle: '029', date: '2026-08-27', stage: 'Primary Reference', status: 'Processed Ready', area: '797.55 km²' },
+    { cycle: '030', date: '2026-09-08', stage: 'Orbit Cycle 030', status: 'Cataloged' },
+    { cycle: '031', date: '2026-09-20', stage: 'Orbit Cycle 031', status: 'Cataloged' },
+  ];
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
+    <div className="bg-[#1a1f3d] rounded-xl border border-[#587ebb]/40 p-5 shadow-lg space-y-4">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo text-aqua border border-dusk flex items-center justify-center">
-            <Calendar className="w-4 h-4 text-teal" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-primary tracking-tight">
-                2. Select Available Satellite Observation Date{isMajuli ? '' : 's'}
-              </h2>
-              <span className="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full border bg-indigo text-aqua border-dusk">
-                {isMajuli
-                  ? '1 Processed Observation (Single-Date Mode)'
-                  : isBarpeta
-                  ? '2 Processed Observations (12-Day Interval Mode)'
-                  : '0 Observations Ready'}
-              </span>
-            </div>
-            <p className="text-xs text-muted">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#3b4a8c]/50">
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-semibold text-[#c6e9f1] tracking-tight">
+              Satellite Observation Dates & Timeline
+            </h2>
+            <span className="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-md border bg-[#222950] text-[#87b8e8] border-[#3b4a8c]">
               {isMajuli
-                ? 'Only dates with authentic processed NISAR raster products are selectable.'
+                ? 'Track 015 / Frame 3700'
                 : isBarpeta
-                ? 'Select the Baseline (27 June 2026) and Event (09 July 2026) observations to view the water change comparison.'
-                : 'Satellite observations have not been extracted for this area.'}
-            </p>
+                ? '8 Verified Observation Cycles (Track 019 / Frame 075)'
+                : 'Area Selection Required'}
+            </span>
           </div>
+          <p className="text-xs text-[#87b8e8]">
+            {isMajuli
+              ? 'Multi-cycle 12-day exact repeat timeline with primary high-resolution water extraction.'
+              : isBarpeta
+              ? 'Continuous 12-day multi-date observation sequence spanning the 2026 monsoon season.'
+              : 'Select a study reach to view observation dates.'}
+          </p>
         </div>
 
         {isBarpeta && (
-          <div className="text-xs font-mono font-medium text-muted bg-subtle px-3 py-1.5 rounded-lg border border-border">
-            Interval between available observations: <strong className="text-primary">12 Days</strong> (Track 019 / Frame 075)
+          <div className="text-xs font-mono font-medium text-[#c6e9f1] bg-[#222950] px-3 py-1.5 rounded-lg border border-[#587ebb]/40">
+            Repeat Interval: <strong className="text-white">12 Days</strong>
           </div>
         )}
       </div>
 
       {/* ========================================================================= */}
-      {/* STATE A: MAJULI (Single-Date Processed Observation)                       */}
+      {/* STATE A: MAJULI (Single-Date Processed Observation + Orbit Sequence)     */}
       {/* ========================================================================= */}
       {isMajuli && (
         <div className="space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* The single processed observation for Majuli */}
-            <div className="p-4 rounded-xl border border-teal ring-1 ring-teal bg-subtle shadow-xs relative">
+            {/* The primary processed observation for Majuli */}
+            <div className="p-4 rounded-xl border border-[#87b8e8] ring-1 ring-[#87b8e8]/50 bg-[#222950] shadow-md relative">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold font-mono px-2 py-0.5 rounded bg-indigo text-aqua border border-dusk">
-                  Track 015 / Frame 3700
+                <span className="text-[10px] font-semibold font-mono px-2 py-0.5 rounded bg-[#1a1f3d] text-[#87b8e8] border border-[#3b4a8c]">
+                  Cycle 029 • Track 015
                 </span>
-                <span className="flex items-center gap-1 text-[11px] font-semibold text-teal bg-indigo px-2 py-0.5 rounded border border-dusk">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-teal" />
-                  Processed Result Ready
+                <span className="text-[11px] font-semibold text-[#c6e9f1] bg-[#3b4a8c] px-2 py-0.5 rounded border border-[#587ebb]">
+                  Verified Result
                 </span>
               </div>
 
-              <div className="text-lg font-bold text-primary font-mono">27 August 2026</div>
-              <div className="text-xs text-body mt-1 leading-relaxed">
-                Post-monsoon Level-2 GCOV extraction. <strong>797.55 km²</strong> surface water classified across <strong>13,821 extracted water polygons</strong>.
+              <div className="text-lg font-bold text-white font-mono">27 August 2026</div>
+              <div className="text-xs text-[#c6e9f1] mt-1 leading-relaxed">
+                Level-2 GCOV extraction: <strong className="text-white">797.55 km²</strong> classified surface water across <strong className="text-white">13,821 polygons</strong> in the 8,955.16 km² swath.
               </div>
 
-              <div className="mt-3 pt-2.5 border-t border-border text-[11px] text-primary font-semibold flex items-center justify-between">
-                <span>Selected for Water Extent Delineation</span>
-                <span className="font-mono text-muted">10m Spatial Resolution</span>
+              <div className="mt-3 pt-2.5 border-t border-[#3b4a8c]/50 text-[11px] text-[#87b8e8] flex items-center justify-between">
+                <span>Selected Observation</span>
+                <span className="font-mono text-slate-300">10m Resolution</span>
               </div>
             </div>
 
-            {/* Scientific Transparency Notice */}
-            <div className="md:col-span-2 p-4 rounded-xl border border-border bg-subtle text-xs text-body flex flex-col justify-center space-y-2">
-              <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                <Info className="w-4 h-4 text-sky-600 shrink-0" />
-                <span>Single-Observation Scientific Scope:</span>
+            {/* 12-Day Orbital Repeat Catalog for Track 015 */}
+            <div className="md:col-span-2 p-4 rounded-xl border border-[#587ebb]/40 bg-[#222950]/80 text-xs text-[#c6e9f1] space-y-2.5">
+              <div className="font-semibold text-white">
+                Track 015 / Frame 3700 Orbital Repeat Sequence (Ascending Pass)
               </div>
-              <p className="leading-relaxed">
-                Currently, <strong>27 August 2026</strong> is the only NISAR Level-2 observation processed and verified for Track 015.
-              </p>
-              <p className="text-slate-500 leading-relaxed">
-                No second observation pass is currently processed for Track 015, so a multi-temporal before/after flood change comparison is not offered for Majuli.
-                If you wish to test a multi-temporal comparison, select <strong>Barpeta</strong> in Step 1.
-              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                {majuliCycles.map((c) => {
+                  const isCurrent = c.date === '2026-08-27';
+                  return (
+                    <div
+                      key={c.cycle}
+                      className={`p-2 rounded-lg border text-[11px] font-mono ${
+                        isCurrent
+                          ? 'bg-[#3b4a8c] border-[#87b8e8] text-white shadow-sm'
+                          : 'bg-[#1a1f3d] border-[#3b4a8c]/50 text-slate-300'
+                      }`}
+                    >
+                      <div className="text-[10px] text-[#87b8e8]">Cycle {c.cycle}</div>
+                      <div className="font-bold text-white">{c.date}</div>
+                      <div className="text-[10px] mt-0.5 text-slate-300">{c.stage}</div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* STATE B: BARPETA (Two-Date Comparison: 27 June vs 09 July 2026)          */}
+      {/* STATE B: BARPETA (8-Date Multi-Temporal Sequence)                         */}
       {/* ========================================================================= */}
       {isBarpeta && (
         <div className="space-y-4">
+          {/* 8-Cycle Multi-Date Barpeta Timeline Selector */}
+          <div>
+            <div className="text-xs font-semibold text-[#87b8e8] uppercase tracking-wider mb-2">
+              Multi-Date Observation Sequence (Track 019 / Frame 075 • 12-Day Interval)
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+              {barpetaCycles.map((c) => {
+                const isBaseline = baselineDate === c.date;
+                const isEvent = eventDate === c.date;
+                return (
+                  <div
+                    key={c.cycle}
+                    onClick={() => {
+                      if (!isBaseline && !isEvent) {
+                        onSelectEvent(c.date);
+                      }
+                    }}
+                    className={`p-2.5 rounded-lg border transition-all text-xs cursor-pointer ${
+                      isBaseline
+                        ? 'bg-[#3b4a8c] border-[#87b8e8] ring-1 ring-[#87b8e8] shadow-md text-white'
+                        : isEvent
+                        ? 'bg-[#881337] border-[#f43f5e] ring-1 ring-[#f43f5e] shadow-md text-white'
+                        : 'bg-[#222950] border-[#3b4a8c]/60 hover:border-[#87b8e8]/60 text-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-mono text-[#87b8e8]">
+                      <span>C{c.cycle}</span>
+                      {isBaseline && <span className="text-[#87b8e8] font-bold">Base</span>}
+                      {isEvent && <span className="text-[#f43f5e] font-bold">Event</span>}
+                    </div>
+                    <div className="font-bold text-white font-mono mt-0.5">{c.label}</div>
+                    <div className="text-[10px] text-slate-300 truncate mt-0.5">{c.stage}</div>
+                    <div className="text-[10px] font-mono font-semibold text-[#87b8e8] mt-1">
+                      {c.area} ({c.pct})
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Primary Pair Cards (27 Jun vs 09 Jul) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            {/* 1. Baseline Observation Card (27 June 2026) */}
-            <div className={`p-4 rounded-xl border transition-all relative ${
-              baselineDate === '2026-06-27'
-                ? 'bg-subtle border-teal ring-1 ring-teal shadow-xs'
-                : 'bg-white border-border hover:border-dusk/40'
-            }`}>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-indigo text-aqua border border-dusk">
-                  Cycle 024 • Track 019 / Frame 075
+            {/* 1. Baseline Observation Card */}
+            <div className="p-3.5 rounded-xl border border-[#87b8e8] bg-[#222950] shadow-md">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#1a1f3d] text-[#87b8e8] border border-[#3b4a8c]">
+                  Cycle 024 • Baseline
                 </span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal text-midnight">
-                  Baseline (Before)
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#3b4a8c] text-white">
+                  Reference Date
                 </span>
               </div>
-
-              <div className="text-base font-bold text-primary font-mono mb-1">
-                27 June 2026
+              <div className="text-base font-bold text-white font-mono">
+                {baselineDate}
               </div>
-              <div className="text-xs text-body leading-snug mb-2">
-                Pre-Flood High Flow observation. Evaluated baseline water area: <strong className="text-primary font-mono font-semibold">1.660 km²</strong>.
-              </div>
-
-              <div className="pt-2 border-t border-border flex items-center justify-between text-[11px]">
-                <span className="text-muted">Role: Pre-Flood Reference</span>
-                <span className="text-teal font-semibold">✓ Selected as Baseline</span>
+              <div className="text-xs text-[#c6e9f1] mt-0.5 leading-snug">
+                Bankfull discharge baseline. Classified water extent: <strong className="text-white font-mono">1.660 km²</strong> (18.14% of corridor).
               </div>
             </div>
 
-            {/* 2. Event Observation Card (09 July 2026) */}
-            <div className={`p-4 rounded-xl border transition-all relative ${
-              eventDate === '2026-07-09'
-                ? 'bg-subtle border-map-inundated ring-1 ring-map-inundated shadow-xs'
-                : 'bg-white border-border hover:border-dusk/40'
-            }`}>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-indigo text-aqua border border-dusk">
-                  Cycle 025 • Track 019 / Frame 075
+            {/* 2. Event Observation Card */}
+            <div className="p-3.5 rounded-xl border border-[#f43f5e] bg-[#222950] shadow-md">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#1a1f3d] text-[#f43f5e] border border-[#881337]">
+                  Cycle 025 • Event
                 </span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-map-inundated text-white">
-                  Event (After)
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#e11d48] text-white">
+                  Event Observation
                 </span>
               </div>
-
-              <div className="text-base font-bold text-primary font-mono mb-1">
-                09 July 2026
+              <div className="text-base font-bold text-white font-mono">
+                {eventDate}
               </div>
-              <div className="text-xs text-body leading-snug mb-2">
-                Event observation (09 July 2026). Evaluated event water area: <strong className="text-primary font-mono font-semibold">3.997 km²</strong> (+140.77% increase in classified water area in evaluated 9.152 km² corridor).
-              </div>
-
-              <div className="pt-2 border-t border-border flex items-center justify-between text-[11px]">
-                <span className="text-muted">Role: High-Water Event</span>
-                <span className="text-map-inundated font-semibold">✓ Selected as Event</span>
+              <div className="text-xs text-[#c6e9f1] mt-0.5 leading-snug">
+                Peak inundation surge: <strong className="text-white font-mono">3.997 km²</strong> (+140.77% water increase; +2.337 km² newly flooded).
               </div>
             </div>
           </div>
 
           {/* Active selection summary banner */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-subtle border border-border text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-[#222950] border border-[#587ebb]/40 text-xs">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-teal"></span>
-                <span className="text-body">Baseline (Before):</span>
-                <strong className="text-primary font-mono">{baselineDate}</strong>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#87b8e8]"></span>
+                <span className="text-[#87b8e8]">Baseline:</span>
+                <strong className="text-white font-mono">{baselineDate}</strong>
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-muted" />
+              <span className="text-slate-400">➔</span>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-map-inundated"></span>
-                <span className="text-body">Event (After):</span>
-                <strong className="text-primary font-mono">{eventDate}</strong>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></span>
+                <span className="text-[#87b8e8]">Event:</span>
+                <strong className="text-white font-mono">{eventDate}</strong>
               </div>
-              <span className="text-muted font-mono text-[11px]">(Δt = 12 Days • Track 019 / Frame 075)</span>
+              <span className="text-slate-400 font-mono text-[11px]">(Δt = 12 Days • Track 019 / Frame 075)</span>
             </div>
 
             {/* Threshold toggle button */}
             <button
               onClick={() => setShowAdvancedTuning(!showAdvancedTuning)}
-              className="flex items-center gap-1.5 text-xs text-primary font-medium hover:text-teal cursor-pointer transition-colors"
+              className="text-xs text-[#87b8e8] hover:text-white font-medium cursor-pointer transition-colors"
             >
-              <Sliders className="w-3.5 h-3.5" />
               <span>{showAdvancedTuning ? 'Hide Radar Settings' : 'Tune Radar Threshold'}</span>
             </button>
           </div>
 
           {/* Optional Collapsible Threshold Tuning */}
           {showAdvancedTuning && (
-            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs animate-in fade-in duration-200">
+            <div className="p-3.5 rounded-xl bg-[#141830] border border-[#587ebb]/40 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs animate-in fade-in duration-200">
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold text-slate-800">Log-Ratio Change Threshold:</span>
-                  <span className="font-mono font-bold text-sky-700">{thresholdDb.toFixed(1)} dB</span>
+                  <span className="font-semibold text-white">Log-Ratio Change Threshold:</span>
+                  <span className="font-mono font-bold text-[#87b8e8]">{thresholdDb.toFixed(1)} dB</span>
                 </div>
                 <input
                   type="range"
@@ -213,26 +256,26 @@ export default function DateSelector({
                   step="0.5"
                   value={thresholdDb}
                   onChange={(e) => onThresholdChange(parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+                  className="w-full h-1.5 bg-[#222950] rounded-lg appearance-none cursor-pointer accent-[#87b8e8]"
                 />
                 <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                   <span>-10.0 dB (Conservative)</span>
-                  <span className="text-sky-700 font-semibold">-4.5 dB (Verified)</span>
+                  <span className="text-[#87b8e8] font-semibold">-4.5 dB (Verified)</span>
                   <span>-2.0 dB (Sensitive)</span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-slate-800">Lee Speckle Noise Filter</div>
-                  <div className="text-[11px] text-slate-500">3×3 adaptive variance window to reduce radar grain</div>
+                  <div className="font-semibold text-white">Lee Speckle Noise Filter</div>
+                  <div className="text-[11px] text-slate-400">3×3 adaptive variance window to reduce radar grain</div>
                 </div>
                 <button
                   onClick={() => onToggleSpeckleFilter(!speckleFilter)}
-                  className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-colors cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-md font-semibold text-xs transition-colors cursor-pointer ${
                     speckleFilter
-                      ? 'bg-sky-600 text-white'
-                      : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                      ? 'bg-[#87b8e8] text-[#1a1f3d]'
+                      : 'bg-[#222950] text-slate-300 border border-[#3b4a8c] hover:bg-[#3b4a8c]'
                   }`}
                 >
                   {speckleFilter ? 'Filter: ON' : 'Filter: OFF'}
@@ -247,12 +290,11 @@ export default function DateSelector({
       {/* STATE C: UNSUPPORTED / UNPROCESSED REGION                                 */}
       {/* ========================================================================= */}
       {!isMajuli && !isBarpeta && (
-        <div className="p-4 rounded-xl border border-amber-200 bg-amber-50 text-xs text-amber-900 space-y-2">
-          <div className="flex items-center gap-2 font-bold text-amber-950">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>No Processed Satellite Observations Available for this Area</span>
+        <div className="p-4 rounded-xl border border-amber-500/40 bg-[#222950] text-xs text-amber-200 space-y-2">
+          <div className="font-bold text-amber-300">
+            No Processed Satellite Observations Available for this Area
           </div>
-          <p className="leading-relaxed">
+          <p className="leading-relaxed text-slate-300">
             There are currently no processed NISAR Level-2 satellite observations for this area.
             To explore verified satellite radar data, please select either <strong>Majuli River Island</strong> or <strong>Barpeta & Lower Floodplain</strong>.
           </p>

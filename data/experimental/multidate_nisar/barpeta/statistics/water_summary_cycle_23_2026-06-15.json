@@ -1,0 +1,94 @@
+{
+  "granule_id": "NISAR_S2_PR_GCOV_023_019_D_075_2500_CRNA_A_20260615T124208_20260615T124245_P00500_M_F_I_001",
+  "filename": "NISAR_S2_PR_GCOV_023_019_D_075_2500_CRNA_A_20260615T124208_20260615T124245_P00500_M_F_I_001.h5",
+  "cycle_number": 23,
+  "acquisition_date": "2026-06-15",
+  "utc_timestamp": "2026-06-15T12:42:08Z",
+  "methodology": {
+    "algorithm": "adaptive_bimodal_otsu",
+    "threshold_db": -17.6958,
+    "speckle_filter": "adaptive_lee",
+    "window_size": 5,
+    "noise_variance": 0.25,
+    "min_cluster_pixels": 5
+  },
+  "valid_data_accounting": {
+    "total_pixels": 14400,
+    "valid_pixels": 14400,
+    "excluded_pixels": 0,
+    "valid_coverage_percent": 100.0
+  },
+  "extent_metrics": {
+    "water_pixels": 1924,
+    "land_pixels": 12476,
+    "water_area_km2": 1.2228,
+    "water_area_ha": 122.28,
+    "valid_area_km2": 9.1519,
+    "water_coverage_percent": 13.36
+  },
+  "sar_statistics": {
+    "hh_water": {
+      "p10": -23.95024310864593,
+      "p25": -23.669975066820896,
+      "p50": -23.135867292360796,
+      "p75": -22.740892049829117,
+      "p90": -22.310396675997346,
+      "min": -25.3019019442541,
+      "max": -6.357778250844179,
+      "mean": -23.14637102448113,
+      "std": 0.7736268712456986,
+      "sample_size": 1924
+    },
+    "hh_land": {
+      "p10": -13.319264439491388,
+      "p25": -12.335687027125974,
+      "p50": -11.517108741309162,
+      "p75": -10.724719795816126,
+      "p90": -9.730029529257047,
+      "min": -24.976020233381167,
+      "max": -2.5698367962184214,
+      "mean": -11.5175501078264,
+      "std": 2.2801816696465877,
+      "sample_size": 12476
+    }
+  },
+  "threshold_sensitivity": {
+    "adaptive_otsu": {
+      "threshold_db": -17.6958,
+      "water_pixels": 1924,
+      "water_area_km2": 1.2228,
+      "water_coverage_percent": 13.36
+    },
+    "fixed_-18.50dB": {
+      "threshold_db": -18.5,
+      "water_pixels": 1924,
+      "water_area_km2": 1.2228,
+      "water_coverage_percent": 13.36
+    },
+    "fixed_-20.00dB": {
+      "threshold_db": -20.0,
+      "water_pixels": 1924,
+      "water_area_km2": 1.2228,
+      "water_coverage_percent": 13.36
+    },
+    "fixed_-20.28dB": {
+      "threshold_db": -20.279166666666665,
+      "water_pixels": 1923,
+      "water_area_km2": 1.2222,
+      "water_coverage_percent": 13.35
+    },
+    "fixed_-22.00dB": {
+      "threshold_db": -22.0,
+      "water_pixels": 1734,
+      "water_area_km2": 1.102,
+      "water_coverage_percent": 12.04
+    },
+    "summary_metrics": {
+      "spread_all_methods_km2": 0.1208,
+      "spread_all_methods_pct_of_corridor": 1.32,
+      "spread_fixed_thresholds_only_km2": 0.1208,
+      "min_water_km2": 1.102,
+      "max_water_km2": 1.2228
+    }
+  }
+}

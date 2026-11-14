@@ -54,9 +54,8 @@ export default function WorkspaceTabs({ activeWorkspace, onSelectWorkspace }) {
     <div className="bg-[#111827] rounded-xl border border-slate-800 p-2 shadow-2xl">
       <div className="flex items-center justify-between px-2 pt-1 pb-2 border-b border-slate-800/80 mb-2">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-cyan-400" />
           <span className="text-xs font-bold text-white uppercase tracking-wider">
-            Scientific Study Workspaces (NASA Space Apps 2026)
+            Scientific Study Workspaces
           </span>
         </div>
         <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">
