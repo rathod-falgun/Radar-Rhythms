@@ -1,12 +1,9 @@
 import React from 'react';
-import { ShieldAlert, Microscope, BookOpen, Volume2, VolumeX } from 'lucide-react';
-import { playRadarPing } from '../utils/audio';
+import { ShieldAlert, Microscope, BookOpen } from 'lucide-react';
 
 export default function PersonaSwitcher({
   currentPersona,
-  onSelectPersona,
-  soundEnabled,
-  onToggleSound
+  onSelectPersona
 }) {
   const personas = [
     {
@@ -40,7 +37,6 @@ export default function PersonaSwitcher({
 
   const handleSelect = (id) => {
     onSelectPersona(id);
-    playRadarPing(id === 'disaster' ? 350 : id === 'scientist' ? 660 : 880);
   };
 
   return (
@@ -57,11 +53,10 @@ export default function PersonaSwitcher({
               <button
                 key={p.id}
                 onClick={() => handleSelect(p.id)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                  isActive
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${isActive
                     ? `${p.activeBg} shadow-md`
                     : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-850'
-                }`}
+                  }`}
                 title={p.description}
               >
                 <Icon className={`w-3.5 h-3.5 ${isActive ? p.color : 'text-slate-400'}`} />
@@ -73,31 +68,6 @@ export default function PersonaSwitcher({
             );
           })}
         </div>
-      </div>
-
-      {/* Audio Radar Sonification Toggle */}
-      <div className="flex items-center gap-2 pr-1">
-        <button
-          onClick={onToggleSound}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-mono transition-colors border ${
-            soundEnabled
-              ? 'bg-cyan-950 text-cyan-300 border-cyan-800'
-              : 'bg-slate-900/80 text-slate-500 border-slate-800 hover:text-slate-300'
-          }`}
-          title="Toggle synthetic radar frequency sonification"
-        >
-          {soundEnabled ? (
-            <>
-              <Volume2 className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span className="text-[11px]">Sonar Audio ON</span>
-            </>
-          ) : (
-            <>
-              <VolumeX className="w-3.5 h-3.5 text-slate-500" />
-              <span className="text-[11px]">Audio Muted</span>
-            </>
-          )}
-        </button>
       </div>
     </div>
   );

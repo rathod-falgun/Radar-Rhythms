@@ -46,6 +46,12 @@ class AppConfig(BaseModel):
     DEFAULT_MAJULI_BBOX: List[float] = [93.60, 26.50, 94.60, 27.30]  # [west, south, east, north]
     DEFAULT_DATE_RANGE: str = "2026-07-01T00:00:00Z/2026-09-30T23:59:59Z"
 
+    # Production CORS Allowed Origins (comma-separated or '*' fallback)
+    CORS_ALLOWED_ORIGINS: str = os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,*"
+    )
+
 settings = AppConfig()
 
 

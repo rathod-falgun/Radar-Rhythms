@@ -103,10 +103,10 @@ export default function DisasterAlertPanel({ statistics, regionName, regionId })
       ];
 
   return (
-    <div className="bg-[#0f172a]/90 border border-slate-800 rounded-xl p-5 shadow-xl backdrop-blur">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800/80">
+    <div className="card-outer rounded p-5 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[var(--border-outer)]">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-rose-950 text-rose-400 border border-rose-800/50">
+          <div className="p-2 rounded bg-rose-950 text-rose-400 border border-rose-800/50">
             <ShieldAlert className="w-5 h-5" />
           </div>
           <div>
@@ -116,14 +116,14 @@ export default function DisasterAlertPanel({ statistics, regionName, regionId })
                 {alertStatus.level}
               </span>
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#e5e5e5]/70">
               Operational flood warning metrics computed from NISAR SAR change raster
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-xs">
-          <div className="bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 font-mono text-cyan-300">
+          <div className="box-inner px-2.5 py-1 rounded border border-[var(--border-outer)] font-mono text-[#fca311]">
             Reach: <span className="text-white font-semibold">{regionName}</span>
           </div>
         </div>

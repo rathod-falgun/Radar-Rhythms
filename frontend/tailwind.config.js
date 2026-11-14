@@ -7,75 +7,44 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        serif: ['Fraunces', 'Georgia', 'serif'],
+        sans: ['Manrope', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        // Astro Color Theme (Port Gore, Chambray, Steel Blue, Cornflower, Link Water)
-        portgore: '#1a1f3d',
-        chambray: '#3b4a8c',
-        steelblue: '#587ebb',
-        cornflower: '#87b8e8',
-        linkwater: '#c6e9f1',
+        // The 5 Core Night-Pass Radar Colors
+        black: '#000000',
+        prussian: '#14213d',
+        orange: '#fca311',
+        alabaster: '#e5e5e5',
+        white: '#ffffff',
 
-        astro: {
-          base: '#1a1f3d',
-          gradient: '#3b4a8c',
-          box: '#222950',
-          border: '#587ebb',
-          highlight: '#87b8e8',
-          accent: '#c6e9f1',
-        },
+        // Tints & Functional Mappings
+        'night-bg': '#000000',
+        'night-panel': '#14213d',
+        'night-panel-fade': 'rgba(20, 33, 61, 0.85)',
+        'night-signal': '#fca311',
+        'night-text': '#e5e5e5',
+        'night-heading': '#ffffff',
+        'night-border': 'rgba(229, 229, 229, 0.12)',
+        'night-border-hover': 'rgba(252, 163, 17, 0.6)',
 
-        // Theme compatibility tokens mapped to Astro palette
-        midnight: '#1a1f3d',
-        indigo: '#222950',
-        panel: '#283262',
-        dusk: '#3b4a8c',
-        teal: '#587ebb',
-        aqua: '#87b8e8',
-        cloud: '#c6e9f1',
-
-        // Semantic Role Tokens
-        space: {
-          bg: '#1a1f3d',
-          card: '#222950',
-          panel: '#283262',
-          border: 'rgba(88, 126, 187, 0.45)',
-          borderStrong: '#587ebb',
-          text: '#c6e9f1',
-          muted: '#87b8e8',
-          dim: '#587ebb',
-        },
-
-        // Scientific Map Semantic Colors (ABSOLUTELY PRESERVED)
+        // Scientific Map Semantic Colors (Aligned with palette)
         map: {
-          persistent: '#06B6D4',
-          inundated: '#E11D48',
-          land: '#64748B',
-          receded: '#D97706',
+          persistent: '#14213d',
+          inundated: '#fca311',
+          land: '#333333',
+          receded: '#a3a3a3',
         },
-
-        // Backward compatibility
-        radar: {
-          dark: '#0a0e17',
-          card: '#111827',
-          panel: '#1a2234',
-          accent: '#00d2ff',
-          neon: '#39ff14',
-          crimson: '#ff3366',
-          amber: '#ffb703',
-        },
-        brand: {
-          prussian: '#0b132b',
-          space: '#1c2541',
-          dusk: '#3a506b',
-          teal: '#5bc0be',
-          aqua: '#6fffe9',
-        }
-      }
+      },
+      borderRadius: {
+        DEFAULT: '4px',
+        sm: '3px',
+        md: '4px',
+        lg: '6px',
+        xl: '8px',
+      },
     },
   },
   plugins: [],
 }
-

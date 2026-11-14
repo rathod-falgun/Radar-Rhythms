@@ -41,18 +41,18 @@ export default function HowItWorksView() {
   ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-[#1a1f3d] via-[#222950] to-[#1a1f3d] text-[#c6e9f1] rounded-xl border border-[#587ebb]/40 p-6 sm:p-8 shadow-lg shadow-[#1a1f3d]/60 relative overflow-hidden">
-        <div className="relative z-10 max-w-2xl space-y-2">
-          <span className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-md bg-[#222950] text-[#87b8e8] border border-[#3b4a8c] inline-block font-mono">
-            Radar Remote Sensing Process
+    <div className="space-y-8 w-full">
+      {/* Top Editorial Banner */}
+      <div className="card-outer text-[#e5e5e5] rounded p-6 sm:p-10 relative overflow-hidden">
+        <div className="max-w-3xl space-y-3">
+          <span className="text-[10px] font-mono uppercase tracking-widest px-2.5 py-1 rounded box-inner text-[#fca311] inline-block font-medium">
+            Radar Sensing Methodology
           </span>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-            How NISAR Radar Sees What Cameras Cannot
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-editorial tracking-tight text-white">
+            How Radar Sees <span className="text-[#fca311] font-normal italic">What Cameras Cannot</span>
           </h2>
-          <p className="text-sm text-[#c6e9f1] leading-relaxed">
-            During the South Asian monsoon, persistent cloud cover blinds optical satellites. Here is how NASA–ISRO NISAR satellite radar observations are turned into understandable flood maps in four steps.
+          <p className="text-sm sm:text-base text-[#e5e5e5]/80 font-sans leading-relaxed pt-1">
+            During the South Asian monsoon, persistent cloud cover blinds optical satellites. The NASA–ISRO NISAR mission transmits active L-band microwaves that penetrate dense monsoon clouds, heavy rainfall, and nighttime darkness to image hydrological change.
           </p>
         </div>
       </div>
@@ -63,26 +63,29 @@ export default function HowItWorksView() {
           return (
             <div
               key={step.step}
-              className="p-5 rounded-xl bg-[#1a1f3d] border border-[#587ebb]/40 shadow-md flex flex-col justify-between space-y-3"
+              className="p-5 rounded card-outer flex flex-col justify-between space-y-4"
             >
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#222950] text-[#87b8e8] border border-[#3b4a8c]">
-                    Step {step.step}
+                  <span className="text-2xl font-editorial font-bold text-white/40">
+                    {step.step}
+                  </span>
+                  <span className="text-[9px] font-mono uppercase tracking-widest px-2.5 py-0.5 rounded box-inner text-[#fca311] font-semibold">
+                    Stage {step.step}
                   </span>
                 </div>
 
-                <h3 className="text-sm font-semibold text-white leading-snug">
+                <h3 className="text-base font-editorial font-semibold text-white leading-snug">
                   {step.title}
                 </h3>
 
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <div className="p-3 rounded box-inner text-xs font-sans text-[#e5e5e5]/80 leading-relaxed">
                   {step.desc}
-                </p>
+                </div>
               </div>
 
-              <div className="pt-2 border-t border-[#3b4a8c]/50">
-                <span className="text-[10px] font-mono text-[#87b8e8] font-medium block">
+              <div className="pt-3 border-t border-[var(--border-outer)]">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#e5e5e5]/60 block">
                   {step.badge}
                 </span>
               </div>

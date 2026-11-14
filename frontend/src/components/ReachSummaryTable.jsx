@@ -23,22 +23,22 @@ export default function ReachSummaryTable({ selectedRegionId, onSelectRegion, ba
 
   if (loading) {
     return (
-      <div className="bg-[#111827] rounded-xl border border-slate-800 p-4 text-xs text-slate-400 font-mono">
+      <div className="card-outer rounded p-4 text-xs text-[#e5e5e5]/70 font-mono">
         Aggregating multi-reach flood damage statistics...
       </div>
     );
   }
 
   return (
-    <div className="bg-[#111827] rounded-xl border border-slate-800 p-4 shadow-xl">
+    <div className="card-outer rounded p-4 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Table className="w-4 h-4 text-cyan-400" />
+          <Table className="w-4 h-4 text-[#fca311]" />
           <h3 className="text-sm font-semibold text-white">
             Phase 6: Multi-Reach Regional Flood Risk & Inundation Matrix
           </h3>
         </div>
-        <span className="text-xs text-slate-400 font-mono">
+        <span className="text-xs text-[#e5e5e5]/60 font-mono">
           Track 019 / Frame 075 Valley Corridor (Calibrated Regional Reach Projections)
         </span>
       </div>
@@ -46,7 +46,7 @@ export default function ReachSummaryTable({ selectedRegionId, onSelectRegion, ba
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-slate-800 text-slate-400 font-mono text-[11px] bg-slate-900/50">
+            <tr className="border-b border-[var(--border-outer)] text-[#e5e5e5]/60 font-mono text-[11px] box-inner">
               <th className="py-2.5 px-3">Reach Name</th>
               <th className="py-2.5 px-3">District</th>
               <th className="py-2.5 px-3">Total Area</th>
@@ -57,7 +57,7 @@ export default function ReachSummaryTable({ selectedRegionId, onSelectRegion, ba
               <th className="py-2.5 px-3 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 font-sans">
+          <tbody className="divide-y divide-[var(--border-outer)] font-sans">
             {reaches.map((r) => {
               const isSelected = r.id === selectedRegionId;
               return (

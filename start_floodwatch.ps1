@@ -1,14 +1,13 @@
-# Brahmaputra FloodWatch - Unified PowerShell Launcher
+# Radar Rhythms - Unified PowerShell Launcher
 Write-Host "=====================================================================" -ForegroundColor Cyan
-Write-Host "      BRAHMAPUTRA FLOODWATCH - NASA SPACE APPS CHALLENGE 2026" -ForegroundColor Cyan
-Write-Host "            'Dancing with the SARs' Multi-Temporal Radar" -ForegroundColor Yellow
+Write-Host "         RADAR RHYTHMS — NASA-ISRO NISAR SAR EARTH OBSERVATION" -ForegroundColor Cyan
 Write-Host "=====================================================================" -ForegroundColor Cyan
 Write-Host ""
 
 $workspace = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Write-Host "[1/3] Starting FastAPI Backend on http://127.0.0.1:8005 ..." -ForegroundColor Green
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$workspace\backend'; python -m uvicorn app.main:app --host 127.0.0.1 --port 8005 --reload"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$workspace\backend'; if (Test-Path '.\.venv\Scripts\python.exe') { .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8005 --reload } else { python -m uvicorn app.main:app --host 127.0.0.1 --port 8005 --reload }"
 
 Write-Host "[2/3] Starting Vite Frontend on http://localhost:5173 ..." -ForegroundColor Green
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location '$workspace\frontend'; npm run dev"
@@ -26,4 +25,3 @@ Write-Host "- Frontend UI:  http://localhost:5173" -ForegroundColor White
 Write-Host "- Backend API:  http://127.0.0.1:8005" -ForegroundColor White
 Write-Host "- API Docs:     http://127.0.0.1:8005/docs" -ForegroundColor White
 Write-Host "=====================================================================" -ForegroundColor Cyan
-

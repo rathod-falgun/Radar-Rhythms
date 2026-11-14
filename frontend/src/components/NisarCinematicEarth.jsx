@@ -15,9 +15,21 @@ import { Satellite, Compass, RefreshCw } from 'lucide-react';
  * - Subtle 3D orbital trajectory ring indicating the satellite's orbital plane
  * - Interactive mouse/touch dragging with smooth inertial damping
  */
-export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
+export default function NisarCinematicEarth({ onExplore, onHowItWorks, motionPaused = false }) {
   const mountRef = useRef(null);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const autoRotateRef = useRef(true);
+  const motionPausedRef = useRef(motionPaused);
+
+  useEffect(() => {
+    motionPausedRef.current = motionPaused;
+  }, [motionPaused]);
+
+  useEffect(() => {
+    autoRotateRef.current = isAutoRotating;
+  }, [isAutoRotating]);
+
   const dragRef = useRef({
     isDragging: false,
     prevX: 0,
@@ -83,17 +95,17 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
     container.appendChild(renderer.domElement);
 
     // =========================================================================
-    // 2. LIGHTING (Generous ambient light ensures Earth is NEVER dark or black)
+    // 2. LIGHTING (Upper-left sunlight: lit side is warm, dark side falls into black)
     // =========================================================================
-    const ambientLight = new THREE.AmbientLight(0xddeeff, 1.2);
+    const ambientLight = new THREE.AmbientLight(0x0a1226, 0.22);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xffffff, 2.5);
-    sunLight.position.set(6, 4, 5); // Sun illumination from upper right
+    const sunLight = new THREE.DirectionalLight(0xfff3e0, 3.4);
+    sunLight.position.set(-7, 6, 4.5); // Sun illumination from upper left
     scene.add(sunLight);
 
-    const limbRimLight = new THREE.DirectionalLight(0x5bc0be, 1.0);
-    limbRimLight.position.set(-6, -3, -4);
+    const limbRimLight = new THREE.DirectionalLight(0xfca311, 1.3);
+    limbRimLight.position.set(-6, 5, -2);
     scene.add(limbRimLight);
 
     // =========================================================================
@@ -145,11 +157,12 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
 
     // =========================================================================
     // 4. 3D EARTH GLOBE
-    // Radius = 1.62. Earth fills ~57% of the viewport height with abundant
-    // margin on all sides, ensuring a prominent, commanding, unclipped sphere.
+    // Radius = 1.90. Earth fills top-right quadrant with rich commanding presence
+    // while maintaining smooth clearance from boundaries.
     // =========================================================================
-    const earthRadius = 1.62;
+    const earthRadius = 1.90;
     const earthGroup = new THREE.Group();
+    earthGroup.position.set(0, 0, 0); // Centered cleanly in fit manner
     earthGroup.rotation.z = THREE.MathUtils.degToRad(23.5); // 23.5° axial tilt
     scene.add(earthGroup);
 
@@ -158,18 +171,18 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
     const earthGeometry = new THREE.SphereGeometry(earthRadius, 256, 256);
     const earthMaterial = new THREE.MeshPhongMaterial({
       map: initialTexture,
-      specular: new THREE.Color(0x336699),
-      shininess: 25,
+      specular: new THREE.Color(0xfca311),
+      shininess: 18,
     });
     const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
     earthGroup.add(earthMesh);
 
-    // Luminous Atmospheric Halo on Planet Silhouette (inspired by reference art)
+    // Luminous Atmospheric Halo on Planet Silhouette
     const atmoGeometry = new THREE.SphereGeometry(earthRadius * 1.018, 128, 128);
     const atmoMaterial = new THREE.MeshBasicMaterial({
-      color: 0x87b8e8,
+      color: 0xfca311,
       transparent: true,
-      opacity: 0.16,
+      opacity: 0.12,
       blending: THREE.AdditiveBlending,
       side: THREE.BackSide,
     });
@@ -204,9 +217,9 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
     const markerGroup = new THREE.Group();
     markerGroup.position.set(mx, my, mz);
 
-    // Subtle cyan location pin dot
+    // Target pin: subtle orange beacon dot
     const pinGeo = new THREE.SphereGeometry(0.034, 16, 16);
-    const pinMat = new THREE.MeshBasicMaterial({ color: 0x5bc0be });
+    const pinMat = new THREE.MeshBasicMaterial({ color: 0xfca311 });
     const pinMesh = new THREE.Mesh(pinGeo, pinMat);
     markerGroup.add(pinMesh);
 
@@ -215,14 +228,14 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
     // =========================================================================
     // 6. TRUE 3D ORBIT THROUGH MID OF EARTH & REAL NASA NISAR SPACECRAFT
     // Orbit radius X = 2.24, Y = 0.90, Z = 2.12.
-    // Sized with wide amplitude and large clearance around the enlarged Earth,
-    // carving a sweeping, continuous curve with zero clipping.
+    // Pure night-pass radar aesthetic: thin orange orbit ring on pure black.
     // =========================================================================
-    const orbitRadiusX = 2.24;
-    const orbitRadiusY = 0.90;
-    const orbitRadiusZ = 2.12;
+    const orbitCenterX = 0;
+    const orbitRadiusX = 2.65;
+    const orbitRadiusY = 1.05;
+    const orbitRadiusZ = 2.50;
 
-    // Dual Glowing Orbital Ring (Reflective, luminous track inspired by reference design)
+    // Single Thin Orange Orbit Ring
     const orbitPoints = [];
     const segments = 192;
     for (let i = 0; i <= segments; i++) {
@@ -234,34 +247,14 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
     }
     const orbitGeo = new THREE.BufferGeometry().setFromPoints(orbitPoints);
     const orbitMat = new THREE.LineBasicMaterial({
-      color: 0x87b8e8,
+      color: 0xfca311,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.75,
       depthTest: true,
       depthWrite: false,
     });
     const orbitLine = new THREE.Line(orbitGeo, orbitMat);
     scene.add(orbitLine);
-
-    // Outer subtle metallic sheen track
-    const outerTrackPoints = [];
-    for (let i = 0; i <= segments; i++) {
-      const angle = (i / segments) * Math.PI * 2;
-      const ox = Math.cos(angle) * (orbitRadiusX + 0.03);
-      const oy = Math.sin(angle) * (orbitRadiusY + 0.018);
-      const oz = Math.sin(angle) * (orbitRadiusZ + 0.03);
-      outerTrackPoints.push(new THREE.Vector3(ox, oy, oz));
-    }
-    const outerTrackGeo = new THREE.BufferGeometry().setFromPoints(outerTrackPoints);
-    const outerTrackMat = new THREE.LineBasicMaterial({
-      color: 0xc6e9f1,
-      transparent: true,
-      opacity: 0.35,
-      depthTest: true,
-      depthWrite: false,
-    });
-    const outerTrackLine = new THREE.Line(outerTrackGeo, outerTrackMat);
-    scene.add(outerTrackLine);
 
     // Real NASA-ISRO NISAR Spacecraft in Orbit
     const satelliteTexture = textureLoader.load('/assets/nisar_satellite.png');
@@ -340,8 +333,10 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
     const animate = () => {
       animId = requestAnimationFrame(animate);
 
+      const shouldAnimate = !isReducedMotion && !motionPausedRef.current;
+
       // Orbital Satellite Progression in 3D around the Earth
-      if (!isReducedMotion) {
+      if (shouldAnimate) {
         satAngle += 0.0075;
       }
 
@@ -359,11 +354,12 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
       satelliteSprite.scale.set(satBaseWidth * depthScale, satBaseHeight * depthScale, 1);
 
       // Earth Rotation & Inertia
-      if (!dragRef.current.isDragging && !isReducedMotion) {
-        dragRef.current.rotationY += dragRef.current.velocityY;
-        dragRef.current.velocityY *= 0.96; // Inertial decay
-        if (Math.abs(dragRef.current.velocityY) < 0.0016) {
-          dragRef.current.velocityY = 0.0016; // Maintain gentle constant rotation
+      if (!dragRef.current.isDragging && shouldAnimate) {
+        if (autoRotateRef.current) {
+          dragRef.current.rotationY += 0.0022;
+        } else {
+          dragRef.current.rotationY += dragRef.current.velocityY;
+          dragRef.current.velocityY *= 0.94; // Inertial decay
         }
       }
 
@@ -391,7 +387,7 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
     container.__recenter = () => {
       dragRef.current.rotationY = 4.65;
       dragRef.current.rotationX = 0.1;
-      dragRef.current.velocityY = 0.0016;
+      dragRef.current.velocityY = 0;
     };
 
     return () => {
@@ -410,6 +406,11 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
     };
   }, [isReducedMotion]);
 
+  const handleToggleRotate = () => {
+    setIsAutoRotating((prev) => !prev);
+    dragRef.current.velocityY = 0.003;
+  };
+
   const handleResetView = () => {
     if (mountRef.current && mountRef.current.__recenter) {
       mountRef.current.__recenter();
@@ -417,10 +418,10 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
   };
 
   return (
-    <div className="relative w-full max-w-[800px] h-[380px] sm:h-[480px] md:h-[560px] lg:h-[640px] xl:h-[700px] flex items-center justify-center select-none overflow-visible">
-      {/* Space Atmospheric Glow with Chambray & Steel Blue */}
+    <div className="relative w-full max-w-[800px] lg:max-w-[860px] h-[360px] sm:h-[420px] md:h-[480px] lg:h-[540px] flex items-center justify-center select-none overflow-visible">
+      {/* Pure black background with subtle prussian depth */}
       <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <div className="w-[320px] h-[320px] sm:w-[460px] sm:h-[460px] md:w-[560px] md:h-[560px] rounded-full bg-gradient-to-tr from-[#3b4a8c]/40 via-[#587ebb]/20 to-transparent blur-3xl pointer-events-none"></div>
+        <div className="w-[340px] h-[340px] sm:w-[500px] sm:h-[500px] rounded-full bg-[#14213d]/25 blur-3xl pointer-events-none"></div>
       </div>
 
       {/* Three.js 3D WebGL Canvas Mount Container */}
@@ -430,20 +431,25 @@ export default function NisarCinematicEarth({ onExplore, onHowItWorks }) {
         style={{ touchAction: 'none' }}
       />
 
-      {/* Interactive Controls Overlay */}
-      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-20 flex items-center gap-1.5 sm:gap-2">
+      {/* Interactive Controls Overlay: Rotate 3D Sphere & Recenter Orbit stacked on left */}
+      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-20 flex flex-col items-start gap-2">
+        <button
+          onClick={handleToggleRotate}
+          className="px-2.5 py-1 rounded bg-[#14213d] hover:bg-[#14213d]/80 border border-[#e5e5e5]/15 hover:border-[#fca311] text-[#e5e5e5] hover:text-white text-[10px] sm:text-[11px] font-mono tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer shadow-xs select-none"
+          title="Click to toggle automatic 3D rotation"
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotating ? 'bg-[#fca311] animate-pulse' : 'bg-[#e5e5e5]/40'}`}></span>
+          <span>Rotate 3D Sphere</span>
+        </button>
+
         <button
           onClick={handleResetView}
-          className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-[#222950]/80 hover:bg-[#283262] border border-[#587ebb]/50 hover:border-[#87b8e8] text-[#c6e9f1] hover:text-white text-[10px] sm:text-[11px] font-mono flex items-center gap-1 sm:gap-1.5 transition-all shadow-sm backdrop-blur-sm cursor-pointer"
+          className="px-2.5 py-1 rounded bg-[#14213d] hover:bg-[#14213d]/80 border border-[#e5e5e5]/15 hover:border-[#fca311] text-[#e5e5e5] hover:text-white text-[10px] sm:text-[11px] font-mono tracking-wider uppercase flex items-center gap-1.5 transition-all cursor-pointer shadow-xs select-none"
           title="Reset Earth Orientation"
         >
-          <span>Recenter South Asia</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#38bdf8]"></span>
+          <span>Recenter Orbit</span>
         </button>
-      </div>
-
-      {/* Subtle Drag Hint Pill */}
-      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-20 flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-[#222950]/70 border border-[#587ebb]/40 text-[9px] sm:text-[10px] font-mono text-[#87b8e8] pointer-events-none backdrop-blur-sm">
-        <span>Drag to rotate 3D Earth</span>
       </div>
     </div>
   );

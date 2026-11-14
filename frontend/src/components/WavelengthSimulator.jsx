@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Waves, Sparkles, ShieldCheck, EyeOff, CheckCircle2, ArrowRight } from 'lucide-react';
-import { playRadarPing } from '../utils/audio';
 
 export default function WavelengthSimulator() {
   const [activeBand, setActiveBand] = useState('L'); // 'L', 'S', 'C'
@@ -13,12 +12,12 @@ export default function WavelengthSimulator() {
       frequency: '1.25 GHz',
       agency: 'NASA',
       canopyPenetration: 'Full Canopy Penetration',
-      subCanopyFloodDetection: 'Excellent (Double-Bounce)',
-      color: '#059669', // Emerald
+      subCanopyFloodDetection: 'High Sensitivity (Double-Bounce)',
+      color: '#fca311', // Night-Pass Orange
       radarReturn: '+3.5 dB (dihedral specular reflection)',
-      summary: 'Long microwave penetrates tree crowns and elephant grass down to standing floodwaters, bouncing off vertical trunks back to the sensor.',
+      summary: 'Long 24 cm microwave penetrates tree crowns and elephant grass down to standing floodwaters, reflecting off vertical trunks back to the sensor.',
       rayPaths: [
-        { type: 'primary', d: 'M 100 20 L 250 180 L 320 180 L 390 20', color: '#059669' }
+        { type: 'primary', d: 'M 100 20 L 250 180 L 320 180 L 390 20', color: '#fca311' }
       ]
     },
     {
@@ -28,12 +27,12 @@ export default function WavelengthSimulator() {
       frequency: '3.20 GHz',
       agency: 'ISRO',
       canopyPenetration: 'Moderate Penetration',
-      subCanopyFloodDetection: 'Good (Wetlands & Margins)',
-      color: '#0284c7', // Sky Blue
+      subCanopyFloodDetection: 'Moderate (Wetlands & Margins)',
+      color: '#e5e5e5', // Alabaster
       radarReturn: '-4.2 dB (diffuse + boundary reflection)',
       summary: 'Intermediate wavelength sensitive to surface roughness, soil moisture, and emergent vegetation along sandbars (chars) and river margins.',
       rayPaths: [
-        { type: 'primary', d: 'M 100 20 L 220 120 L 280 40', color: '#0284c7' }
+        { type: 'primary', d: 'M 100 20 L 220 120 L 280 40', color: '#e5e5e5' }
       ]
     },
     {
@@ -41,14 +40,14 @@ export default function WavelengthSimulator() {
       name: 'Sentinel-1 C-band',
       wavelength: '5.6 cm',
       frequency: '5.40 GHz',
-      agency: 'ESA',
+      agency: 'ESA Reference',
       canopyPenetration: 'Surface Canopy Only',
-      subCanopyFloodDetection: 'Blinded (Leaves Block Signal)',
-      color: '#d97706', // Amber
+      subCanopyFloodDetection: 'Attenuated (Foliage Scatter)',
+      color: '#737373', // Dim Alabaster
       radarReturn: '-11.0 dB (volume scattering from upper leaves)',
-      summary: 'Short microwave scatters mostly off top foliage. Cannot reach water beneath dense Kaziranga canopy, resulting in false negatives.',
+      summary: 'Short microwave scatters mostly off top foliage. Cannot reach water beneath dense Kaziranga canopy, resulting in surface false negatives.',
       rayPaths: [
-        { type: 'primary', d: 'M 100 20 L 180 80 L 240 20', color: '#d97706' }
+        { type: 'primary', d: 'M 100 20 L 180 80 L 240 20', color: '#737373' }
       ]
     }
   ];
@@ -57,44 +56,38 @@ export default function WavelengthSimulator() {
 
   const handleSelectBand = (id) => {
     setActiveBand(id);
-    playRadarPing(id === 'L' ? 440 : id === 'S' ? 660 : 880);
   };
 
   return (
-    <div className="bg-[#1C2541] border border-[#3A506B]/50 rounded-xl p-5 shadow-lg">
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-[#3A506B]/40">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#0B132B] text-[#5BC0BE] border border-[#3A506B]/60 flex items-center justify-center">
-            <Waves className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-sm font-semibold text-[#F4F6F8] flex items-center gap-2">
-              Dancing with the SARs: Microwave Penetration Physics
-              <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#0B132B] text-[#6FFFE9] font-mono border border-[#3A506B] font-medium">
-                L vs S vs C Band
-              </span>
-            </h3>
-            <p className="text-xs text-slate-300">
-              Interactive canopy penetration cross-section modeled for Assam's riverine wetlands
-            </p>
-          </div>
+    <div className="card-outer rounded p-6 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-5 pb-4 border-b border-[var(--border-outer)]">
+        <div>
+          <h3 className="text-base font-editorial tracking-wide text-white flex items-center gap-2">
+            Microwave Penetration Physics
+            <span className="text-xs px-2.5 py-0.5 rounded box-inner text-[#fca311] font-mono uppercase tracking-widest font-semibold">
+              L vs S vs C Band
+            </span>
+          </h3>
+          <p className="text-xs font-sans text-[#e5e5e5]/70 mt-0.5">
+            Canopy penetration cross-section modeled for the Brahmaputra River corridor
+          </p>
         </div>
 
         {/* Band Selector Tabs */}
-        <div className="flex items-center gap-1.5 bg-[#0B132B] p-1 rounded-lg border border-[#3A506B]/50 text-xs font-medium">
+        <div className="flex items-center gap-1.5 box-inner p-1 rounded text-xs font-mono uppercase tracking-wider">
           {bands.map((band) => (
             <button
               key={band.id}
               onClick={() => handleSelectBand(band.id)}
-              className={`px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded transition-all flex items-center gap-2 cursor-pointer ${
                 activeBand === band.id
-                  ? 'bg-[#24314D] text-[#6FFFE9] shadow-xs border border-[#5BC0BE]/50 font-semibold'
-                  : 'text-slate-300 hover:text-[#F4F6F8]'
+                  ? 'bg-[#fca311] text-black font-semibold'
+                  : 'text-[#e5e5e5]/70 hover:text-white'
               }`}
             >
               <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: band.color }}
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: activeBand === band.id ? '#000000' : band.color }}
               ></span>
               {band.name}
             </button>
@@ -102,55 +95,53 @@ export default function WavelengthSimulator() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
         {/* Interactive Physics Cross-Section SVG Diagram */}
-        <div className="lg:col-span-7 bg-[#0B132B] border border-[#3A506B]/60 rounded-xl p-3 relative overflow-hidden shadow-inner">
-          <div className="text-[11px] font-mono text-slate-300 mb-1 flex items-center justify-between">
-            <span>MICROWAVE RADAR INTERACTION PROFILE</span>
-            <span style={{ color: current.color }}>λ = {current.wavelength} ({current.frequency})</span>
+        <div className="lg:col-span-7 box-inner rounded p-4 relative overflow-hidden">
+          <div className="text-xs font-mono uppercase tracking-widest text-[#e5e5e5]/70 mb-2 flex items-center justify-between">
+            <span>Radar Microwave Interaction Profile</span>
+            <span style={{ color: current.color }} className="font-semibold">λ = {current.wavelength} ({current.frequency})</span>
           </div>
 
           <svg viewBox="0 0 500 240" className="w-full h-auto select-none">
             <defs>
               <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0B132B" />
-                <stop offset="100%" stopColor="#1C2541" />
+                <stop offset="0%" stopColor="#000000" />
+                <stop offset="100%" stopColor="#0a1020" />
               </linearGradient>
               <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#06B6D4" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#0891B2" stopOpacity="0.95" />
-              </linearGradient>
-              <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3A506B" />
-                <stop offset="100%" stopColor="#1C2541" />
+                <stop offset="0%" stopColor="#14213d" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="#0a1020" stopOpacity="1" />
               </linearGradient>
             </defs>
 
             {/* Sky Background */}
             <rect x="0" y="0" width="500" height="190" fill="url(#skyGrad)" />
 
-            {/* Cloud Layer (Showing optical blindness) */}
-            <ellipse cx="250" cy="35" rx="160" ry="18" fill="#475569" opacity="0.45" />
-            <text x="250" y="38" textAnchor="middle" fill="#94a3b8" fontSize="10" fontFamily="sans-serif">
-              ☁️ South Asian Monsoon Cloud Deck (100% Optical Occlusion)
+            {/* Cloud Deck */}
+            <ellipse cx="250" cy="35" rx="160" ry="16" fill="#1f2937" opacity="0.6" />
+            <text x="250" y="39" textAnchor="middle" fill="#9ca3af" fontSize="9" fontFamily="monospace" letterSpacing="1">
+              MONSOON CLOUD DECK (OPTICAL SENSORS OCCLUDED)
             </text>
 
             {/* Submerged Forest Floor / Flood Water */}
             <rect x="0" y="190" width="500" height="30" fill="url(#waterGrad)" />
-            <rect x="0" y="220" width="500" height="20" fill="url(#groundGrad)" />
+            <rect x="0" y="220" width="500" height="20" fill="#000000" />
+            <line x1="0" y1="190" x2="500" y2="190" stroke="#fca311" strokeWidth="1" strokeOpacity="0.5" />
+            <line x1="0" y1="220" x2="500" y2="220" stroke="#e5e5e5" strokeWidth="1" strokeOpacity="0.2" />
 
             {/* Tree Canopies & Trunks */}
-            <rect x="180" y="120" width="14" height="70" fill="#78350f" />
-            <circle cx="187" cy="110" r="32" fill="#15803d" opacity="0.85" />
-            <circle cx="170" cy="115" r="24" fill="#166534" opacity="0.9" />
+            <rect x="180" y="120" width="12" height="70" fill="#3b2d1d" />
+            <circle cx="186" cy="110" r="30" fill="#0d2618" stroke="#164e2e" strokeWidth="1" />
+            <circle cx="172" cy="115" r="22" fill="#0d2618" stroke="#164e2e" strokeWidth="1" />
 
-            <rect x="300" y="100" width="16" height="90" fill="#78350f" />
-            <circle cx="308" cy="85" r="40" fill="#15803d" opacity="0.85" />
-            <circle cx="330" cy="95" r="28" fill="#166534" opacity="0.9" />
+            <rect x="300" y="100" width="14" height="90" fill="#3b2d1d" />
+            <circle cx="307" cy="85" r="38" fill="#0d2618" stroke="#164e2e" strokeWidth="1" />
+            <circle cx="328" cy="95" r="26" fill="#0d2618" stroke="#164e2e" strokeWidth="1" />
 
             {/* Water label */}
-            <text x="50" y="210" fill="#e0f2fe" fontSize="11" fontWeight="bold" fontFamily="sans-serif">
-              Standing Floodwater (Specular Reflector)
+            <text x="30" y="210" fill="#e5e5e5" fontSize="10" fontFamily="monospace" letterSpacing="1">
+              STANDING WATER (SPECULAR SCATTERING)
             </text>
 
             {/* Dynamic Radar Pulse Ray */}
@@ -160,7 +151,7 @@ export default function WavelengthSimulator() {
                 d={ray.d}
                 fill="none"
                 stroke={ray.color}
-                strokeWidth="3.5"
+                strokeWidth="3"
                 strokeDasharray="6,4"
                 className="animate-pulse"
               />
@@ -168,10 +159,10 @@ export default function WavelengthSimulator() {
 
             {/* Satellite Icon & Beam Source */}
             <g transform="translate(70, 10)">
-              <rect x="0" y="0" width="30" height="15" fill="#5BC0BE" rx="2" />
-              <line x1="-15" y1="7" x2="0" y2="7" stroke="#94a3b8" strokeWidth="2" />
-              <line x1="30" y1="7" x2="45" y2="7" stroke="#94a3b8" strokeWidth="2" />
-              <text x="15" y="25" fill="#6FFFE9" fontSize="8" textAnchor="middle" fontFamily="monospace">
+              <rect x="0" y="0" width="28" height="14" fill="#14213d" stroke="#fca311" strokeWidth="1" rx="2" />
+              <line x1="-12" y1="7" x2="0" y2="7" stroke="#e5e5e5" strokeWidth="1.5" />
+              <line x1="28" y1="7" x2="40" y2="7" stroke="#e5e5e5" strokeWidth="1.5" />
+              <text x="14" y="24" fill="#fca311" fontSize="8" textAnchor="middle" fontFamily="monospace">
                 NISAR
               </text>
             </g>
@@ -180,34 +171,35 @@ export default function WavelengthSimulator() {
 
         {/* Physics Explanations Card */}
         <div className="lg:col-span-5 space-y-3 text-xs">
-          <div className="p-3.5 rounded-lg bg-[#24314D] border border-[#3A506B]/50">
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-semibold text-[#F4F6F8] text-sm">{current.name}</span>
+          <div className="p-4 rounded box-inner">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="font-editorial font-semibold text-white text-base">{current.name}</span>
               <span
-                className="px-2 py-0.5 rounded text-[10px] font-medium text-white"
+                className="px-2.5 py-0.5 rounded text-xs font-mono uppercase tracking-wider font-semibold text-black"
                 style={{ backgroundColor: current.color }}
               >
                 {current.agency}
               </span>
             </div>
-            <p className="text-slate-300 leading-relaxed mt-1">
+            <p className="text-[#e5e5e5]/80 font-sans leading-relaxed mt-1 text-xs">
               {current.summary}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <div className="p-2.5 rounded-md bg-[#0B132B]/60 border border-[#3A506B]/50">
-              <span className="text-slate-400 block mb-0.5">Canopy Penetration:</span>
-              <strong className="text-[#F4F6F8]">{current.canopyPenetration}</strong>
+          <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+            <div className="p-3 rounded box-inner">
+              <span className="text-[#e5e5e5]/50 uppercase tracking-wider block mb-1">Canopy Penetration:</span>
+              <strong className="text-white text-xs">{current.canopyPenetration}</strong>
             </div>
-            <div className="p-2.5 rounded-md bg-[#0B132B]/60 border border-[#3A506B]/50">
-              <span className="text-slate-400 block mb-0.5">Sub-Canopy Flood:</span>
-              <strong className="text-[#F4F6F8]">{current.subCanopyFloodDetection}</strong>
+            <div className="p-3 rounded box-inner">
+              <span className="text-[#e5e5e5]/50 uppercase tracking-wider block mb-1">Sub-Canopy Flood:</span>
+              <strong className="text-white text-xs">{current.subCanopyFloodDetection}</strong>
             </div>
           </div>
 
-          <div className="p-3 rounded-md bg-[#222950] border border-[#587ebb]/40 text-[#c6e9f1] text-[11px] leading-relaxed">
-            <strong className="text-[#87b8e8]">Why it matters for radar Earth observation:</strong> During the monsoon, dense elephant grass and jungle canopies hide vast floodwaters from optical and short-wave radar. NISAR's 24 cm L-band wave easily penetrates this canopy, creating a double-bounce return that reveals submerged ground.
+          <div className="p-3.5 rounded box-inner text-[#e5e5e5]/80 text-xs leading-relaxed font-sans">
+            <strong className="text-[#fca311] font-mono uppercase tracking-wider text-[11px] block mb-1">Hydrological Impact:</strong>
+            During monsoon crests, dense grass and jungle canopies obscure inundated terrain from optical sensors. NISAR's 24 cm L-band wave penetrates this canopy, creating a double-bounce return that maps submerged ground.
           </div>
         </div>
       </div>

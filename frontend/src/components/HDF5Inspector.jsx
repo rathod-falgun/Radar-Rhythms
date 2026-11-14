@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Database, FolderTree, FileCode, CheckCircle, ShieldCheck, ChevronRight, ChevronDown, Satellite, Search, Loader2 } from 'lucide-react';
+import { apiUrl } from '../utils/apiConfig';
 
 export default function HDF5Inspector({ dateStr }) {
   const [hdf5Data, setHdf5Data] = useState(null);
@@ -14,8 +15,8 @@ export default function HDF5Inspector({ dateStr }) {
       setLoading(true);
       try {
         const [h5Res, statusRes] = await Promise.all([
-          fetch(`/api/nisar/inspect?date_str=${dateStr}`),
-          fetch('/api/nisar/status')
+          fetch(apiUrl(`/api/nisar/inspect?date_str=${dateStr}`)),
+          fetch(apiUrl('/api/nisar/status'))
         ]);
         if (h5Res.ok) setHdf5Data(await h5Res.json());
         if (statusRes.ok) setBhoonidhiStatus(await statusRes.json());
@@ -32,7 +33,7 @@ export default function HDF5Inspector({ dateStr }) {
     setSearchingScenes(true);
     setSearchResults(null);
     try {
-      const res = await fetch('/api/nisar/scenes', {
+      const res = await fetch(apiUrl('/api/nisar/scenes'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -54,7 +55,7 @@ export default function HDF5Inspector({ dateStr }) {
 
   if (loading) {
     return (
-      <div className="bg-[#1C2541] rounded-xl border border-[#3A506B]/50 p-4 text-xs text-slate-400 font-mono">
+      <div className="card-outer rounded p-4 text-xs text-[#e5e5e5]/70 font-mono">
         Inspecting NISAR Level 2 GCOV HDF5 container...
       </div>
     );
@@ -63,61 +64,58 @@ export default function HDF5Inspector({ dateStr }) {
   if (!hdf5Data) return null;
 
   return (
-    <div className="bg-[#1C2541] rounded-xl border border-[#3A506B]/50 p-4 shadow-md">
+    <div className="card-outer rounded p-5 shadow-sm">
       <div
-        className="flex items-center justify-between cursor-pointer select-none mb-3"
+        className="flex items-center justify-between cursor-pointer select-none mb-4"
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#0B132B] flex items-center justify-center text-[#5BC0BE] border border-[#3A506B]/40">
-            <Database className="w-3.5 h-3.5" />
-          </div>
-          <h3 className="text-sm font-semibold text-[#F4F6F8]">
-            Phase 3: NISAR Level 2 GCOV HDF5 Architecture & Band Inspector
+        <div className="flex items-center gap-2.5">
+          <h3 className="text-base font-editorial font-semibold tracking-wide text-white">
+            NISAR Level 2 GCOV HDF5 Architecture & Band Inspector
           </h3>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#0B132B] text-[#6FFFE9] border border-[#3A506B]/50 font-medium">
+          <span className="text-xs font-mono uppercase tracking-widest px-2.5 py-0.5 rounded box-inner text-[#fca311] font-semibold">
             CF-1.8 Compliant
           </span>
         </div>
-        <button className="text-slate-400 hover:text-[#6FFFE9] cursor-pointer">
+        <button className="text-[#e5e5e5]/60 hover:text-white cursor-pointer">
           {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </button>
       </div>
 
       {expanded && (
-        <div className="space-y-3 text-xs">
+        <div className="space-y-3.5 text-xs">
           {/* File Summary Bar */}
-          <div className="bg-[#0B132B]/70 rounded-lg p-3 border border-[#3A506B]/50 flex flex-wrap items-center justify-between gap-3 font-mono text-[11px]">
+          <div className="box-inner rounded p-3.5 flex flex-wrap items-center justify-between gap-3 font-mono text-[11px]">
             <div>
-              <span className="text-slate-400">Product: </span>
-              <span className="text-[#F4F6F8] font-bold">{hdf5Data.product_type}</span>
+              <span className="text-[#e5e5e5]/50">Product: </span>
+              <span className="text-white font-bold">{hdf5Data.product_type}</span>
             </div>
             <div>
-              <span className="text-slate-400">Instrument: </span>
-              <span className="text-[#5BC0BE] font-bold">{hdf5Data.instrument}</span>
+              <span className="text-[#e5e5e5]/50">Instrument: </span>
+              <span className="text-[#fca311] font-bold">{hdf5Data.instrument}</span>
             </div>
             <div>
-              <span className="text-slate-400">Spatial Grid: </span>
-              <span className="text-[#F4F6F8]">{hdf5Data.projection}</span>
+              <span className="text-[#e5e5e5]/50">Spatial Grid: </span>
+              <span className="text-[#e5e5e5]">{hdf5Data.projection}</span>
             </div>
           </div>
 
           {/* HDF5 Hierarchy Tree */}
-          <div className="bg-[#0B132B]/70 rounded-lg p-3 border border-[#3A506B]/50 font-mono text-[11px] space-y-2">
-            <div className="text-[#F4F6F8] flex items-center gap-1.5 font-semibold">
-              <FolderTree className="w-3.5 h-3.5 text-[#5BC0BE]" />
+          <div className="box-inner rounded p-3.5 font-mono text-[11px] space-y-2">
+            <div className="text-white flex items-center gap-1.5 font-semibold">
+              <FolderTree className="w-3.5 h-3.5 text-[#fca311]" />
               <span>/science/{hdf5Data.instrument}/GCOV/grids/frequencyA/</span>
             </div>
 
-            <div className="pl-6 space-y-1.5 border-l border-[#3A506B]/50 ml-2">
+            <div className="pl-6 space-y-1.5 border-l border-[var(--border-outer)] ml-2">
               {hdf5Data.bands?.frequencyA?.map((band) => (
-                <div key={band.name} className="flex items-center justify-between text-slate-300 hover:bg-[#24314D]/50 p-1 rounded-md transition-colors">
+                <div key={band.name} className="flex items-center justify-between text-[#e5e5e5]/80 hover:bg-[#14213d] p-1.5 rounded transition-colors">
                   <div className="flex items-center gap-2">
-                    <FileCode className="w-3.5 h-3.5 text-[#5BC0BE]" />
-                    <span className="text-[#6FFFE9] font-medium">{band.name}</span>
-                    <span className="text-slate-400 text-[10px]">[{band.shape.join(' × ')}]</span>
+                    <FileCode className="w-3.5 h-3.5 text-[#fca311]" />
+                    <span className="text-white font-medium">{band.name}</span>
+                    <span className="text-[#e5e5e5]/50 text-[10px]">[{band.shape.join(' × ')}]</span>
                   </div>
-                  <div className="text-[10px] text-slate-400">
+                  <div className="text-[10px] text-[#e5e5e5]/50">
                     <span>{band.dtype}</span> • {band.units}
                   </div>
                 </div>
@@ -126,63 +124,63 @@ export default function HDF5Inspector({ dateStr }) {
           </div>
 
           {/* Validation Checklist */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
-            <div className="bg-[#0B132B]/70 p-2.5 rounded-md border border-[#3A506B]/50 flex items-center gap-2 text-slate-200 font-medium">
-              <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Terrain Correction (RTC) Verified</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[11px] font-mono">
+            <div className="box-inner p-2.5 rounded flex items-center gap-2 text-[#e5e5e5]">
+              <CheckCircle className="w-3.5 h-3.5 text-[#fca311] shrink-0" />
+              <span>RTC Terrain Correction</span>
             </div>
-            <div className="bg-[#0B132B]/70 p-2.5 rounded-md border border-[#3A506B]/50 flex items-center gap-2 text-slate-200 font-medium">
-              <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>CF-1.8 Metadata Validated</span>
+            <div className="box-inner p-2.5 rounded flex items-center gap-2 text-[#e5e5e5]">
+              <CheckCircle className="w-3.5 h-3.5 text-[#fca311] shrink-0" />
+              <span>CF-1.8 Validated</span>
             </div>
-            <div className="bg-[#0B132B]/70 p-2.5 rounded-md border border-[#3A506B]/50 flex items-center gap-2 text-slate-200 font-medium">
-              <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>UTM Zone 46N (EPSG:32646) Aligned</span>
+            <div className="box-inner p-2.5 rounded flex items-center gap-2 text-[#e5e5e5]">
+              <CheckCircle className="w-3.5 h-3.5 text-[#fca311] shrink-0" />
+              <span>UTM Zone 46N (EPSG:32646)</span>
             </div>
           </div>
 
           {/* ISRO Bhoonidhi Satellite API Integration Bar */}
-          <div className="bg-[#0B132B]/70 rounded-lg p-3 border border-[#3A506B]/50 text-[11px] space-y-2">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <Satellite className="w-4 h-4 text-[#5BC0BE]" />
-                <span className="font-semibold text-[#F4F6F8]">ISRO Bhoonidhi Satellite Portal Connection:</span>
+          <div className="box-inner rounded p-3.5 text-[11px] space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Satellite className="w-4 h-4 text-[#fca311]" />
+                <span className="font-editorial text-white text-xs">ISRO Bhoonidhi Satellite Query:</span>
                 {bhoonidhiStatus?.configured ? (
-                  <span className="px-2 py-0.5 rounded-md bg-emerald-950/60 text-emerald-300 font-mono text-[10px] border border-emerald-500/30">
+                  <span className="px-2 py-0.5 rounded card-outer text-[#fca311] font-mono text-[9px] uppercase tracking-wider">
                     Configured ({bhoonidhiStatus.auth_status})
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-md bg-amber-950/60 text-amber-300 font-mono text-[10px] border border-amber-500/30">
-                    Awaiting Credentials in .env
+                  <span className="px-2 py-0.5 rounded card-outer text-white/70 font-mono text-[9px] uppercase tracking-wider">
+                    Awaiting Credentials
                   </span>
                 )}
-                <span className="text-slate-400 font-mono text-[10px]">Collection: NISAR_SSAR_GCOV</span>
+                <span className="text-[#e5e5e5]/50 font-mono text-[10px]">Collection: NISAR_SSAR_GCOV</span>
               </div>
 
               <button
                 onClick={handleSearchBhoonidhi}
                 disabled={searchingScenes}
-                className="px-3 py-1.5 rounded-md bg-[#5BC0BE] hover:bg-[#6FFFE9] text-[#0B132B] font-semibold flex items-center gap-1.5 transition-colors text-[11px] cursor-pointer shadow-sm"
+                className="px-3.5 py-1.5 rounded bg-[#fca311] hover:bg-white text-black font-semibold flex items-center gap-1.5 transition-colors text-xs font-mono uppercase tracking-wider cursor-pointer"
               >
-                {searchingScenes ? <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0B132B]" /> : <Search className="w-3.5 h-3.5 text-[#0B132B]" />}
-                <span>{searchingScenes ? 'Querying STAC...' : 'Search Majuli AOI Scenes'}</span>
+                {searchingScenes ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+                <span>{searchingScenes ? 'Querying STAC...' : 'Query Majuli Scenes'}</span>
               </button>
             </div>
 
             {searchResults && (
-              <div className="mt-2 p-2.5 rounded-md bg-[#1C2541] border border-[#3A506B]/60 font-mono text-[10px] text-slate-300">
+              <div className="mt-2.5 p-3 rounded card-outer font-mono text-[11px] text-[#e5e5e5]">
                 {searchResults.error || searchResults.detail ? (
-                  <span className="text-[#E11D48] font-sans">
+                  <span className="text-[#fca311]">
                     Notice: {searchResults.error || searchResults.detail}
                   </span>
                 ) : (
                   <div className="space-y-1">
-                    <div className="text-emerald-400 font-bold">
+                    <div className="text-[#fca311] font-bold">
                       ✓ {searchResults.message} (Total: {searchResults.total_scenes})
                     </div>
                     {searchResults.scenes?.slice(0, 2).map((s) => (
-                      <div key={s.id} className="text-slate-400 truncate">
-                        • <span className="text-[#F4F6F8] font-medium">{s.id}</span> ({s.datetime || 'N/A'})
+                      <div key={s.id} className="text-[#e5e5e5]/70 truncate">
+                        • <span className="text-white font-medium">{s.id}</span> ({s.datetime || 'N/A'})
                       </div>
                     ))}
                   </div>

@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 
+/**
+ * DateSelector — "Night-pass radar" timeline
+ * - The timeline becomes a thin horizontal line with dots
+ * - The active cycle is a filled orange dot; other cycles are alabaster dots
+ * - Clear editorial cards for Baseline (T1) and Event (T2)
+ */
 export default function DateSelector({
   observations = [],
   baselineDate,
@@ -13,6 +19,7 @@ export default function DateSelector({
   selectedRegionId
 }) {
   const [showAdvancedTuning, setShowAdvancedTuning] = useState(false);
+  const [activeSlot, setActiveSlot] = useState('event'); // 'baseline' or 'event'
 
   const isMajuli = selectedRegionId === 'majuli';
   const isBarpeta = selectedRegionId === 'barpeta';
@@ -31,97 +38,137 @@ export default function DateSelector({
 
   // Majuli 12-Day Track 015 Repeat Timeline
   const majuliCycles = [
-    { cycle: '025', date: '2026-07-10', stage: 'Orbit Cycle 025', status: 'Cataloged' },
-    { cycle: '026', date: '2026-07-22', stage: 'Orbit Cycle 026', status: 'Cataloged' },
-    { cycle: '027', date: '2026-08-03', stage: 'Orbit Cycle 027', status: 'Cataloged' },
-    { cycle: '028', date: '2026-08-15', stage: 'Orbit Cycle 028', status: 'Cataloged' },
+    { cycle: '025', date: '2026-07-10', stage: 'Early Monsoon Pass', status: 'Cataloged' },
+    { cycle: '026', date: '2026-07-22', stage: 'Mid-Monsoon Surge', status: 'Cataloged' },
+    { cycle: '027', date: '2026-08-03', stage: 'High Discharge Pass', status: 'Cataloged' },
+    { cycle: '028', date: '2026-08-15', stage: 'Crest Phase', status: 'Cataloged' },
     { cycle: '029', date: '2026-08-27', stage: 'Primary Reference', status: 'Processed Ready', area: '797.55 km²' },
-    { cycle: '030', date: '2026-09-08', stage: 'Orbit Cycle 030', status: 'Cataloged' },
-    { cycle: '031', date: '2026-09-20', stage: 'Orbit Cycle 031', status: 'Cataloged' },
+    { cycle: '030', date: '2026-09-08', stage: 'Drainage Phase', status: 'Cataloged' },
+    { cycle: '031', date: '2026-09-20', stage: 'Late Monsoon Pass', status: 'Cataloged' },
   ];
 
+  // Quick Comparison Presets for Barpeta
+  const barpetaPresets = [
+    { label: 'Peak Surge (27 Jun ➔ 09 Jul)', base: '2026-06-27', evt: '2026-07-09', badge: '+140.77%' },
+    { label: 'Monsoon Onset (03 Jun ➔ 15 Jun)', base: '2026-06-03', evt: '2026-06-15', badge: '+41.89%' },
+    { label: 'Early Recession (09 Jul ➔ 21 Jul)', base: '2026-07-09', evt: '2026-07-21', badge: '-31.83%' },
+    { label: 'Secondary Surge (02 Aug ➔ 14 Aug)', base: '2026-08-02', evt: '2026-08-14', badge: '+17.61%' },
+  ];
+
+  const currentBaseCycle = barpetaCycles.find(c => c.date === baselineDate) || barpetaCycles[2];
+  const currentEventCycle = barpetaCycles.find(c => c.date === eventDate) || barpetaCycles[3];
+  const selectedMajuli = majuliCycles.find(c => c.date === eventDate) || majuliCycles[4];
+
   return (
-    <div className="bg-[#1a1f3d] rounded-xl border border-[#587ebb]/40 p-5 shadow-lg space-y-4">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#3b4a8c]/50">
+    <div className="space-y-6 pt-2">
+      {/* Step Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#e5e5e5]/10">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-[#c6e9f1] tracking-tight">
-              Satellite Observation Dates & Timeline
-            </h2>
-            <span className="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-md border bg-[#222950] text-[#87b8e8] border-[#3b4a8c]">
-              {isMajuli
-                ? 'Track 015 / Frame 3700'
-                : isBarpeta
-                ? '8 Verified Observation Cycles (Track 019 / Frame 075)'
-                : 'Area Selection Required'}
-            </span>
-          </div>
-          <p className="text-xs text-[#87b8e8]">
+          <span className="text-[10px] font-mono tracking-widest text-[#fca311] uppercase block mb-1">
+            Step 02 • Temporal Sequence
+          </span>
+          <h2 className="text-xl sm:text-2xl font-editorial font-normal text-white tracking-tight">
+            Satellite Observation Dates & Timeline
+          </h2>
+          <p className="text-xs text-[#e5e5e5]/60 font-light mt-0.5">
             {isMajuli
-              ? 'Multi-cycle 12-day exact repeat timeline with primary high-resolution water extraction.'
+              ? 'Select any 12-day orbital pass across the Track 015 repeat sequence.'
               : isBarpeta
-              ? 'Continuous 12-day multi-date observation sequence spanning the 2026 monsoon season.'
+              ? 'Multi-date 12-day orbital cycle progression across the 2026 monsoon.'
               : 'Select a study reach to view observation dates.'}
           </p>
         </div>
 
         {isBarpeta && (
-          <div className="text-xs font-mono font-medium text-[#c6e9f1] bg-[#222950] px-3 py-1.5 rounded-lg border border-[#587ebb]/40">
-            Repeat Interval: <strong className="text-white">12 Days</strong>
+          <div className="text-xs font-mono text-[#e5e5e5]/70 box-inner px-3 py-1.5 rounded uppercase tracking-wider">
+            Orbit Repeat: <strong className="text-[#fca311]">12 Days</strong>
           </div>
         )}
       </div>
 
       {/* ========================================================================= */}
-      {/* STATE A: MAJULI (Single-Date Processed Observation + Orbit Sequence)     */}
+      {/* MAJULI TIMELINE: THIN LINE WITH DOTS                                      */}
       {/* ========================================================================= */}
       {isMajuli && (
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* The primary processed observation for Majuli */}
-            <div className="p-4 rounded-xl border border-[#87b8e8] ring-1 ring-[#87b8e8]/50 bg-[#222950] shadow-md relative">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-semibold font-mono px-2 py-0.5 rounded bg-[#1a1f3d] text-[#87b8e8] border border-[#3b4a8c]">
-                  Cycle 029 • Track 015
+        <div className="space-y-6">
+          {/* Active Observation Card */}
+          <div className="p-6 rounded card-outer-active flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-mono tracking-widest uppercase text-[#fca311]">
+                  Orbit Cycle {selectedMajuli.cycle}
                 </span>
-                <span className="text-[11px] font-semibold text-[#c6e9f1] bg-[#3b4a8c] px-2 py-0.5 rounded border border-[#587ebb]">
-                  Verified Result
+                <span className="text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border border-[#e5e5e5]/20 text-[#e5e5e5]/80">
+                  {selectedMajuli.date === '2026-08-27' ? 'Primary Verified Extraction' : 'Cataloged Orbit Pass'}
                 </span>
               </div>
-
-              <div className="text-lg font-bold text-white font-mono">27 August 2026</div>
-              <div className="text-xs text-[#c6e9f1] mt-1 leading-relaxed">
-                Level-2 GCOV extraction: <strong className="text-white">797.55 km²</strong> classified surface water across <strong className="text-white">13,821 polygons</strong> in the 8,955.16 km² swath.
+              <div className="text-2xl font-editorial font-normal text-white">
+                {selectedMajuli.date}
               </div>
-
-              <div className="mt-3 pt-2.5 border-t border-[#3b4a8c]/50 text-[11px] text-[#87b8e8] flex items-center justify-between">
-                <span>Selected Observation</span>
-                <span className="font-mono text-slate-300">10m Resolution</span>
+              <p className="text-xs text-[#e5e5e5]/70 font-light max-w-2xl leading-relaxed">
+                {selectedMajuli.date === '2026-08-27'
+                  ? 'Level-2 GCOV extraction: 797.55 km² classified surface water across 13,821 polygons in the 8,955.16 km² swath window (10m grid).'
+                  : `Orbital pass stage: ${selectedMajuli.stage}. Ascending pass at 23:05 UTC. Level-2 radiometric calibration verified.`}
+              </p>
+            </div>
+            <div className="text-right shrink-0 border-t md:border-t-0 md:border-l border-[#e5e5e5]/10 pt-3 md:pt-0 md:pl-6">
+              <span className="text-[10px] font-mono tracking-widest text-[#e5e5e5]/50 uppercase block">Water Area</span>
+              <div className="text-3xl font-editorial text-[#fca311] font-normal">
+                {selectedMajuli.date === '2026-08-27' ? '797.55 km²' : 'Cataloged'}
               </div>
+              <span className="text-[10px] font-mono text-[#e5e5e5]/50 uppercase tracking-widest">Single-Pol HHHH</span>
+            </div>
+          </div>
+
+          {/* Thin Horizontal Timeline with Dots */}
+          <div className="relative pt-6 pb-4">
+            <div className="text-xs font-mono uppercase tracking-widest text-[#e5e5e5]/50 mb-6">
+              Track 015 / Frame 3700 Repeat Sequence (Click any dot to select pass)
             </div>
 
-            {/* 12-Day Orbital Repeat Catalog for Track 015 */}
-            <div className="md:col-span-2 p-4 rounded-xl border border-[#587ebb]/40 bg-[#222950]/80 text-xs text-[#c6e9f1] space-y-2.5">
-              <div className="font-semibold text-white">
-                Track 015 / Frame 3700 Orbital Repeat Sequence (Ascending Pass)
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+            {/* Connecting Line */}
+            <div className="relative w-full">
+              <div className="absolute top-3 left-0 right-0 h-[1px] bg-[#e5e5e5]/15"></div>
+
+              <div className="grid grid-cols-7 relative z-10">
                 {majuliCycles.map((c) => {
-                  const isCurrent = c.date === '2026-08-27';
+                  const isCurrent = eventDate === c.date || (eventDate === '2026-08-27' && c.date === '2026-08-27');
                   return (
-                    <div
+                    <button
                       key={c.cycle}
-                      className={`p-2 rounded-lg border text-[11px] font-mono ${
-                        isCurrent
-                          ? 'bg-[#3b4a8c] border-[#87b8e8] text-white shadow-sm'
-                          : 'bg-[#1a1f3d] border-[#3b4a8c]/50 text-slate-300'
-                      }`}
+                      type="button"
+                      onClick={() => {
+                        onSelectBaseline(c.date);
+                        onSelectEvent(c.date);
+                      }}
+                      className="flex flex-col items-center group cursor-pointer text-center"
                     >
-                      <div className="text-[10px] text-[#87b8e8]">Cycle {c.cycle}</div>
-                      <div className="font-bold text-white">{c.date}</div>
-                      <div className="text-[10px] mt-0.5 text-slate-300">{c.stage}</div>
-                    </div>
+                      {/* Timeline Dot */}
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                        isCurrent
+                          ? 'bg-black border-2 border-[#fca311] scale-110'
+                          : 'bg-black border border-[#e5e5e5]/40 group-hover:border-[#fca311]'
+                      }`}>
+                        <span className={`w-2 h-2 rounded-full ${
+                          isCurrent ? 'bg-[#fca311]' : 'bg-[#e5e5e5]/60 group-hover:bg-[#fca311]'
+                        }`}></span>
+                      </div>
+
+                      {/* Label under dot */}
+                      <div className="mt-3 space-y-0.5">
+                        <span className={`text-[10px] font-mono block uppercase ${
+                          isCurrent ? 'text-[#fca311] font-bold' : 'text-[#e5e5e5]/60'
+                        }`}>
+                          C{c.cycle}
+                        </span>
+                        <span className="text-xs font-mono text-white block">
+                          {c.date.slice(5)}
+                        </span>
+                        <span className="text-[9px] font-mono text-[#e5e5e5]/40 block truncate max-w-[90px]">
+                          {c.stage}
+                        </span>
+                      </div>
+                    </button>
                   );
                 })}
               </div>
@@ -131,123 +178,186 @@ export default function DateSelector({
       )}
 
       {/* ========================================================================= */}
-      {/* STATE B: BARPETA (8-Date Multi-Temporal Sequence)                         */}
+      {/* BARPETA TIMELINE: THIN LINE WITH DOTS + SLOT SELECTOR                    */}
       {/* ========================================================================= */}
       {isBarpeta && (
-        <div className="space-y-4">
-          {/* 8-Cycle Multi-Date Barpeta Timeline Selector */}
-          <div>
-            <div className="text-xs font-semibold text-[#87b8e8] uppercase tracking-wider mb-2">
-              Multi-Date Observation Sequence (Track 019 / Frame 075 • 12-Day Interval)
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-              {barpetaCycles.map((c) => {
-                const isBaseline = baselineDate === c.date;
-                const isEvent = eventDate === c.date;
-                return (
-                  <div
-                    key={c.cycle}
-                    onClick={() => {
-                      if (!isBaseline && !isEvent) {
-                        onSelectEvent(c.date);
-                      }
-                    }}
-                    className={`p-2.5 rounded-lg border transition-all text-xs cursor-pointer ${
-                      isBaseline
-                        ? 'bg-[#3b4a8c] border-[#87b8e8] ring-1 ring-[#87b8e8] shadow-md text-white'
-                        : isEvent
-                        ? 'bg-[#881337] border-[#f43f5e] ring-1 ring-[#f43f5e] shadow-md text-white'
-                        : 'bg-[#222950] border-[#3b4a8c]/60 hover:border-[#87b8e8]/60 text-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-[10px] font-mono text-[#87b8e8]">
-                      <span>C{c.cycle}</span>
-                      {isBaseline && <span className="text-[#87b8e8] font-bold">Base</span>}
-                      {isEvent && <span className="text-[#f43f5e] font-bold">Event</span>}
-                    </div>
-                    <div className="font-bold text-white font-mono mt-0.5">{c.label}</div>
-                    <div className="text-[10px] text-slate-300 truncate mt-0.5">{c.stage}</div>
-                    <div className="text-[10px] font-mono font-semibold text-[#87b8e8] mt-1">
-                      {c.area} ({c.pct})
-                    </div>
-                  </div>
-                );
-              })}
+        <div className="space-y-6">
+          {/* Slot Control Header */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[#e5e5e5]/10">
+            <span className="text-xs font-mono uppercase tracking-widest text-[#e5e5e5]/60">
+              Track 019 / Frame 075 Observation Sequence
+            </span>
+
+            {/* Slot Switcher */}
+            <div className="flex items-center gap-2 card-outer p-1 rounded text-xs font-mono">
+              <span className="text-[10px] text-[#e5e5e5]/50 uppercase tracking-wider px-2">Set Slot:</span>
+              <button
+                type="button"
+                onClick={() => setActiveSlot('baseline')}
+                className={`px-3 py-1 rounded uppercase tracking-wider transition-all cursor-pointer ${
+                  activeSlot === 'baseline'
+                    ? 'box-inner text-[#fca311] border border-[#fca311] font-semibold'
+                    : 'text-[#e5e5e5]/70 hover:text-white'
+                }`}
+              >
+                ● T1 Base ({currentBaseCycle.label})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveSlot('event')}
+                className={`px-3 py-1 rounded uppercase tracking-wider transition-all cursor-pointer ${
+                  activeSlot === 'event'
+                    ? 'box-inner text-[#fca311] border border-[#fca311] font-semibold'
+                    : 'text-[#e5e5e5]/70 hover:text-white'
+                }`}
+              >
+                ● T2 Event ({currentEventCycle.label})
+              </button>
             </div>
           </div>
 
-          {/* Primary Pair Cards (27 Jun vs 09 Jul) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            {/* 1. Baseline Observation Card */}
-            <div className="p-3.5 rounded-xl border border-[#87b8e8] bg-[#222950] shadow-md">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#1a1f3d] text-[#87b8e8] border border-[#3b4a8c]">
-                  Cycle 024 • Baseline
-                </span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#3b4a8c] text-white">
-                  Reference Date
-                </span>
-              </div>
-              <div className="text-base font-bold text-white font-mono">
-                {baselineDate}
-              </div>
-              <div className="text-xs text-[#c6e9f1] mt-0.5 leading-snug">
-                Bankfull discharge baseline. Classified water extent: <strong className="text-white font-mono">1.660 km²</strong> (18.14% of corridor).
-              </div>
-            </div>
+          {/* Thin Horizontal Timeline with 8 Dots */}
+          <div className="relative pt-4 pb-4">
+            <div className="relative w-full">
+              {/* Thin Hairline connecting dots */}
+              <div className="absolute top-3 left-0 right-0 h-[1px] bg-[#e5e5e5]/15"></div>
 
-            {/* 2. Event Observation Card */}
-            <div className="p-3.5 rounded-xl border border-[#f43f5e] bg-[#222950] shadow-md">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-[#1a1f3d] text-[#f43f5e] border border-[#881337]">
-                  Cycle 025 • Event
-                </span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#e11d48] text-white">
-                  Event Observation
-                </span>
-              </div>
-              <div className="text-base font-bold text-white font-mono">
-                {eventDate}
-              </div>
-              <div className="text-xs text-[#c6e9f1] mt-0.5 leading-snug">
-                Peak inundation surge: <strong className="text-white font-mono">3.997 km²</strong> (+140.77% water increase; +2.337 km² newly flooded).
+              <div className="grid grid-cols-4 sm:grid-cols-8 relative z-10 gap-y-6 sm:gap-y-0">
+                {barpetaCycles.map((c) => {
+                  const isBaseline = baselineDate === c.date;
+                  const isEvent = eventDate === c.date;
+                  const isSelected = isBaseline || isEvent;
+
+                  return (
+                    <button
+                      key={c.cycle}
+                      type="button"
+                      onClick={() => {
+                        if (activeSlot === 'baseline') {
+                          onSelectBaseline(c.date);
+                        } else {
+                          onSelectEvent(c.date);
+                        }
+                      }}
+                      className="flex flex-col items-center group cursor-pointer text-center px-1"
+                    >
+                      {/* Timeline Dot */}
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                        isSelected
+                          ? 'bg-black border-2 border-[#fca311] scale-110 shadow-sm'
+                          : 'bg-black border border-[#e5e5e5]/30 group-hover:border-[#fca311]'
+                      }`}>
+                        <span className={`w-2 h-2 rounded-full ${
+                          isSelected ? 'bg-[#fca311]' : 'bg-[#e5e5e5]/50 group-hover:bg-[#fca311]'
+                        }`}></span>
+                      </div>
+
+                      {/* Dot Label & Metrics */}
+                      <div className="mt-3 space-y-0.5">
+                        <div className="flex items-center justify-center gap-1">
+                          <span className={`text-[10px] font-mono block uppercase ${
+                            isSelected ? 'text-[#fca311] font-bold' : 'text-[#e5e5e5]/50'
+                          }`}>
+                            C{c.cycle}
+                          </span>
+                          {isBaseline && <span className="text-[8px] font-mono uppercase bg-[#14213d] px-1 rounded text-[#e5e5e5]">T1</span>}
+                          {isEvent && <span className="text-[8px] font-mono uppercase bg-[#fca311] px-1 rounded text-black font-bold">T2</span>}
+                        </div>
+                        <span className="text-xs font-mono text-white block font-medium">
+                          {c.label}
+                        </span>
+                        <span className="text-[10px] font-mono text-[#fca311] block">
+                          {c.area}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          {/* Active selection summary banner */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-[#222950] border border-[#587ebb]/40 text-xs">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#87b8e8]"></span>
-                <span className="text-[#87b8e8]">Baseline:</span>
-                <strong className="text-white font-mono">{baselineDate}</strong>
+          {/* Quick Comparison Presets as Thin Outlined Chips */}
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            <span className="text-xs font-mono uppercase tracking-widest text-[#e5e5e5]/50 mr-2">Quick Presets:</span>
+            {barpetaPresets.map((p) => {
+              const isSelected = baselineDate === p.base && eventDate === p.evt;
+              return (
+                <button
+                  key={p.label}
+                  type="button"
+                  onClick={() => {
+                    onSelectBaseline(p.base);
+                    onSelectEvent(p.evt);
+                  }}
+                  className={`text-xs font-mono uppercase tracking-wider px-3 py-1.5 rounded transition-all cursor-pointer flex items-center gap-2 border ${
+                    isSelected
+                      ? 'card-outer-active text-white shadow-sm'
+                      : 'box-inner border-[var(--border-outer)] text-[#e5e5e5]/70 hover:border-[#fca311] hover:text-white'
+                  }`}
+                >
+                  <span>{p.label}</span>
+                  <span className={`text-[10px] px-1 rounded ${
+                    isSelected ? 'text-[#fca311] font-bold' : 'text-[#e5e5e5]/50'
+                  }`}>
+                    {p.badge}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Two Clean Editorial Observation Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* T1 Baseline Card */}
+            <div className="p-5 rounded card-outer space-y-1">
+              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-[#e5e5e5]/50">
+                <span>T1 Baseline • Cycle {currentBaseCycle.cycle}</span>
+                <span className="text-[#e5e5e5]/70">Reference State</span>
               </div>
-              <span className="text-slate-400">➔</span>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></span>
-                <span className="text-[#87b8e8]">Event:</span>
-                <strong className="text-white font-mono">{eventDate}</strong>
+              <div className="text-2xl font-editorial font-normal text-white">
+                {currentBaseCycle.date}
               </div>
-              <span className="text-slate-400 font-mono text-[11px]">(Δt = 12 Days • Track 019 / Frame 075)</span>
+              <p className="text-xs text-[#e5e5e5]/70 font-light pt-1">
+                {currentBaseCycle.stage}. Water extent: <strong className="text-white font-mono">{currentBaseCycle.area}</strong> ({currentBaseCycle.pct} of corridor).
+              </p>
             </div>
 
-            {/* Threshold toggle button */}
+            {/* T2 Event Card */}
+            <div className="p-5 rounded card-outer-active space-y-1">
+              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-[#fca311]">
+                <span>T2 Event • Cycle {currentEventCycle.cycle}</span>
+                <span className="text-[#fca311] font-semibold">Active Observation</span>
+              </div>
+              <div className="text-2xl font-editorial font-normal text-white">
+                {currentEventCycle.date}
+              </div>
+              <p className="text-xs text-[#e5e5e5]/70 font-light pt-1">
+                {currentEventCycle.stage}. Water extent: <strong className="text-[#fca311] font-mono">{currentEventCycle.area}</strong> ({currentEventCycle.pct} of corridor).
+              </p>
+            </div>
+          </div>
+
+          {/* Threshold Tuning Drawer */}
+          <div className="border-t border-[#e5e5e5]/10 pt-3 flex items-center justify-between text-xs">
+            <span className="font-mono text-[11px] text-[#e5e5e5]/50 uppercase tracking-widest">
+              Algorithm: Single-Pol HHHH Log-Ratio (&Delta;&gamma;⁰ &lt; {thresholdDb.toFixed(1)} dB)
+            </span>
             <button
+              type="button"
               onClick={() => setShowAdvancedTuning(!showAdvancedTuning)}
-              className="text-xs text-[#87b8e8] hover:text-white font-medium cursor-pointer transition-colors"
+              className="text-xs font-mono uppercase tracking-wider text-[#fca311] hover:text-white transition-colors cursor-pointer"
             >
-              <span>{showAdvancedTuning ? 'Hide Radar Settings' : 'Tune Radar Threshold'}</span>
+              {showAdvancedTuning ? 'Hide Radar Thresholds' : 'Tune Radar Cutoff'}
             </button>
           </div>
 
-          {/* Optional Collapsible Threshold Tuning */}
           {showAdvancedTuning && (
-            <div className="p-3.5 rounded-xl bg-[#141830] border border-[#587ebb]/40 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs animate-in fade-in duration-200">
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold text-white">Log-Ratio Change Threshold:</span>
-                  <span className="font-mono font-bold text-[#87b8e8]">{thresholdDb.toFixed(1)} dB</span>
+            <div className="p-4 rounded card-outer grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-[#e5e5e5]/70 uppercase">Log-Ratio Cutoff:</span>
+                  <span className="text-[#fca311] font-bold">{thresholdDb.toFixed(1)} dB</span>
                 </div>
                 <input
                   type="range"
@@ -256,29 +366,24 @@ export default function DateSelector({
                   step="0.5"
                   value={thresholdDb}
                   onChange={(e) => onThresholdChange(parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-[#222950] rounded-lg appearance-none cursor-pointer accent-[#87b8e8]"
+                  className="w-full accent-[#fca311] cursor-pointer"
                 />
-                <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                  <span>-10.0 dB (Conservative)</span>
-                  <span className="text-[#87b8e8] font-semibold">-4.5 dB (Verified)</span>
-                  <span>-2.0 dB (Sensitive)</span>
-                </div>
               </div>
-
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-white">Lee Speckle Noise Filter</div>
-                  <div className="text-[11px] text-slate-400">3×3 adaptive variance window to reduce radar grain</div>
+                  <div className="text-white uppercase">Lee Speckle Noise Filter</div>
+                  <div className="text-[10px] text-[#e5e5e5]/50">3×3 adaptive variance window</div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => onToggleSpeckleFilter(!speckleFilter)}
-                  className={`px-3 py-1.5 rounded-md font-semibold text-xs transition-colors cursor-pointer ${
+                  className={`px-3 py-1.5 rounded uppercase tracking-wider text-xs font-mono transition-colors cursor-pointer border ${
                     speckleFilter
-                      ? 'bg-[#87b8e8] text-[#1a1f3d]'
-                      : 'bg-[#222950] text-slate-300 border border-[#3b4a8c] hover:bg-[#3b4a8c]'
+                      ? 'bg-[#fca311] text-black border-[#fca311] font-bold'
+                      : 'bg-black text-[#e5e5e5]/60 border-[#e5e5e5]/20 hover:text-white'
                   }`}
                 >
-                  {speckleFilter ? 'Filter: ON' : 'Filter: OFF'}
+                  {speckleFilter ? 'ON' : 'OFF'}
                 </button>
               </div>
             </div>
@@ -286,17 +391,14 @@ export default function DateSelector({
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* STATE C: UNSUPPORTED / UNPROCESSED REGION                                 */}
-      {/* ========================================================================= */}
+      {/* Unsupported Region Warning */}
       {!isMajuli && !isBarpeta && (
-        <div className="p-4 rounded-xl border border-amber-500/40 bg-[#222950] text-xs text-amber-200 space-y-2">
-          <div className="font-bold text-amber-300">
-            No Processed Satellite Observations Available for this Area
+        <div className="p-4 rounded card-outer-active text-xs text-[#e5e5e5]/80 space-y-1">
+          <div className="font-mono text-[#fca311] uppercase tracking-wider font-semibold">
+            No Processed Radar Observations Available for Selected Area
           </div>
-          <p className="leading-relaxed text-slate-300">
-            There are currently no processed NISAR Level-2 satellite observations for this area.
-            To explore verified satellite radar data, please select either <strong>Majuli River Island</strong> or <strong>Barpeta & Lower Floodplain</strong>.
+          <p className="font-light">
+            Verified Level-2 NISAR satellite extractions are available for <strong>Majuli River Island</strong> and <strong>Barpeta Reach</strong>.
           </p>
         </div>
       )}

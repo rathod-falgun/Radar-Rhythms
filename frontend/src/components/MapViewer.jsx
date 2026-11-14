@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon, Marker, Popup, ImageOverlay, useMap, Tooltip, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import { Layers, MapPin, Eye, EyeOff, Compass, Cloud, Radio, Sliders, ShieldAlert, Sparkles, Loader2, AlertTriangle, CheckCircle2, TrendingUp } from 'lucide-react';
+import { apiUrl } from '../utils/apiConfig';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -35,8 +36,8 @@ function MapRecenter({ center, zoom, bounds }) {
 // In-memory cache so GeoJSON files are only downloaded once per session
 let cachedMajuliGeoJson = null;
 let cachedMajuliSummary = null;
-let cachedBarpetaGeoJson = null;
-let cachedBarpetaSummary = null;
+const cachedBarpetaGeoJsonMap = {};
+const cachedBarpetaSummaryMap = {};
 
 // Verified GPS coordinates for Majuli landmarks (Track 015 / Frame 3700)
 const MAJULI_LANDMARKS = [
@@ -73,8 +74,8 @@ export default function MapViewer({
   const [majuliError, setMajuliError] = useState(null);
 
   // Real Barpeta Change GeoJSON and Summary State
-  const [barpetaGeoJson, setBarpetaGeoJson] = useState(cachedBarpetaGeoJson);
-  const [barpetaSummary, setBarpetaSummary] = useState(cachedBarpetaSummary);
+  const [barpetaGeoJson, setBarpetaGeoJson] = useState(null);
+  const [barpetaSummary, setBarpetaSummary] = useState(null);
   const [loadingBarpeta, setLoadingBarpeta] = useState(false);
   const [barpetaError, setBarpetaError] = useState(null);
   const [showNewlyInundated, setShowNewlyInundated] = useState(true);
@@ -98,8 +99,8 @@ export default function MapViewer({
       setMajuliError(null);
       try {
         const [geojsonRes, summaryRes] = await Promise.all([
-          fetch('/api/water/majuli/boundaries'),
-          fetch('/api/water/majuli/summary')
+          fetch(apiUrl('/api/water/majuli/boundaries')),
+          fetch(apiUrl('/api/water/majuli/summary'))
         ]);
 
         if (!geojsonRes.ok) throw new Error(`HTTP ${geojsonRes.status}: Failed fetching boundaries`);
@@ -131,12 +132,13 @@ export default function MapViewer({
     return () => { isMounted = false; };
   }, [isMajuli]);
 
-  // 2. Fetch real Barpeta change boundaries when Barpeta is selected
+  // 2. Fetch real Barpeta change boundaries when Barpeta is selected or dates change
   useEffect(() => {
     if (!isBarpeta) return;
-    if (cachedBarpetaGeoJson && cachedBarpetaSummary) {
-      setBarpetaGeoJson(cachedBarpetaGeoJson);
-      setBarpetaSummary(cachedBarpetaSummary);
+    const cacheKey = `${baselineDate}_${eventDate}`;
+    if (cachedBarpetaGeoJsonMap[cacheKey] && cachedBarpetaSummaryMap[cacheKey]) {
+      setBarpetaGeoJson(cachedBarpetaGeoJsonMap[cacheKey]);
+      setBarpetaSummary(cachedBarpetaSummaryMap[cacheKey]);
       return;
     }
 
@@ -145,9 +147,10 @@ export default function MapViewer({
       setLoadingBarpeta(true);
       setBarpetaError(null);
       try {
+        const query = `baseline_date=${baselineDate || '2026-06-27'}&event_date=${eventDate || '2026-07-09'}`;
         const [geojsonRes, summaryRes] = await Promise.all([
-          fetch('/api/flood/barpeta/boundaries'),
-          fetch('/api/flood/barpeta/summary')
+          fetch(apiUrl(`/api/flood/barpeta/boundaries?${query}`)),
+          fetch(apiUrl(`/api/flood/barpeta/summary?${query}`))
         ]);
 
         if (!geojsonRes.ok) throw new Error(`HTTP ${geojsonRes.status}: Failed fetching Barpeta change boundaries`);
@@ -156,8 +159,8 @@ export default function MapViewer({
         const geojsonData = await geojsonRes.json();
         const summaryData = await summaryRes.json();
 
-        cachedBarpetaGeoJson = geojsonData;
-        cachedBarpetaSummary = summaryData;
+        cachedBarpetaGeoJsonMap[cacheKey] = geojsonData;
+        cachedBarpetaSummaryMap[cacheKey] = summaryData;
 
         if (isMounted) {
           setBarpetaGeoJson(geojsonData);
@@ -177,7 +180,7 @@ export default function MapViewer({
 
     loadBarpetaData();
     return () => { isMounted = false; };
-  }, [isBarpeta]);
+  }, [isBarpeta, baselineDate, eventDate]);
 
   // 3. Demo overlay generation for other reaches
   useEffect(() => {
@@ -249,107 +252,96 @@ export default function MapViewer({
   }
 
   const tileUrls = {
-    satellite: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     street: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    light: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+    dark: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
   };
 
   const tileAttributions = {
     satellite: '&copy; Esri &mdash; Earthstar Geographics',
     street: '&copy; OpenStreetMap contributors',
-    light: '&copy; OpenStreetMap contributors, HOT',
+    dark: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
   };
 
+  const barpetaPct = comparisonData?.statistics?.percentage_change;
+  const barpetaPctText = barpetaPct !== undefined ? `${barpetaPct >= 0 ? '+' : ''}${barpetaPct}%` : '+140.77%';
+
   return (
-    <div className="bg-[#1a1f3d] rounded-xl border border-[#587ebb]/40 p-4 shadow-lg flex flex-col h-full font-sans">
+    <div className="card-outer rounded p-4 flex flex-col h-full font-sans">
       {/* Map Header & Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-3 pb-3 border-b border-[#e5e5e5]/10">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-[#c6e9f1]">
+          <h3 className="text-base font-editorial text-white">
             {isMajuli
-              ? 'Real NISAR Water Classification Layer (Majuli Island)'
+              ? `Real NISAR Water Classification Layer (Majuli Island • ${eventDate || '2026-08-27'})`
               : isBarpeta
-              ? 'Multi-Temporal NISAR Water Change Vector Layer (+140.77% Increase in Corridor)'
+              ? `Multi-Temporal NISAR Water Change: ${baselineDate} ➔ ${eventDate} (${barpetaPctText})`
               : 'Interactive SAR Satellite Flood Map'}
           </h3>
-          <span className="text-[10px] font-mono text-[#87b8e8] bg-[#222950] px-2.5 py-0.5 rounded-md border border-[#3b4a8c] font-semibold">
+          <span className="text-xs font-mono text-[#fca311] box-inner px-2.5 py-1 rounded uppercase tracking-wider font-semibold">
             {isMajuli ? 'Track 015 / Frame 3700' : 'Track 019 / Frame 075'}
           </span>
         </div>
 
-        {/* Layer Controls */}
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs">
-          {/* Base Layer Switcher */}
-          <div className="bg-[#222950] border border-[#587ebb]/40 rounded-md p-0.5 flex items-center">
+        {/* Layer Controls: Water Layers on Left, Optical Basemap on Right */}
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono w-full">
+          {/* Left: SAR Water Classification Layers */}
+          <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => setBaseLayer('satellite')}
-              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded font-medium transition-colors cursor-pointer text-[11px] sm:text-xs ${
-                baseLayer === 'satellite' ? 'bg-[#3b4a8c] text-[#c6e9f1] font-medium shadow-xs' : 'text-[#87b8e8] hover:text-white'
+              onClick={() => setShowInundationLayer(!showInundationLayer)}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded border uppercase tracking-wider text-xs transition-colors cursor-pointer ${
+                showInundationLayer
+                  ? 'bg-white text-black border-white font-bold'
+                  : 'box-inner text-[#e5e5e5]/70 hover:text-white'
               }`}
             >
-              Satellite
+              <span className={`w-2 h-2 rounded-full ${showInundationLayer ? 'bg-[#0096c7]' : 'bg-[#e5e5e5]/40'}`}></span>
+              <span>{isMajuli ? 'Water Layer' : isBarpeta ? 'Change Vectors' : 'Flood Overlay'}</span>
             </button>
-            <button
-              onClick={() => setBaseLayer('street')}
-              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded font-medium transition-colors cursor-pointer text-[11px] sm:text-xs ${
-                baseLayer === 'street' ? 'bg-[#3b4a8c] text-[#c6e9f1] font-medium shadow-xs' : 'text-[#87b8e8] hover:text-white'
-              }`}
-            >
-              Streets
-            </button>
-            <button
-              onClick={() => setBaseLayer('light')}
-              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded font-medium transition-colors cursor-pointer text-[11px] sm:text-xs ${
-                baseLayer === 'light' ? 'bg-[#3b4a8c] text-[#c6e9f1] font-medium shadow-xs' : 'text-[#87b8e8] hover:text-white'
-              }`}
-            >
-              Terrain
-            </button>
+
+            {isBarpeta && showInundationLayer && (
+              <div className="flex items-center gap-1.5 box-inner rounded p-0.5 text-xs">
+                <button
+                  onClick={() => setShowNewlyInundated(!showNewlyInundated)}
+                  className={`px-2.5 py-1 rounded uppercase tracking-wider font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+                    showNewlyInundated
+                      ? 'bg-white text-black font-bold'
+                      : 'text-[#e5e5e5]/60 hover:text-white'
+                  }`}
+                  title="Toggle Newly Inundated active floodwater expansion"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#38bdf8]"></span>
+                  <span>Flood (+2.34 km²)</span>
+                </button>
+                <button
+                  onClick={() => setShowPersistentWater(!showPersistentWater)}
+                  className={`px-2.5 py-1 rounded uppercase tracking-wider font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+                    showPersistentWater
+                      ? 'bg-white text-black font-bold'
+                      : 'text-[#e5e5e5]/60 hover:text-white'
+                  }`}
+                  title="Toggle Permanent baseline river channel"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#0077b6]"></span>
+                  <span>Channel (1.66 km²)</span>
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Toggle Flood Layer */}
-          <button
-            onClick={() => setShowInundationLayer(!showInundationLayer)}
-            className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 rounded-md border font-medium transition-colors cursor-pointer text-[11px] sm:text-xs ${
-              showInundationLayer
-                ? 'bg-[#3b4a8c] text-[#c6e9f1] border-[#587ebb]'
-                : 'bg-[#222950] text-[#87b8e8] border-[#3b4a8c]'
-            }`}
-          >
-            <span>{isMajuli ? 'NISAR Water Layer' : isBarpeta ? 'Change Vectors' : 'Flood Overlay'}</span>
-          </button>
-
-          {isBarpeta && showInundationLayer && (
-            <div className="flex items-center gap-1 bg-[#222950] border border-[#587ebb]/40 rounded-md p-0.5 text-[10px] sm:text-[11px]">
-              <button
-                onClick={() => setShowNewlyInundated(!showNewlyInundated)}
-                className={`px-2 py-0.5 rounded font-medium transition-colors cursor-pointer ${
-                  showNewlyInundated
-                    ? 'bg-[#E11D48] text-white font-semibold'
-                    : 'text-[#87b8e8] hover:text-white'
-                }`}
-                title="Toggle Newly Inundated active floodwater (+2.337 km²)"
-              >
-                ● Flood (+2.34 km²)
-              </button>
-              <button
-                onClick={() => setShowPersistentWater(!showPersistentWater)}
-                className={`px-2 py-0.5 rounded font-medium transition-colors cursor-pointer ${
-                  showPersistentWater
-                    ? 'bg-[#587ebb] text-white font-semibold'
-                    : 'text-[#87b8e8] hover:text-white'
-                }`}
-                title="Toggle Permanent braided river channel (1.660 km²)"
-              >
-                ● Channel (1.66 km²)
-              </button>
+          {/* Right: Optical Satellite Basemap Only */}
+          <div className="flex items-center gap-2.5 ml-auto">
+            <span className="text-xs text-[#e5e5e5]/70 uppercase tracking-wider font-mono hidden sm:inline">Basemap:</span>
+            <div className="box-inner rounded px-3 py-1 flex items-center gap-2 text-xs font-mono uppercase tracking-wider border border-[var(--border-outer)] shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.7)] shrink-0"></span>
+              <span className="text-white font-semibold tracking-wider">Optical Satellite</span>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
       {/* Leaflet Map */}
-      <div className="w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[560px] rounded-lg overflow-hidden border border-[#587ebb]/50 relative z-10 shadow-inner">
+      <div className="w-full h-[340px] sm:h-[400px] md:h-[450px] lg:h-[480px] rounded overflow-hidden border border-[#e5e5e5]/15 relative z-10 shadow-inner">
         <MapContainer
           center={centerCoords}
           zoom={region.zoom || 11}
@@ -371,9 +363,9 @@ export default function MapViewer({
               key={`majuli-real-water-${layerOpacity}`}
               data={majuliGeoJson}
               style={() => ({
-                color: '#0284c7',
+                color: '#ffffff',
                 weight: 0.8,
-                fillColor: '#00d2ff',
+                fillColor: '#0096c7',
                 fillOpacity: layerOpacity,
               })}
               onEachFeature={(feature, layer) => {
@@ -381,12 +373,12 @@ export default function MapViewer({
                 const areaHa = props.area_ha ? props.area_ha.toFixed(2) : (props.area_m2 ? (props.area_m2 / 10000).toFixed(2) : 'N/A');
                 const areaKm2 = props.area_km2 ? props.area_km2.toFixed(4) : (props.area_m2 ? (props.area_m2 / 1e6).toFixed(4) : 'N/A');
                 layer.bindTooltip(
-                  `<div class="p-1 font-sans text-xs text-slate-900 leading-snug">
-                    <strong class="text-sky-900 flex items-center gap-1">
+                  `<div class="p-1 font-mono text-xs text-white bg-black border border-[#38bdf8] leading-snug">
+                    <strong class="text-[#38bdf8] flex items-center gap-1">
                       <span>NISAR Water Feature #${props.feature_id || ''}</span>
                     </strong>
                     <div class="mt-0.5">Area: <strong>${areaHa} ha</strong> (${areaKm2} km²)</div>
-                    <div class="text-[10px] text-sky-700 font-mono mt-0.5">Track 015 / Frame 3700 • HHHH Single-Pol</div>
+                    <div class="text-[10px] text-[#e5e5e5]/60 mt-0.5">Track 015 / Frame 3700 • HHHH Single-Pol</div>
                   </div>`,
                   { sticky: true }
                 );
@@ -414,24 +406,24 @@ export default function MapViewer({
 
                 if (isNew) {
                   return {
-                    color: '#e11d48',
-                    weight: 2,
-                    fillColor: '#f43f5e',
+                    color: '#ffffff',
+                    weight: 1.5,
+                    fillColor: '#38bdf8',
                     fillOpacity: layerOpacity,
                   };
                 }
                 if (isPersistent) {
                   return {
-                    color: '#0284c7',
-                    weight: 2,
-                    fillColor: '#00d2ff',
+                    color: '#ffffff',
+                    weight: 1.2,
+                    fillColor: '#0077b6',
                     fillOpacity: layerOpacity,
                   };
                 }
                 return {
-                  color: '#d97706',
+                  color: '#e5e5e5',
                   weight: 1.5,
-                  fillColor: '#f59e0b',
+                  fillColor: '#a3a3a3',
                   fillOpacity: layerOpacity,
                 };
               }}
@@ -442,18 +434,18 @@ export default function MapViewer({
                 const areaHa = p.area_ha ? p.area_ha.toFixed(1) : (p.area_m2 ? (p.area_m2 / 10000).toFixed(1) : 'N/A');
 
                 layer.bindTooltip(
-                  `<div class="p-1 font-sans text-xs text-slate-900 leading-snug">
-                    <strong style="color: ${p.class_code === 2 ? '#e11d48' : '#0284c7'}">${className}</strong>
+                  `<div class="p-1 font-mono text-xs text-white bg-black border border-[#e5e5e5]/20 leading-snug">
+                    <strong style="color: ${p.class_code === 2 ? '#38bdf8' : '#60a5fa'}">${className}</strong>
                     <div class="mt-0.5">Area: <strong>${areaKm2} km²</strong> (${areaHa} ha)</div>
-                    <div class="text-[10px] text-slate-600 font-mono mt-0.5">Track 019 / Frame 075 • 12-Day Interval</div>
+                    <div class="text-[10px] text-[#e5e5e5]/60 mt-0.5">Track 019 / Frame 075</div>
                   </div>`,
                   { sticky: true }
                 );
 
                 layer.bindPopup(
-                  `<div class="text-xs text-slate-900 p-1 font-sans">
-                    <h4 class="font-bold" style="color: ${p.class_code === 2 ? '#e11d48' : '#0284c7'}">${className}</h4>
-                    <div class="text-slate-600 text-[11px] mt-1">
+                  `<div class="text-xs text-[#e5e5e5] bg-black p-2 font-mono border border-[#e5e5e5]/20">
+                    <h4 class="font-bold" style="color: ${p.class_code === 2 ? '#38bdf8' : '#60a5fa'}">${className}</h4>
+                    <div class="text-[#e5e5e5]/70 text-[11px] mt-1">
                       Feature ID: #${p.feature_id || 'N/A'}<br/>
                       Area: <strong>${areaKm2} km²</strong> (${areaHa} hectares)<br/>
                       Interval: 27 June ➔ 09 July 2026 (12 Days)<br/>
@@ -548,10 +540,10 @@ export default function MapViewer({
             ))}
         </MapContainer>
 
-        {/* Floating Opacity Slider */}
+        {/* Floating Opacity Slider (Positioned at top-right to keep zoom controls separate) */}
         {showInundationLayer && (
-          <div className="absolute top-3 left-3 bg-[#1a1f3d]/90 border border-[#587ebb]/50 rounded-lg p-2 text-xs text-[#c6e9f1] font-sans z-[1000] backdrop-blur-md flex items-center gap-2 shadow-lg">
-            <span className="text-[11px] text-[#87b8e8] font-medium">Opacity:</span>
+          <div className="absolute top-3 right-3 box-inner rounded p-2 text-xs text-[#e5e5e5] font-mono z-[1000] backdrop-blur-md flex items-center gap-2 shadow-lg border border-[var(--border-outer)]">
+            <span className="text-[10px] text-[#e5e5e5]/60 uppercase tracking-wider">Opacity:</span>
             <input
               type="range"
               min="0.2"
@@ -559,20 +551,20 @@ export default function MapViewer({
               step="0.05"
               value={layerOpacity}
               onChange={(e) => setLayerOpacity(parseFloat(e.target.value))}
-              className="w-20 h-1 bg-[#222950] rounded-lg appearance-none cursor-pointer accent-[#87b8e8]"
+              className="w-20 h-1 bg-black rounded appearance-none cursor-pointer accent-[#38bdf8]"
             />
-            <span className="font-mono text-[10px] text-[#c6e9f1] font-semibold">{Math.round(layerOpacity * 100)}%</span>
+            <span className="text-[10px] text-[#38bdf8] font-bold">{Math.round(layerOpacity * 100)}%</span>
           </div>
         )}
 
         {/* Loading Overlay */}
         {((isMajuli && loadingMajuli) || (isBarpeta && loadingBarpeta)) && (
-          <div className="absolute inset-0 bg-[#1a1f3d]/85 backdrop-blur-sm z-[1000] flex flex-col items-center justify-center p-6 text-center">
-            <Loader2 className="w-8 h-8 text-[#87b8e8] animate-spin mb-3" />
-            <span className="text-sm font-semibold text-[#c6e9f1]">
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-[1000] flex flex-col items-center justify-center p-6 text-center">
+            <Loader2 className="w-8 h-8 text-[#fca311] animate-spin mb-3" />
+            <span className="text-base font-editorial text-white">
               {isMajuli ? 'Rendering 13,821 Classified Water Polygons...' : 'Rendering Barpeta Flood Change Vectors...'}
             </span>
-            <span className="text-xs text-[#87b8e8] font-mono mt-1">
+            <span className="text-xs text-[#fca311] font-mono mt-1">
               {isMajuli
                 ? 'Track 015 / Frame 3700 • 797.55 km² Water Extent'
                 : 'Track 019 / Frame 075 • +140.77% Water Area Increase'}
@@ -580,64 +572,8 @@ export default function MapViewer({
           </div>
         )}
 
-        {/* Floating Real Majuli Scientific Legend */}
-        {isMajuli && !loadingMajuli && (
-          <div className="absolute bottom-8 right-3 bg-[#1a1f3d]/95 border border-[#587ebb]/60 rounded-xl p-3 text-xs text-[#c6e9f1] z-[1000] shadow-xl backdrop-blur-md max-w-xs space-y-1.5 font-sans pointer-events-auto">
-            <div className="flex items-center justify-between pb-1.5 border-b border-[#3b4a8c]/50">
-              <span className="text-[#87b8e8] font-semibold">Verified NISAR Water Extent</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#222950] text-[#c6e9f1] border border-[#587ebb]/50 font-semibold">
-                Track 015
-              </span>
-            </div>
-            <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-slate-400">Water Extent:</span>
-              <span className="text-[#87b8e8] font-semibold">797.55 km²</span>
-            </div>
-            <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-slate-400">Water Polygons:</span>
-              <span className="text-[#c6e9f1] font-semibold">13,821 Features</span>
-            </div>
-            <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-slate-400">Swath Coverage:</span>
-              <span className="text-[#c6e9f1] font-semibold">8.91% of 8,955.16 km²</span>
-            </div>
-            <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-slate-400">Observation Date:</span>
-              <span className="text-slate-300">2026-08-27</span>
-            </div>
-          </div>
-        )}
-
-        {/* Floating Real Barpeta Scientific Legend */}
-        {isBarpeta && !loadingBarpeta && (
-          <div className="absolute bottom-8 right-3 bg-[#1a1f3d]/95 border border-[#587ebb]/60 rounded-xl p-3 text-xs text-[#c6e9f1] z-[1000] shadow-xl backdrop-blur-md max-w-xs space-y-1.5 font-sans pointer-events-auto">
-            <div className="flex items-center justify-between pb-1.5 border-b border-[#3b4a8c]/50">
-              <span className="text-[#f43f5e] font-semibold">Water Area Change (+140.77%)</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#222950] text-[#c6e9f1] border border-[#587ebb]/50 font-semibold">
-                Track 019
-              </span>
-            </div>
-            <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-slate-400">Baseline (27 Jun):</span>
-              <span className="text-[#87b8e8] font-semibold">1.660 km²</span>
-            </div>
-            <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-slate-400">Event (09 Jul):</span>
-              <span className="text-[#f43f5e] font-semibold">3.997 km²</span>
-            </div>
-            <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-slate-400">Newly Inundated:</span>
-              <span className="text-[#f43f5e] font-semibold">+2.337 km²</span>
-            </div>
-            <div className="text-[11px] font-mono flex items-center justify-between">
-              <span className="text-slate-400">Persistent Channel:</span>
-              <span className="text-[#87b8e8] font-semibold">1.660 km²</span>
-            </div>
-          </div>
-        )}
-
         {/* Floating Telemetry Badge */}
-        <div className="absolute bottom-2 left-2 bg-[#1a1f3d]/90 border border-[#587ebb]/50 rounded-md px-2.5 py-1 text-[10px] text-[#c6e9f1] font-mono z-[1000] backdrop-blur-md pointer-events-none shadow-md">
+        <div className="absolute bottom-2 left-2 box-inner rounded px-2.5 py-1 text-[10px] text-[#e5e5e5]/80 font-mono z-[1000] backdrop-blur-md pointer-events-none shadow-sm uppercase tracking-wider">
           {isMajuli
             ? 'NISAR Track 015 / Frame 3700 • UTM Zone 46N (EPSG:32646) • Pixel: 10 m • 8,955.16 km² Swath'
             : isBarpeta
@@ -645,6 +581,80 @@ export default function MapViewer({
             : 'NISAR Track 019 / Frame 075 • UTM Zone 46N (EPSG:32646) • Pixel: 25 m • 240 km Swath'}
         </div>
       </div>
+
+      {/* Separate Scientific Information Panel Below Map (Kept separate so it does NOT obstruct the map image) */}
+      {isBarpeta && !loadingBarpeta && (
+        <div className="mt-3 p-3 rounded box-inner border border-[var(--border-outer)] space-y-2.5 font-mono">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--border-outer)]">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#38bdf8]"></span>
+              <span className="text-white uppercase tracking-wider font-semibold text-xs">
+                SAR Multi-Temporal Flood Matrix
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#e5e5e5]/80">Water Inundation Surge:</span>
+              <span className="text-[#38bdf8] font-bold text-sm">{barpetaPctText}</span>
+              <span className="text-xs px-2 py-0.5 rounded box-inner text-[#38bdf8] border border-[#38bdf8]/40 font-semibold ml-1">
+                Track 019
+              </span>
+            </div>
+          </div>
+
+          {/* Two Separate Stage Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div className="flex items-start gap-2.5 p-2.5 rounded bg-black/40 border border-[var(--border-outer)]">
+              <span className="w-3.5 h-3.5 rounded bg-[#0077b6] border border-white shrink-0 mt-0.5"></span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-semibold text-xs">Stage 1: Pre-Flood Channel</span>
+                  <span className="text-white font-bold ml-1 text-xs">1.66 km²</span>
+                </div>
+                <span className="text-xs text-[#e5e5e5]/60 block mt-0.5">
+                  Baseline normal riverbed (27 June)
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2.5 p-2.5 rounded bg-[#38bdf8]/5 border border-[#38bdf8]/30">
+              <span className="w-3.5 h-3.5 rounded bg-[#38bdf8] border border-white shrink-0 mt-0.5"></span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[#38bdf8] font-semibold text-xs">Stage 2: Flood Expansion</span>
+                  <span className="text-[#38bdf8] font-bold ml-1 text-xs">+2.34 km²</span>
+                </div>
+                <span className="text-xs text-[#38bdf8]/80 block mt-0.5">
+                  Submerged farmland & chars (09 July)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-xs text-[#e5e5e5]/70 pt-1.5 border-t border-[var(--border-outer)]/40 flex flex-wrap items-center justify-between gap-2">
+            <span>Deep Blue = River Channel • Light Blue = Submerged Land (+140.77% surge)</span>
+          </div>
+        </div>
+      )}
+
+      {/* Separate Scientific Information Panel Below Map (Majuli) */}
+      {isMajuli && !loadingMajuli && (
+        <div className="mt-3 p-3 rounded box-inner border border-[var(--border-outer)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
+          <div className="flex items-center gap-2.5">
+            <span className="w-3.5 h-3.5 rounded bg-[#0096c7] border border-white shrink-0"></span>
+            <div>
+              <span className="text-white font-semibold text-sm">Classified Water Extent</span>
+              <span className="text-xs text-[#e5e5e5]/70 block">13,821 Extracted Vector Polygons (10m Resolution)</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-[#e5e5e5]/70">Total Water Area:</span>
+            <span className="text-[#38bdf8] font-bold text-base">797.55 km²</span>
+            <span className="text-xs px-2.5 py-0.5 rounded box-inner text-[#38bdf8] border border-[#38bdf8]/40 font-semibold">
+              Track 015 / Frame 3700
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

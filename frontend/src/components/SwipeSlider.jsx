@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Eye, MoveHorizontal, SlidersHorizontal, Sparkles, Layers, Crosshair, HelpCircle } from 'lucide-react';
-import { playBackscatterProbeTone } from '../utils/audio';
 
 export default function SwipeSlider({
   comparisonData,
@@ -38,7 +37,8 @@ export default function SwipeSlider({
         for (let x = 0; x < dim; x++) {
           const idx = (y * dim + x) * 4;
           const val = dbToGray(baseline_hh_db[y][x]);
-          imgData.data[idx] = Math.floor(val * 0.7);
+          // Clean monochrome SAR backscatter
+          imgData.data[idx] = Math.floor(val * 0.85);
           imgData.data[idx + 1] = Math.floor(val * 0.9);
           imgData.data[idx + 2] = val;
           imgData.data[idx + 3] = 255;
@@ -58,48 +58,48 @@ export default function SwipeSlider({
 
           if (viewMode === 'radar_vs_radar') {
             const val = dbToGray(event_hh_db[y][x]);
-            imgData.data[idx] = Math.floor(val * 0.7);
+            imgData.data[idx] = Math.floor(val * 0.85);
             imgData.data[idx + 1] = Math.floor(val * 0.9);
             imgData.data[idx + 2] = val;
             imgData.data[idx + 3] = 255;
           } else {
             const cls = classification_mask[y][x];
             if (cls === 1) {
-              // Permanent Water (Deep Sapphire Blue)
-              imgData.data[idx] = 16;
-              imgData.data[idx + 1] = 64;
-              imgData.data[idx + 2] = 180;
-              imgData.data[idx + 3] = 240;
+              // Permanent Water (Deep Channel Blue #0077b6)
+              imgData.data[idx] = 0;
+              imgData.data[idx + 1] = 119;
+              imgData.data[idx + 2] = 182;
+              imgData.data[idx + 3] = 255;
             } else if (cls === 2) {
-              // Confirmed Open Inundation (Crimson Red)
-              imgData.data[idx] = 244;
-              imgData.data[idx + 1] = 40;
-              imgData.data[idx + 2] = 75;
-              imgData.data[idx + 3] = 250;
+              // Confirmed Open Inundation (Light Water Blue #38bdf8)
+              imgData.data[idx] = 56;
+              imgData.data[idx + 1] = 189;
+              imgData.data[idx + 2] = 248;
+              imgData.data[idx + 3] = 255;
             } else if (cls === 3) {
-              // Marginal Inundation / Saturated Soil (Amber)
-              imgData.data[idx] = 245;
-              imgData.data[idx + 1] = 158;
-              imgData.data[idx + 2] = 11;
-              imgData.data[idx + 3] = 210;
+              // Marginal Inundation / Saturated Soil (Warm Orange Tint)
+              imgData.data[idx] = 200;
+              imgData.data[idx + 1] = 130;
+              imgData.data[idx + 2] = 20;
+              imgData.data[idx + 3] = 220;
             } else if (cls === 4) {
-              // Flooded Emergent Vegetation (Emerald)
-              imgData.data[idx] = 16;
-              imgData.data[idx + 1] = 185;
-              imgData.data[idx + 2] = 129;
+              // Flooded Emergent Vegetation (Bright Signal Orange-White)
+              imgData.data[idx] = 255;
+              imgData.data[idx + 1] = 200;
+              imgData.data[idx + 2] = 80;
               imgData.data[idx + 3] = 240;
             } else if (cls === 5) {
-              // Receded Water
-              imgData.data[idx] = 168;
-              imgData.data[idx + 1] = 85;
-              imgData.data[idx + 2] = 247;
-              imgData.data[idx + 3] = 220;
+              // Receded Water (Muted Alabaster)
+              imgData.data[idx] = 180;
+              imgData.data[idx + 1] = 180;
+              imgData.data[idx + 2] = 180;
+              imgData.data[idx + 3] = 200;
             } else {
-              // Stable Land
-              const val = Math.floor(dbToGray(event_hh_db[y][x]) * 0.45);
-              imgData.data[idx] = val + 15;
-              imgData.data[idx + 1] = val + 20;
-              imgData.data[idx + 2] = val + 25;
+              // Stable Land (Dark radar floor)
+              const val = Math.floor(dbToGray(event_hh_db[y][x]) * 0.35);
+              imgData.data[idx] = val + 10;
+              imgData.data[idx + 1] = val + 12;
+              imgData.data[idx + 2] = val + 18;
               imgData.data[idx + 3] = 255;
             }
           }
@@ -162,11 +162,6 @@ export default function SwipeSlider({
         mechanism: mechanisms[cls] || 'Scattering',
         cls_code: cls
       });
-
-      // Subtle acoustic pitch representing decibel return
-      if (Math.random() < 0.25) {
-        playBackscatterProbeTone(event_hh_db[pxY][pxX]);
-      }
     }
   };
 
@@ -177,42 +172,39 @@ export default function SwipeSlider({
   };
 
   return (
-    <div className="bg-[#1a1f3d] rounded-xl border border-[#587ebb]/40 p-4 shadow-lg flex flex-col justify-between">
+    <div className="card-outer rounded p-4 shadow-sm flex flex-col justify-between">
       {/* Header & Controls */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-[#222950] border border-[#587ebb]/50 flex items-center justify-center text-[#87b8e8]">
-            <MoveHorizontal className="w-3.5 h-3.5" />
-          </div>
-          <h3 className="text-sm font-semibold text-white">
-            Interactive Curtain Swipe Comparator
+          <h3 className="text-sm font-editorial tracking-wide text-white">
+            Curtain Swipe Comparator
           </h3>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#222950] text-[#87b8e8] border border-[#3b4a8c] font-medium">
-            12-day interval
+          <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded box-inner text-[#fca311] font-medium">
+            12-day repeat pass
           </span>
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center gap-1 bg-[#222950] p-0.5 rounded-lg border border-[#587ebb]/40 text-xs font-medium">
+        <div className="flex items-center gap-1 box-inner p-0.5 rounded text-xs font-mono uppercase tracking-wider">
           <button
             onClick={() => setViewMode('radar_vs_flood')}
-            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
+            className={`px-3 py-1 rounded transition-colors cursor-pointer ${
               viewMode === 'radar_vs_flood'
-                ? 'bg-[#3b4a8c] text-white font-medium shadow-xs'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-[#fca311] text-black font-semibold'
+                : 'text-[#e5e5e5]/70 hover:text-white'
             }`}
           >
-            Baseline SAR vs Inundation Map
+            Baseline SAR vs Inundation
           </button>
           <button
             onClick={() => setViewMode('radar_vs_radar')}
-            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
+            className={`px-3 py-1 rounded transition-colors cursor-pointer ${
               viewMode === 'radar_vs_radar'
-                ? 'bg-[#3b4a8c] text-white font-medium shadow-xs'
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-[#fca311] text-black font-semibold'
+                : 'text-[#e5e5e5]/70 hover:text-white'
             }`}
           >
-            Direct SAR Backscatter (HH dB)
+            Direct SAR Backscatter (dB)
           </button>
         </div>
       </div>
@@ -228,7 +220,7 @@ export default function SwipeSlider({
         onTouchEnd={() => { setIsDragging(false); setHoveredPixel(null); }}
         onTouchCancel={() => { setIsDragging(false); setHoveredPixel(null); }}
         onTouchMove={handleTouchMove}
-        className="relative w-full aspect-[4/3] sm:aspect-video md:aspect-[2/1] rounded-lg overflow-hidden border border-[#587ebb]/50 bg-[#1a1f3d] cursor-col-resize select-none shadow-inner"
+        className="relative w-full aspect-[4/3] sm:aspect-video md:aspect-[2/1] rounded overflow-hidden border border-[#e5e5e5]/20 bg-black cursor-col-resize select-none"
         style={{ touchAction: 'none' }}
       >
         {/* Right Canvas (Event Scene / Inundation) */}
@@ -239,8 +231,9 @@ export default function SwipeSlider({
             height={120}
             className="w-full h-full object-cover image-rendering-pixelated"
           />
-          <div className="absolute top-3 right-3 bg-[#1C2541]/90 text-[#E11D48] text-xs px-2.5 py-1 rounded-md font-mono border border-[#3A506B]/70 shadow-md backdrop-blur-md pointer-events-none font-semibold">
-            {viewMode === 'radar_vs_flood' ? 'After: Flood Map' : `After: ${eventDate}`}
+          <div className="absolute top-3 right-3 bg-black/90 text-[#38bdf8] text-xs px-2.5 py-1 rounded font-mono border border-[#38bdf8]/40 backdrop-blur-md pointer-events-none font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
+            <span className="w-2 h-2 rounded-full bg-[#38bdf8]"></span>
+            <span>{viewMode === 'radar_vs_flood' ? `After: Flood Extent (${eventDate || '09 Jul'} • 4.00 km²)` : `Event SAR: ${eventDate}`}</span>
           </div>
         </div>
 
@@ -257,91 +250,121 @@ export default function SwipeSlider({
               className="w-full h-full object-cover image-rendering-pixelated"
             />
           </div>
-          <div className="absolute top-3 left-3 bg-[#1C2541]/90 text-[#6FFFE9] text-xs px-2.5 py-1 rounded-md font-mono border border-[#3A506B]/70 shadow-md backdrop-blur-md pointer-events-none font-semibold">
-            Before: {baselineDate}
+          <div className="absolute top-3 left-3 bg-black/90 text-white text-xs px-2.5 py-1 rounded font-mono border border-white/30 backdrop-blur-md pointer-events-none font-semibold uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
+            <span className="w-2 h-2 rounded-full bg-[#0077b6] border border-white"></span>
+            <span>Before: Baseline SAR ({baselineDate || '27 Jun'} • 1.66 km²)</span>
           </div>
         </div>
 
         {/* Slider Divider Bar */}
         <div
-          className="absolute top-0 bottom-0 w-0.5 bg-[#5BC0BE] cursor-col-resize"
+          className="absolute top-0 bottom-0 w-[2px] bg-[#fca311] cursor-col-resize"
           style={{ left: `${sliderPosition}%` }}
         >
-          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-[#1C2541] border-2 border-[#5BC0BE] flex items-center justify-center text-[#6FFFE9] shadow-lg">
-            <MoveHorizontal className="w-3.5 h-3.5" />
+          <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-black border-2 border-[#fca311] flex items-center justify-center text-[#fca311] shadow-md">
+            <MoveHorizontal className="w-3 h-3" />
           </div>
         </div>
       </div>
 
       {/* Live Pixel Probe & Value Inspector */}
       {hoveredPixel && (
-        <div className="mt-2.5 bg-[#0B132B]/80 border border-[#3A506B]/60 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
+        <div className="mt-2.5 box-inner rounded p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
-            <Crosshair className="w-4 h-4 text-[#5BC0BE] animate-spin" />
-            <span className="font-mono text-[#F4F6F8] font-semibold">
+            <Crosshair className="w-4 h-4 text-[#fca311]" />
+            <span className="font-mono text-[#e5e5e5] font-semibold">
               Pixel [{hoveredPixel.x}, {hoveredPixel.y}]:
             </span>
             <span
-              className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
+              className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider ${
                 hoveredPixel.cls_code === 2
-                  ? 'bg-rose-950/70 text-[#E11D48] border border-rose-800'
-                  : hoveredPixel.cls_code === 4
-                  ? 'bg-emerald-950/70 text-emerald-400 border border-emerald-800'
+                  ? 'box-inner text-[#fca311] border border-[#fca311]'
                   : hoveredPixel.cls_code === 1
-                  ? 'bg-sky-950/70 text-[#06B6D4] border border-sky-800'
-                  : 'bg-[#24314D] text-slate-300 border border-[#3A506B]'
+                  ? 'card-outer text-white'
+                  : 'box-inner text-[#e5e5e5]/70'
               }`}
             >
               {hoveredPixel.class_name}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-[11px] text-slate-300">
-            <span>Before: <strong className="text-[#F4F6F8]">{hoveredPixel.base_db.toFixed(1)} dB</strong></span>
-            <span>After: <strong className="text-[#F4F6F8]">{hoveredPixel.event_db.toFixed(1)} dB</strong></span>
-            <span className={hoveredPixel.delta_db < 0 ? 'text-[#E11D48] font-bold' : 'text-emerald-400 font-bold'}>
+          <div className="flex items-center gap-3 font-mono text-[11px] text-[#e5e5e5]/80">
+            <span>Before: <strong className="text-white">{hoveredPixel.base_db.toFixed(1)} dB</strong></span>
+            <span>After: <strong className="text-white">{hoveredPixel.event_db.toFixed(1)} dB</strong></span>
+            <span className={hoveredPixel.delta_db < 0 ? 'text-[#fca311] font-bold' : 'text-white font-bold'}>
               Δ: {hoveredPixel.delta_db > 0 ? '+' : ''}{hoveredPixel.delta_db.toFixed(1)} dB
             </span>
           </div>
         </div>
       )}
 
-      {/* Legend & Instructions */}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-[#F4F6F8] font-medium">Map Legend:</span>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-xs bg-[#06B6D4]"></span>
-            <span className="text-slate-300">Permanent Channel (1.66 km²)</span>
+      {/* Two-Stage Water Progression Guide & Scientific Legend */}
+      <div className="mt-3 space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono">
+          <div className="p-2.5 rounded box-inner border border-[var(--border-outer)] flex items-center justify-between shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="w-3.5 h-3.5 rounded bg-[#0077b6] border border-white shrink-0 shadow-xs"></span>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-white font-semibold text-xs">Stage 1: Pre-Flood Channel</span>
+                  <span className="text-[11px] px-1.5 py-0.2 rounded bg-black/60 text-[#e5e5e5]/80 border border-[var(--border-outer)] font-semibold">BEFORE</span>
+                </div>
+                <span className="text-xs text-[#e5e5e5]/70 block mt-0.5">Normal dry riverbed flow (Baseline: 27 June)</span>
+              </div>
+            </div>
+            <div className="text-right shrink-0 ml-2">
+              <span className="text-white font-bold text-sm block">1.66 km²</span>
+              <span className="text-xs text-[#e5e5e5]/60">Baseline Water</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-xs bg-[#E11D48]"></span>
-            <span className="text-[#E11D48] font-semibold">Newly Inundated (+2.34 km²)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-xs bg-[#64748B]"></span>
-            <span className="text-slate-300">Stable Land</span>
+
+          <div className="p-2.5 rounded box-inner border border-[#38bdf8]/40 bg-[#38bdf8]/5 flex items-center justify-between shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="w-3.5 h-3.5 rounded bg-[#38bdf8] border border-white shrink-0 shadow-xs"></span>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[#38bdf8] font-semibold text-xs">Stage 2: Flood Inundation</span>
+                  <span className="text-[11px] px-1.5 py-0.2 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 font-bold">AFTER</span>
+                </div>
+                <span className="text-xs text-[#e5e5e5]/70 block mt-0.5">Overflowed & submerged land (Event: 09 July)</span>
+              </div>
+            </div>
+            <div className="text-right shrink-0 ml-2">
+              <span className="text-[#38bdf8] font-bold text-sm block">+2.34 km²</span>
+              <span className="text-xs text-[#38bdf8] font-semibold">+140.77% Surge</span>
+            </div>
           </div>
         </div>
 
-        <div className="text-[11px] text-slate-400 italic">
-          💡 Drag slider to compare • Hover over pixels to inspect decibels
+        <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-xs font-mono text-[#e5e5e5]/70">
+          <div className="flex items-center gap-3">
+            <span className="text-white font-medium">Map Legend:</span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#0077b6] border border-white"></span> Deep Blue = River Channel
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#38bdf8] border border-white"></span> Light Blue = Submerged Land
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Barpeta Verified Mathematical Proof Banner */}
       {(comparisonData?.region?.id === 'barpeta' || comparisonData?.statistics?.percentage_change === 140.77) && (
-        <div className="mt-3 p-2.5 rounded-lg bg-[#0B132B]/60 border border-[#3A506B]/50 text-xs font-mono text-slate-300 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-md bg-rose-950/70 text-[#E11D48] border border-rose-800 font-semibold text-[10px] uppercase">
-              Calculation
+        <div className="mt-2.5 p-2.5 rounded box-inner border border-[var(--border-outer)] text-xs font-mono text-[#e5e5e5]/80 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded box-inner text-[#fca311] border border-[#fca311]/40 font-semibold text-xs uppercase tracking-wider">
+              Verification Proof
             </span>
-            <span className="text-slate-300">
-              ((3.997 km² After - 1.660 km² Before) / 1.660 km²) × 100 = <strong className="text-[#E11D48] font-bold">+140.77%</strong>
+            <span className="text-xs">
+              ((3.997 km² After - 1.660 km² Before) / 1.660 km²) × 100 = <strong className="text-[#38bdf8] font-bold">+140.77%</strong>
+            </span>
+            <span className="text-[#e5e5e5]/60 text-xs hidden sm:inline">
+              (Total Flood Water: <strong>3.997 km²</strong>)
             </span>
           </div>
-          <div className="text-[10px] text-slate-400 font-mono">
-            Track 019 / Frame 075 • Evaluated corridor: 9.152 km²
+          <div className="text-xs text-[#e5e5e5]/60 font-mono uppercase tracking-widest font-medium">
+            Track 019 / Frame 075 • Corridor: 9.152 km²
           </div>
         </div>
       )}
