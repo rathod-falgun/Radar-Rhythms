@@ -32,12 +32,14 @@ export default function HDF5Inspector({ dateStr }) {
   const handleSearchBhoonidhi = async () => {
     setSearchingScenes(true);
     setSearchResults(null);
+    const isBhoonidhi = Boolean(bhoonidhiStatus?.configured);
+    const targetCollection = isBhoonidhi ? 'NISAR_SSAR_GCOV' : 'NISAR_L2_GCOV_PROVISIONAL_V1';
     try {
       const res = await fetch(apiUrl('/api/nisar/scenes'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          collection: 'NISAR_SSAR_GCOV',
+          collection: targetCollection,
           bbox: [93.60, 26.50, 94.60, 27.30],
           start_date: '2026-07-01T00:00:00Z',
           end_date: '2026-09-30T23:59:59Z'
@@ -46,8 +48,8 @@ export default function HDF5Inspector({ dateStr }) {
       const data = await res.json();
       setSearchResults(data);
     } catch (err) {
-      console.error('Failed to search Bhoonidhi scenes:', err);
-      setSearchResults({ error: 'Network error calling backend Bhoonidhi scene search' });
+      console.error('Failed to search satellite scenes:', err);
+      setSearchResults({ error: 'Network error calling backend satellite scene search' });
     } finally {
       setSearchingScenes(false);
     }
@@ -139,22 +141,26 @@ export default function HDF5Inspector({ dateStr }) {
             </div>
           </div>
 
-          {/* ISRO Bhoonidhi Satellite API Integration Bar */}
+          {/* Satellite API Integration Bar */}
           <div className="box-inner rounded p-3.5 text-[11px] space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2 flex-wrap">
                 <Satellite className="w-4 h-4 text-[#fca311]" />
-                <span className="font-editorial text-white text-xs">ISRO Bhoonidhi Satellite Query:</span>
+                <span className="font-editorial text-white text-xs">
+                  {bhoonidhiStatus?.configured ? 'ISRO Bhoonidhi Satellite Query:' : 'NASA Earthdata CMR Satellite Query:'}
+                </span>
                 {bhoonidhiStatus?.configured ? (
                   <span className="px-2 py-0.5 rounded card-outer text-[#fca311] font-mono text-[9px] uppercase tracking-wider">
-                    Configured ({bhoonidhiStatus.auth_status})
+                    Bhoonidhi Configured ({bhoonidhiStatus.auth_status})
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded card-outer text-white/70 font-mono text-[9px] uppercase tracking-wider">
-                    Awaiting Credentials
+                  <span className="px-2 py-0.5 rounded card-outer text-emerald-400 font-mono text-[9px] uppercase tracking-wider">
+                    CMR Open Access (Free)
                   </span>
                 )}
-                <span className="text-[#e5e5e5]/50 font-mono text-[10px]">Collection: NISAR_SSAR_GCOV</span>
+                <span className="text-[#e5e5e5]/50 font-mono text-[10px]">
+                  Collection: {bhoonidhiStatus?.configured ? 'NISAR_SSAR_GCOV' : 'NISAR_L2_GCOV_PROVISIONAL_V1'}
+                </span>
               </div>
 
               <button
@@ -163,7 +169,7 @@ export default function HDF5Inspector({ dateStr }) {
                 className="px-3.5 py-1.5 rounded bg-[#fca311] hover:bg-white text-black font-semibold flex items-center gap-1.5 transition-colors text-xs font-mono uppercase tracking-wider cursor-pointer"
               >
                 {searchingScenes ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
-                <span>{searchingScenes ? 'Querying STAC...' : 'Query Majuli Scenes'}</span>
+                <span>{searchingScenes ? 'Querying Catalog...' : 'Query Majuli Scenes'}</span>
               </button>
             </div>
 
@@ -178,9 +184,14 @@ export default function HDF5Inspector({ dateStr }) {
                     <div className="text-[#fca311] font-bold">
                       ✓ {searchResults.message} (Total: {searchResults.total_scenes})
                     </div>
-                    {searchResults.scenes?.slice(0, 2).map((s) => (
-                      <div key={s.id} className="text-[#e5e5e5]/70 truncate">
-                        • <span className="text-white font-medium">{s.id}</span> ({s.datetime || 'N/A'})
+                    {searchResults.scenes?.slice(0, 3).map((s) => (
+                      <div key={s.id} className="text-[#e5e5e5]/70 truncate flex items-center gap-1.5 flex-wrap">
+                        <span>•</span>
+                        <span className="text-white font-medium">{s.id}</span>
+                        <span className="text-[#e5e5e5]/50">({s.datetime || 'N/A'})</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded border border-[var(--card-border)] text-[#fca311] font-mono">
+                          {s.provider || (s.id?.includes('_S2_') || s.id?.includes('_SSAR_') ? 'ISRO S-band (Bhoonidhi)' : 'NASA L-band (CMR)')}
+                        </span>
                       </div>
                     ))}
                   </div>

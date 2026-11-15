@@ -37,6 +37,7 @@ from ..services.bhoonidhi_service import (
     BhoonidhiRateLimitError,
     BhoonidhiAPIError
 )
+from ..services.cmr_service import cmr_service
 from ..services.bhoonidhi_stream import (
     BhoonidhiRangeStream,
     BhoonidhiStreamError,
@@ -132,6 +133,10 @@ class NISARSceneSearchRequest(BaseModel):
         le=500,
         description="Maximum scenes to retrieve per search"
     )
+    provider: Optional[str] = Field(
+        default=None,
+        description="Optional provider override: 'isro_bhoonidhi', 'nasa_cmr', or None (auto)"
+    )
 
 router = APIRouter()
 
@@ -163,9 +168,15 @@ def get_observations(
 
 @router.get("/observations/{date_str}")
 def get_observation_detail(date_str: str) -> Dict[str, Any]:
-    """Returns metadata for a specific acquisition date."""
+    """Returns metadata for a specific acquisition date, enriched with catalog provenance."""
     obs = get_observation_by_date(date_str)
-    return obs
+    if not obs:
+        raise HTTPException(status_code=404, detail=f"Observation for date '{date_str}' not found.")
+    enriched = dict(obs)
+    enriched["data_origin"] = "local_validated"
+    enriched["online_catalog_provider"] = "ISRO Bhoonidhi Satellite Portal" if bhoonidhi_service.is_configured() else "NASA Earthdata CMR"
+    enriched["remote_subset_capable"] = True
+    return enriched
 
 @router.get("/sar-grid")
 def get_sar_grid(
@@ -853,12 +864,24 @@ def get_all_reaches_summary(
 
 @router.get("/nisar/inspect")
 def inspect_nisar_product(
-    date_str: str = Query("2026-07-09", description="Observation date to inspect")
+    date_str: str = Query("2026-07-09", description="Observation date to inspect"),
+    item_id: Optional[str] = Query(None, description="Optional remote scene ID to inspect via online API stream")
 ) -> Dict[str, Any]:
     """
     Phase 3: Inspects real NISAR Level 2 GCOV HDF5 container file structure,
     frequency layers, polarimetric datasets, and CF-compliant coordinate attributes.
+    Supports live online HTTP Range stream inspection when item_id is provided,
+    falling back seamlessly to the validated reference container.
     """
+    if item_id and bhoonidhi_service.is_configured():
+        try:
+            remote_res = remote_inspect_nisar_scene(item_id=item_id)
+            remote_res["inspection_mode"] = "remote_online_range_stream"
+            remote_res["provider"] = "ISRO Bhoonidhi (Live HTTP Range Stream)"
+            return remote_res
+        except Exception as e:
+            logger.warning(f"Remote HDF5 inspection failed for '{item_id}', falling back to reference container: {e}")
+
     clean_date = date_str.replace("-", "")
     cycle = "025" if "0709" in clean_date else "024"
     h5_path = f"backend/app/data/nisar_products/NISAR_S2_PR_GCOV_{cycle}_019_D_075_{clean_date}.h5"
@@ -873,7 +896,10 @@ def inspect_nisar_product(
             date_str=date_str
         )
 
-    return NISARGCOVReader.inspect_hdf5_structure(h5_path)
+    res = NISARGCOVReader.inspect_hdf5_structure(h5_path)
+    res["inspection_mode"] = "local_reference_container"
+    res["provider"] = "Local Validated Reference Container"
+    return res
 
 
 # =============================================================================
@@ -887,6 +913,7 @@ def get_bhoonidhi_status() -> Dict[str, Any]:
     and target NISAR collection. Never exposes user credentials or access tokens.
     """
     status = bhoonidhi_service.get_status()
+    cmr_status = cmr_service.get_status()
     return {
         "configured": status["configured"],
         "service": "Bhoonidhi",
@@ -894,7 +921,12 @@ def get_bhoonidhi_status() -> Dict[str, Any]:
         "auth_status": status["auth_status"],
         "token_valid": status["token_valid"],
         "token_expires_in_seconds": status["token_expires_in_seconds"],
-        "base_url": status["base_url"]
+        "base_url": status["base_url"],
+        "cmr_status": cmr_status,
+        "providers": {
+            "isro_bhoonidhi": status,
+            "nasa_cmr": cmr_status
+        }
     }
 
 
@@ -956,6 +988,17 @@ def search_nisar_scenes(request: Optional[NISARSceneSearchRequest] = Body(defaul
                 status_code=422,
                 detail=f"Invalid date format: {str(e)}. Use ISO 8601 (e.g. 2026-07-01T00:00:00Z)."
             )
+
+    # 1. Route to NASA Earthdata CMR if requested or for L-band products
+    if getattr(req, "provider", None) == "nasa_cmr" or req.collection in ["NISAR_LSAR_GCOV", "NISAR_L2_GCOV_PROVISIONAL_V1"]:
+        cmr_coll = req.collection if req.collection and req.collection != "NISAR_LSAR_GCOV" else "NISAR_L2_GCOV_PROVISIONAL_V1"
+        return cmr_service.search_granules(
+            bbox=req.bbox,
+            start_date=req.start_date,
+            end_date=req.end_date,
+            short_name=cmr_coll,
+            limit=req.limit or 100
+        )
 
     try:
         results = bhoonidhi_service.search_scenes(

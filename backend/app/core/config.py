@@ -42,7 +42,12 @@ class AppConfig(BaseModel):
     
     # Target NISAR Collections & AOI
     DEFAULT_COLLECTION: str = "NISAR_SSAR_GCOV"
-    ALLOWED_COLLECTIONS: List[str] = ["NISAR_SSAR_GCOV", "NISAR_LSAR_GCOV", "NISAR_S2_PR_GCOV"]
+    ALLOWED_COLLECTIONS: List[str] = [
+        "NISAR_SSAR_GCOV",
+        "NISAR_LSAR_GCOV",
+        "NISAR_S2_PR_GCOV",
+        "NISAR_L2_GCOV_PROVISIONAL_V1",
+    ]
     DEFAULT_MAJULI_BBOX: List[float] = [93.60, 26.50, 94.60, 27.30]  # [west, south, east, north]
     DEFAULT_DATE_RANGE: str = "2026-07-01T00:00:00Z/2026-09-30T23:59:59Z"
 

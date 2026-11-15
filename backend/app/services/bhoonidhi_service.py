@@ -516,6 +516,7 @@ class BhoonidhiService:
                 "product_size_bytes": props.get("product_size") or props.get("file_size"),
                 "instruments": props.get("instruments") or [props.get("Instrument", "SSAR")],
                 "platform": props.get("platform") or props.get("Platform", "NISAR"),
+                "provider": "ISRO Bhoonidhi (S-band)",
                 "available_assets": list(safe_assets.keys())
             }
             normalized_scenes.append(scene)
