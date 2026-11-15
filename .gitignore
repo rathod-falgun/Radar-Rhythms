@@ -59,9 +59,14 @@ frontend/dist/
 Thumbs.db
 .vscode/
 .idea/
+.agents/
 rewrite_author.sh
 scratch/
 
 # Accidental duplicate/nested directories
 backend/backend/
 data/experimental/multidate_nisar/reports/
+
+# Raw NISAR satellite products
+*.h5
+*.hdf5

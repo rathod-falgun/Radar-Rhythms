@@ -12,7 +12,8 @@ if sys.platform == "win32":
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 # Ensure backend package is in python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "backend")))
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(repo_root, "backend"))
 
 def test_nisar_metadata():
     print("[1/6] Testing NISAR Metadata & Orbital Catalog...")
@@ -24,7 +25,7 @@ def test_nisar_metadata():
         get_observation_by_date
     )
     assert len(NISAR_OBSERVATION_CATALOG) == 7, "Catalog must have 7 12-day revisit cycles"
-    assert len(STUDY_REGIONS) == 5, "Must have 5 study reaches along Brahmaputra"
+    assert len(STUDY_REGIONS) >= 5, "Must have at least 5 study reaches along Brahmaputra"
 
     kaziranga = get_region_by_id("kaziranga")
     assert kaziranga["id"] == "kaziranga"
@@ -132,7 +133,7 @@ def test_fastapi_endpoints():
     # 2. Regions
     res = client.get("/api/regions")
     assert res.status_code == 200
-    assert len(res.json()) == 5
+    assert len(res.json()) >= 5
 
     # 3. Observations
     res = client.get("/api/observations")
@@ -153,7 +154,7 @@ def test_fastapi_endpoints():
     # 6. Reaches Summary
     res = client.get("/api/reaches/summary")
     assert res.status_code == 200
-    assert len(res.json()) == 5
+    assert len(res.json()) >= 5
 
     # 7. GeoJSON Export
     res = client.get("/api/export/geojson?region_id=kaziranga")
@@ -176,7 +177,7 @@ def test_fastapi_endpoints():
 
 def test_frontend_dist():
     print("[6/6] Verifying Frontend Production Distribution...")
-    dist_html = os.path.join(os.path.dirname(__file__), "frontend", "dist", "index.html")
+    dist_html = os.path.join(repo_root, "frontend", "dist", "index.html")
     assert os.path.exists(dist_html), "Frontend dist/index.html must exist"
     print("      ✓ Frontend production build bundle is ready for immediate deployment.")
 

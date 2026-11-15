@@ -76,7 +76,7 @@ This automatically starts:
 #### Automated End-to-End Test Suite
 Run in terminal:
 ```bash
-python verify_system.py
+python scripts/verify_system.py
 ```
 *Result:* 6/6 test suites pass with 100% green status across all metadata, filtering, change detection, HDF5, REST API, and production bundle checks.
 
@@ -119,7 +119,12 @@ NASA SPACE APP 2026/
 │   │   │   └── audio.js             # Web Audio API radar frequency synthesizer
 │   │   └── App.jsx
 │   └── package.json
-├── verify_system.py                 # Automated end-to-end verification suite
+├── scripts/
+│   ├── verify_system.py             # Automated end-to-end verification suite
+│   ├── nisar_change_detection.py    # Standalone SAR change detection utility
+│   ├── nisar_dataset_inspection.py  # HDF5 dataset hierarchy inspector
+│   ├── nisar_timeseries_analysis.py # Multi-temporal radar backscatter analysis
+│   └── view_nisar_data.py           # Quick visualization tool
 ├── start_floodwatch.bat             # Turnkey 1-click launcher for both servers & browser
 ├── start_floodwatch.ps1             # PowerShell turnkey launcher
 ├── SUBMISSION_BRIEF.md              # Official competition submission document
