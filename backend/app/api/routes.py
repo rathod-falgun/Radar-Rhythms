@@ -167,6 +167,8 @@ def get_observations(
     """Returns the observation catalog. If region_id is provided, returns data-driven observations for that area."""
     if region_id:
         return get_observations_for_region(region_id, only_processed=only_processed)
+    if only_processed:
+        return [obs for obs in NISAR_OBSERVATION_CATALOG if obs.get("is_processed") and obs.get("status") == "PROCESSED_AVAILABLE"]
     return NISAR_OBSERVATION_CATALOG
 
 @router.get("/observations/{date_str}")

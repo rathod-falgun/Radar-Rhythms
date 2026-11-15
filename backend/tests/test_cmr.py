@@ -127,6 +127,52 @@ class TestCMREarthdataIntegration(unittest.TestCase):
         self.assertIn("online_catalog_provider", data)
         self.assertEqual(data["data_origin"], "local_validated")
 
+    def test_observations_only_processed_filter(self):
+        """GET /api/observations?only_processed=true must return only genuinely processed scenes."""
+        # Majuli: only cycle 29 is processed
+        res_majuli = client.get("/api/observations?region_id=majuli&only_processed=true")
+        self.assertEqual(res_majuli.status_code, 200)
+        majuli_data = res_majuli.json()
+        self.assertEqual(len(majuli_data), 1)
+        self.assertEqual(majuli_data[0]["cycle"], 29)
+        self.assertTrue(majuli_data[0]["is_processed"])
+        self.assertEqual(majuli_data[0]["status"], "PROCESSED_AVAILABLE")
+
+        # Global: only genuinely processed entries
+        res_global = client.get("/api/observations?only_processed=true")
+        self.assertEqual(res_global.status_code, 200)
+        global_data = res_global.json()
+        self.assertTrue(all(obs.get("is_processed") and obs.get("status") == "PROCESSED_AVAILABLE" for obs in global_data))
+
+    def test_observation_polarization_distinction(self):
+        """Observation metadata must distinguish product polarizations from analysis polarization."""
+        res = client.get("/api/observations/2026-07-09")
+        self.assertEqual(res.status_code, 200)
+        obs = res.json()
+        self.assertEqual(obs["product_polarizations"], ["HHHH", "HVHV", "CRNA"])
+        self.assertEqual(obs["analysis_polarization"], "HHHH (Single-Pol)")
+        self.assertEqual(obs["polarizations"], ["HHHH"])
+        self.assertIn("HHHH single-polarization", obs["polarization_processing_status"])
+
+    def test_barpeta_event_observation_description(self):
+        """Barpeta 2026-07-09 observation must be labeled Event Observation."""
+        res = client.get("/api/observations?region_id=barpeta&only_processed=true")
+        self.assertEqual(res.status_code, 200)
+        obs_list = res.json()
+        c25 = next(o for o in obs_list if o["date"] == "2026-07-09")
+        self.assertIn("Event Observation", c25["stage"])
+        self.assertNotIn("Candidate Peak", c25["stage"])
+        self.assertIn("Event observation evaluated against 27 June baseline", c25["description"])
+
+    def test_river_discharge_documentation(self):
+        """River discharge estimates must document source and estimation status."""
+        res = client.get("/api/observations/2026-07-09")
+        self.assertEqual(res.status_code, 200)
+        obs = res.json()
+        self.assertIn("CWC historical gauge estimate", obs["mean_river_discharge_est"])
+        self.assertEqual(obs["discharge_measurement_status"], "HISTORICAL_GAUGE_ESTIMATE")
+        self.assertIn("Central Water Commission", obs["discharge_source"])
+
 
 if __name__ == "__main__":
     unittest.main()
