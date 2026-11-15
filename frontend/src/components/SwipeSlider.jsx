@@ -65,7 +65,7 @@ export default function SwipeSlider({
           } else {
             const cls = classification_mask[y][x];
             if (cls === 1) {
-              // Permanent Water (Deep Channel Blue #0077b6)
+              // Persistent Water (Deep Channel Blue #0077b6)
               imgData.data[idx] = 0;
               imgData.data[idx + 1] = 119;
               imgData.data[idx + 2] = 182;

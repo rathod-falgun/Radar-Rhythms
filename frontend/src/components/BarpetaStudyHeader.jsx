@@ -28,11 +28,14 @@ export default function BarpetaStudyHeader({ thresholdDb, onThresholdChange, spe
               Barpeta Floodplain — Multi-Temporal NISAR Water Change Analysis
             </h2>
             <span className="text-[10px] font-mono uppercase tracking-widest px-2.5 py-0.5 rounded card-highlight text-[#fca311]">
-              +140.77% Water Increase
+              +140.77% Water Increase (Experimental Classification)
             </span>
           </div>
           <p className="text-xs text-[#e5e5e5]/70 font-mono mt-0.5">
-            NISAR Level-2 GCOV • Track 019 / Frame 075 (Single-Pol HHHH) • 27 June vs 09 July 2026 (12-Day Orbital Repeat)
+            NISAR Level-2 GCOV • Track 019 / Frame 075 (HHHH-named GCOV from CRNA product) • 27 June vs 09 July 2026 (12-Day Observation Interval)
+          </p>
+          <p className="text-[10px] text-[#fca311]/80 font-mono mt-0.5">
+            ⚠ Scientific Notice: Official Level-2 GCOV subswath mask contains all-zero values across this reach; quantitative results reflect empirical algorithmic classification rather than ground-truth validated measurement.
           </p>
         </div>
 

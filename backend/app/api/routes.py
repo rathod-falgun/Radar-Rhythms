@@ -172,7 +172,7 @@ def get_sar_grid(
     region_id: str = Query("kaziranga", description="Study region ID"),
     date_str: str = Query("2026-07-09", description="Observation date (YYYY-MM-DD)")
 ) -> Dict[str, Any]:
-    """Returns calibrated SAR backscatter matrix for single date visualization."""
+    """Returns HHHH-named GCOV backscatter grid for single date visualization."""
     return generate_calibrated_sar_grid(region_id=region_id, date_str=date_str)
 
 VERIFIED_MAJULI_JOB_ID: str = "subset_20261111T120648Z_6ee0444d"
@@ -193,7 +193,7 @@ def compare_observations(
     - Phase 4: Adaptive Lee speckle noise suppression
     - Phase 5: Adaptive Otsu bimodal water thresholding & double-bounce vegetation detection
     - Calculates log-ratio backscatter differences
-    - Separates confirmed inundation from permanent water and double-bounce vegetation
+    - Separates confirmed inundation from persistent water and double-bounce vegetation
     - Quantifies affected area in km2
     - Delivers scientific physical explanations and limitations
     """
@@ -831,7 +831,7 @@ def get_all_reaches_summary(
                 "total_water_km2": 3.997,
                 "inundation_percent": 43.67,
                 "is_real_extraction": True,
-                "notes": "Verified Multi-Date Change Detection (Track 019 / Frame 075, +140.77%)"
+                "notes": "Empirical Algorithmic Classification (Track 019 / Frame 075, +140.77%, Mask unverified)"
             })
             continue
 
@@ -1251,6 +1251,12 @@ def detect_water_bodies(request: WaterDetectionRequest) -> Dict[str, Any]:
 
         # Reuse existing result if already processed with default threshold
         summary_file = os.path.join(out_dir, "water_summary.json") if out_dir else None
+        if not summary_file or not os.path.exists(summary_file):
+            subsets_dir = Path(__file__).resolve().parent.parent.parent.parent / "data" / "output" / "subsets"
+            matches = list(subsets_dir.glob(f"**/{request.job_id}/water_summary.json"))
+            if matches and matches[0].exists():
+                summary_file = str(matches[0])
+
         if summary_file and os.path.exists(summary_file) and request.threshold_db is None:
             try:
                 with open(summary_file, "r", encoding="utf-8") as f:
@@ -1295,6 +1301,13 @@ def get_job_water_boundaries(job_id: str):
 
     out_dir = job.get("output_dir")
     geojson_path = os.path.join(out_dir, "water_boundaries.geojson") if out_dir else None
+
+    if not geojson_path or not os.path.exists(geojson_path):
+        # Portable relative fallback for cross-platform deployments
+        subsets_dir = Path(__file__).resolve().parent.parent.parent.parent / "data" / "output" / "subsets"
+        matches = list(subsets_dir.glob(f"**/{job_id}/water_boundaries.geojson"))
+        if matches and matches[0].exists():
+            geojson_path = str(matches[0])
 
     if not geojson_path or not os.path.exists(geojson_path):
         # Auto-compute if HHHH output is ready
@@ -1438,7 +1451,10 @@ def download_majuli_source_raster():
     subsets_dir = Path(__file__).resolve().parent.parent.parent.parent / "data" / "output" / "subsets"
     matches = list(subsets_dir.glob(f"**/{VERIFIED_MAJULI_JOB_ID}/frequencyA_HHHH.tif"))
     if not matches or not matches[0].exists():
-        raise HTTPException(status_code=404, detail="Majuli source HHHH radar GeoTIFF not found.")
+        raise HTTPException(
+            status_code=404,
+            detail="Optional full-swath source HHHH radar GeoTIFF (322.5 MB) is not deployed in this environment to preserve container limits. Primary classified water GeoTIFF (827 KB) and vector boundaries (51.66 MB) are available."
+        )
 
     return FileResponse(
         str(matches[0]),

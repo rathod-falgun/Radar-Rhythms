@@ -202,7 +202,7 @@ export default function MapViewer({
         const cls = classification_mask[y][x];
 
         if (cls === 1) {
-          // Permanent Water (Deep Blue)
+          // Persistent Water (Deep Blue)
           imgData.data[idx] = 20;
           imgData.data[idx + 1] = 80;
           imgData.data[idx + 2] = 220;

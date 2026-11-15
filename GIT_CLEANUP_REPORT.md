@@ -40,7 +40,7 @@ The following redundant or duplicate files were removed from the Git index using
 | :--- | :--- | :--- |
 | **Runtime HDF5 Products** | `backend/app/data/nisar_products/*.h5` (2 files) | **RETAINED.** Even though general `*.h5` is ignored, these two sample granules (97 KB & 100 KB) are required by the interactive HDF5 tree viewer endpoint (`/api/nisar/inspect`). |
 | **Calibrated SAR Arrays** | `data/experimental/multidate_nisar/barpeta/backscatter/*.npy` (8 files) | **RETAINED.** Required by the backend `/api/compare` endpoint to execute real-time Lee speckle filtering and Otsu thresholding. |
-| **Vector Inundation Boundary** | `data/output/NISAR_Flood_Extent_20260709.geojson` (1 file) | **RETAINED.** 13,821 validated vector flood polygons served by `/api/water/majuli/boundaries`. |
+| **Vector Inundation Boundary** | `data/output/subsets/.../water_boundaries.geojson` (51.66 MB) | **DEPLOY ASSET.** 13,821 validated vector flood polygons served by `/api/water/majuli/boundaries`. (Legacy 1.9 KB Kaziranga bounding box artifact `data/output/NISAR_Flood_Extent_20260709.geojson` retained in Git for reference). |
 | **Timeseries Metrics** | `data/experimental/multidate_nisar/barpeta/statistics/timeseries_summary.json` | **RETAINED.** Powers the interactive multi-temporal SVG hydrograph chart. |
 | **Core Documentation** | `README.md`, `SUBMISSION_BRIEF.md`, `MULTIDATE_SCIENTIFIC_VALIDATION.md`, `docs/` | **RETAINED.** Vital scientific provenance, methodology defense, and challenge evaluation deliverables for NASA judges. |
 | **Turnkey Startup Scripts** | `start_floodwatch.ps1`, `start_floodwatch.bat`, `run_backend.bat`, `run_frontend.bat` | **RETAINED.** Provides single-click startup for evaluators and future open-source contributors. |

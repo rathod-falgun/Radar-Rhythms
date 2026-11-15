@@ -52,9 +52,9 @@ export default function MajuliStudyHeader() {
           <button
             onClick={handleDownloadSourceRadar}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded box-inner hover:border-[#fca311] text-[#e5e5e5]/80 transition-all cursor-pointer"
-            title="Download source Level 2 GCOV HHHH backscatter raster (322.5 MB GeoTIFF)"
+            title="Download source Level 2 GCOV HHHH backscatter raster (322.5 MB GeoTIFF, optional asset)"
           >
-            <span>Source HHHH (322 MB)</span>
+            <span>Source HHHH (322 MB, Optional)</span>
           </button>
         </div>
       </div>

@@ -19,7 +19,7 @@
 [ React 18 + Vite SPA Frontend (Port 5173 / Static Hosting) ]
         │
         ▼ HTTP REST Endpoints (JSON / GeoJSON / CSV / ArrayBuffer)
-[ FastAPI ASGI Backend Service (Port 8005 / Container Host) ]
+[ FastAPI ASGI Backend Service (Port 8000 / Container Host, configurable via PORT env var) ]
   ├── [1] In-Memory Static Metadata Catalogs (Reaches, Cycles, Observation IDs)
   ├── [2] HDF5 Group Tree Accessor (h5py parsing cropped Level-2 GCOV products)
   ├── [3] On-the-Fly Radar Preprocessor (Scipy Lee filter, Decibel conversion)
@@ -32,7 +32,8 @@
   ├── data/experimental/multidate_nisar/barpeta/backscatter/*.npy (Calibrated arrays)
   ├── data/experimental/multidate_nisar/barpeta/change_maps/*.json (Change metrics)
   ├── data/experimental/multidate_nisar/barpeta/statistics/*.json (Timeseries summaries)
-  └── data/output/NISAR_Flood_Extent_20260709.geojson (13,821 vector flood polygons)
+  ├── data/output/subsets/.../water_boundaries.geojson (51.66 MB, 13,821 vector flood polygons)
+  └── data/output/change/2026-06-27_to_2026-07-09/*.tif (Barpeta change rasters)
 ```
 
 ---
@@ -47,7 +48,8 @@ Below is the concrete, code-verified trace for every major user-facing feature i
 - **API Request:** `GET /api/water/majuli/boundaries` (dispatched via `apiUrl('/api/water/majuli/boundaries')` in [apiConfig.js](file:///e:/NASA%20SPACE%20APP%202026/frontend/src/utils/apiConfig.js)).
 - **FastAPI Endpoint:** `@router.get("/water/majuli/boundaries")` in [routes.py](file:///e:/NASA%20SPACE%20APP%202026/backend/app/api/routes.py#L1326-L1333).
 - **Python Service/Function:** `get_majuli_water_boundaries()`.
-- **Source Data File:** `data/output/NISAR_Flood_Extent_20260709.geojson` (13,821 vector polygons, RFC 7946 GeoJSON).
+- **Source Data File:** `data/output/subsets/NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001/subset_20261111T120648Z_6ee0444d/water_boundaries.geojson` (51,661,494 bytes, 13,821 vector polygons, RFC 7946 GeoJSON, Track 015 / Frame 3700, 27 August 2026).
+  *(Note: `data/output/NISAR_Flood_Extent_20260709.geojson` is an exploratory 1.92 KB bounding box artifact and not the production Majuli water layer).*
 - **Computation Classification:** **Precomputed & Pre-generated Static GeoJSON**. The backend simply opens the GeoJSON file from disk, loads it into memory or streams the file bytes directly, and returns `Response(content=f.read(), media_type="application/geo+json")`. No raster thresholding is executed during the HTTP request.
 - **Frontend Visualization:** Leaflet GeoJSON layer parses coordinates and renders vector polygons with cyan stroke (`#38bdf8`) and translucent fill ($45\%$ opacity) overlaid on Esri Dark Canvas tiles.
 
@@ -212,7 +214,7 @@ Below is the concrete, code-verified trace for every major user-facing feature i
 | :--- | :--- | :---: | :--- |
 | **A. Pre-downloaded Raw Data** | `backend/app/data/nisar_products/NISAR_S2_PR_GCOV_024_019_D_075_20260627.h5`, `...20260709.h5` | 197 KB | Parsed on-the-fly by `h5py` for the HDF5 Inspector feature (`/api/nisar/inspect`). |
 | **B. Preprocessed Scientific Data** | `data/experimental/multidate_nisar/barpeta/backscatter/*.npy` (8 files) | 1.15 MB | Ingested by `/api/compare` for real-time Lee filtering, Otsu thresholding, and difference calculation. |
-| **C. Precomputed Statistics** | `data/experimental/multidate_nisar/barpeta/statistics/timeseries_summary.json`, `data/output/NISAR_Flood_Extent_20260709.geojson` | 1.95 MB | Streamed directly to client to power the multi-temporal hydrograph and Majuli 13,821-polygon map. |
+| **C. Precomputed Statistics & Vectors** | `data/experimental/multidate_nisar/barpeta/statistics/timeseries_summary.json`, `data/output/subsets/.../water_boundaries.geojson` | 51.7 MB | Streamed directly to client to power the multi-temporal hydrograph and Majuli 13,821-polygon map. |
 | **D. Runtime Processing** | Dynamic calculations inside `/api/compare`, `/api/export/csv`, `/api/export/geojson` | N/A (RAM) | Computes Scipy uniform filter convolution, Otsu threshold, log-ratio differencing, and CSV string serialization. |
 | **E. Live External Data** | Optional Bhoonidhi STAC API (`/api/nisar/scenes`) & Esri/OSM basemap tiles | External | Basemap tiles load from Esri/OSM in browser; Bhoonidhi STAC is only called on explicit user query. |
 

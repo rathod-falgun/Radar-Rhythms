@@ -115,7 +115,7 @@ export default function PresentationModal({ isOpen, onClose }) {
               <span className="font-mono text-[#E11D48] font-semibold">65.23 m (Crossed on July 07)</span>
             </div>
             <div className="flex justify-between border-b border-[#3A506B]/40 pb-1.5">
-              <span className="text-slate-400">Peak Discharge Recorded:</span>
+              <span className="text-slate-400">Peak Gauged Discharge (CWC Est.):</span>
               <span className="font-mono text-[#06B6D4] font-semibold">56,400 m³/s (Matched Cycle 025)</span>
             </div>
             <div className="flex justify-between">

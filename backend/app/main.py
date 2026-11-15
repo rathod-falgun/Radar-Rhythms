@@ -2,8 +2,11 @@
 from fastapi import FastAPI
 # pyrefly: ignore[missing-import]
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 from .api.routes import router
 from .core.config import settings
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -20,13 +23,26 @@ app = FastAPI(
 
 # Enable CORS for local Vite development and production deployment
 origins = [origin.strip() for origin in settings.CORS_ALLOWED_ORIGINS.split(",") if origin.strip()]
+allow_credentials = "*" not in origins
 if not origins:
-    origins = ["*"]
+    origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    allow_credentials = True
+
+# Startup safety check: warn if running in production with only localhost origins
+if settings.ENVIRONMENT == "production":
+    _local_prefixes = ("http://localhost", "http://127.0.0.1", "https://localhost", "https://127.0.0.1")
+    if all(o.startswith(_local_prefixes) for o in origins):
+        logger.warning(
+            "PRODUCTION environment detected but CORS_ALLOWED_ORIGINS contains only "
+            "localhost origins (%s). Set CORS_ALLOWED_ORIGINS to your deployed frontend "
+            "domain before going live.",
+            ", ".join(origins),
+        )
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

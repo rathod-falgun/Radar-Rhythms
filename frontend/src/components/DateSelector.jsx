@@ -49,7 +49,7 @@ export default function DateSelector({
 
   // Quick Comparison Presets for Barpeta
   const barpetaPresets = [
-    { label: 'Peak Surge (27 Jun ➔ 09 Jul)', base: '2026-06-27', evt: '2026-07-09', badge: '+140.77%' },
+    { label: 'Event Observation (27 Jun ➔ 09 Jul)', base: '2026-06-27', evt: '2026-07-09', badge: '+140.77% (Classified)' },
     { label: 'Monsoon Onset (03 Jun ➔ 15 Jun)', base: '2026-06-03', evt: '2026-06-15', badge: '+41.89%' },
     { label: 'Early Recession (09 Jul ➔ 21 Jul)', base: '2026-07-09', evt: '2026-07-21', badge: '-31.83%' },
     { label: 'Secondary Surge (02 Aug ➔ 14 Aug)', base: '2026-08-02', evt: '2026-08-14', badge: '+17.61%' },

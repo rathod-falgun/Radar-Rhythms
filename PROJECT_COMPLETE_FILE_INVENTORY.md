@@ -8,11 +8,12 @@
 
 ## Executive Inventory Summary
 
-- **Total Tracked Files:** 211
-- **Total Runtime-Required Files:** 34
-- **Total Build-Only Files:** 7
+- **Total Tracked Files in Git:** 215
+- **Essential Production Runtime Files:** 52 (7 frontend static bundle, 15 backend source & config, 30 scientific data assets)
+- **Total Essential Production Runtime Size:** 56.59 MB (56,589,923 bytes / 53.97 MiB)
+- **Optional Full-Swath Source Raster:** 1 file (`frequencyA_HHHH.tif`: 322.51 MB / 307.57 MiB)
 - **Total Documentation & Evidence Files:** 47
-- **Total Scientific Datasets & Outputs:** 81
+- **Total Scientific Datasets & Outputs (Repository-Wide):** 81
 - **Total Scripts & Utilities:** 14
 
 ---
@@ -117,7 +118,7 @@
 | `data/experimental/multidate_nisar/reports/MULTIDATE_WATER_ANALYSIS_REPORT.md` | 12.7 KB | Unnecessary/obsolete | NO (Duplicate) | NO | Duplicate copy of root scientific reports (retained locally, safe to untrack). |
 | `data/experimental/multidate_nisar/reports/NEXT_PHASE_RECOMMENDATIONS.md` | 7.5 KB | Unnecessary/obsolete | NO (Duplicate) | NO | Duplicate copy of root scientific reports (retained locally, safe to untrack). |
 | `data/experimental/multidate_nisar/reports/NISAR_VERIFIED_SCENE_MANIFEST.md` | 10.0 KB | Unnecessary/obsolete | NO (Duplicate) | NO | Duplicate copy of root scientific reports (retained locally, safe to untrack). |
-| `data/output/NISAR_Flood_Extent_20260709.geojson` | 1.9 KB | Required scientific data | **YES** | **YES** | 13,821 vector flood polygons for Majuli reach served by /api/water/majuli/boundaries. |
+| `data/output/NISAR_Flood_Extent_20260709.geojson` | 1.9 KB | Documentation/reference | **YES** | NO | Exploratory Kaziranga bounding box artifact (2 features). Primary Majuli 13,821-polygon layer is served from `data/output/subsets/.../water_boundaries.geojson` (51.66 MB). |
 | `data/output/footprint_map_brahmaputra.png` | 118.5 KB | Documentation/reference | **YES** | NO | Static visual inspection strips, hydrographs, and change charts. |
 | `data/output/nisar_backscatter_difference_histogram.png` | 74.8 KB | Documentation/reference | **YES** | NO | Static visual inspection strips, hydrographs, and change charts. |
 | `data/output/nisar_change_detection_map.png` | 244.1 KB | Documentation/reference | **YES** | NO | Static visual inspection strips, hydrographs, and change charts. |
