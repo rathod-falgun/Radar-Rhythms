@@ -1,4 +1,5 @@
 # pyrefly: ignore[missing-import]
+from PIL.Image import logger
 from fastapi import APIRouter, Query, HTTPException, UploadFile, File, Response, Body
 from fastapi.responses import FileResponse
 import os
