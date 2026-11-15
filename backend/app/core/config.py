@@ -57,12 +57,11 @@ class AppConfig(BaseModel):
     # Deployment environment: "development" or "production"
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
 
-    # CORS Allowed Origins (comma-separated).
-    # Dev default: Vite dev server only.
-    # Production: set CORS_ALLOWED_ORIGINS=https://your-deployed-frontend-domain.com
+    # CORS Allowed Origins (comma-separated, semicolon-separated, or space-separated).
+    # Production default includes the deployed Vercel frontend and local development servers.
     CORS_ALLOWED_ORIGINS: str = os.getenv(
         "CORS_ALLOWED_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173"
+        "https://radar-rhythms.vercel.app,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
     )
 
 settings = AppConfig()
