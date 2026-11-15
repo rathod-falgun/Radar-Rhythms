@@ -64,3 +64,4 @@ scratch/
 
 # Accidental duplicate/nested directories
 backend/backend/
+data/experimental/multidate_nisar/reports/
