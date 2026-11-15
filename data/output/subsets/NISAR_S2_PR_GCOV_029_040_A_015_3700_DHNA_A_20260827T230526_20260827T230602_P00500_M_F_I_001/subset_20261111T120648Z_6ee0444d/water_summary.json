@@ -1,0 +1,47 @@
+{
+  "status": "success",
+  "methodology": {
+    "algorithm": "adaptive_bimodal_otsu",
+    "threshold_db": -15.0,
+    "speckle_filter": "adaptive_lee",
+    "min_cluster_pixels": 10,
+    "units": "linear gamma-0 converted to decibels (10*log10)"
+  },
+  "spatial_reference": {
+    "crs": "EPSG:32646",
+    "pixel_size_x_m": 10.0,
+    "pixel_size_y_m": 10.0,
+    "pixel_area_m2": 100.0,
+    "raster_dimensions": [
+      8948,
+      10008
+    ]
+  },
+  "extent_metrics": {
+    "total_raster_pixels": 89551584,
+    "valid_pixels": 89551584,
+    "water_pixels": 7975500,
+    "land_pixels": 81576084,
+    "water_area_km2": 797.55,
+    "water_area_ha": 79755.0,
+    "valid_area_km2": 8955.158,
+    "water_coverage_percent": 8.91,
+    "polygon_features_count": 13821
+  },
+  "sar_statistics": {
+    "hh_water_mean_db": -18.63,
+    "hh_water_std_db": 2.59,
+    "hh_land_mean_db": -8.91,
+    "hh_land_std_db": 3.88
+  },
+  "outputs": {
+    "water_mask_geotiff": "data\\output\\subsets\\NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001\\subset_20261111T120648Z_6ee0444d\\water_classification.tif",
+    "water_boundaries_geojson": "data\\output\\subsets\\NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001\\subset_20261111T120648Z_6ee0444d\\water_boundaries.geojson"
+  },
+  "limitations": [
+    "Smooth specular dry surfaces (e.g. smooth airport runways or calm sandbars) may occasionally display low backscatter similar to water.",
+    "Flooded vegetation with emergent canopy exhibits double-bounce enhancement rather than specular attenuation.",
+    "Steep terrain shadow can produce radar dark spots (minimized over Brahmaputra floodplain).",
+    "Provides satellite-based flood monitoring and decision support, not official flood warnings or guaranteed ground-level gauges."
+  ]
+}

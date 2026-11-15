@@ -1,0 +1,47 @@
+{
+  "status": "success",
+  "methodology": {
+    "algorithm": "adaptive_bimodal_otsu",
+    "threshold_db": -20.279166666666665,
+    "speckle_filter": "adaptive_lee",
+    "min_cluster_pixels": 5,
+    "units": "linear gamma-0 converted to decibels (10*log10)"
+  },
+  "spatial_reference": {
+    "crs": "EPSG:32646",
+    "pixel_size_x_m": 25.21008403360611,
+    "pixel_size_y_m": 25.210084033664316,
+    "pixel_area_m2": 635.5483369829491,
+    "raster_dimensions": [
+      120,
+      120
+    ]
+  },
+  "extent_metrics": {
+    "total_raster_pixels": 14400,
+    "valid_pixels": 14400,
+    "water_pixels": 2612,
+    "land_pixels": 11788,
+    "water_area_km2": 1.66,
+    "water_area_ha": 166.01,
+    "valid_area_km2": 9.152,
+    "water_coverage_percent": 18.14,
+    "polygon_features_count": 1
+  },
+  "sar_statistics": {
+    "hh_water_mean_db": -22.72,
+    "hh_water_std_db": 0.75,
+    "hh_land_mean_db": -11.73,
+    "hh_land_std_db": 1.36
+  },
+  "outputs": {
+    "water_mask_geotiff": "E:\\NASA SPACE APP 2026\\data\\output\\change\\samples\\2026-06-27\\water_classification.tif",
+    "water_boundaries_geojson": "E:\\NASA SPACE APP 2026\\data\\output\\change\\samples\\2026-06-27\\water_boundaries.geojson"
+  },
+  "limitations": [
+    "Smooth specular dry surfaces (e.g. smooth airport runways or calm sandbars) may occasionally display low backscatter similar to water.",
+    "Flooded vegetation with emergent canopy exhibits double-bounce enhancement rather than specular attenuation.",
+    "Steep terrain shadow can produce radar dark spots (minimized over Brahmaputra floodplain).",
+    "Provides satellite-based flood monitoring and decision support, not official flood warnings or guaranteed ground-level gauges."
+  ]
+}

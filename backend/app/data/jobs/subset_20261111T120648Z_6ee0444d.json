@@ -1,0 +1,143 @@
+{
+  "job_id": "subset_20261111T120648Z_6ee0444d",
+  "item_id": "NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001",
+  "collection": "NISAR_SSAR_GCOV",
+  "frequency": "frequencyA",
+  "layers": [
+    "HHHH",
+    "HVHV",
+    "mask"
+  ],
+  "include_exception_mask": false,
+  "include_number_of_looks": false,
+  "wgs84_bbox": null,
+  "projected_bounds": [
+    559370.96,
+    2931197.29,
+    659452.91,
+    3020677.84
+  ],
+  "output_dir": "E:\\NASA SPACE APP 2026\\data\\output\\subsets\\NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001\\subset_20261111T120648Z_6ee0444d",
+  "cache_dir": "E:\\NASA SPACE APP 2026\\backend\\app\\data\\cache\\range_blocks",
+  "cache_max_disk_bytes": 2684354560,
+  "strip_rows": 512,
+  "timeout": null,
+  "disk_free_bytes_at_start": {
+    "E:": 255417143296
+  },
+  "status": "completed",
+  "created_at": "2026-11-11T12:06:48.122691+00:00",
+  "started_at": "2026-11-11T12:06:48.161699+00:00",
+  "updated_at": "2026-11-12T14:07:02.376219+00:00",
+  "completed_at": "2026-11-12T14:07:02.376219+00:00",
+  "total_file_size": 12666974812,
+  "progress": {
+    "progress_percent": 100.0,
+    "current_layer": null,
+    "status_message": "Completed all requested Majuli GeoTIFF layers.",
+    "completed_rows": 26844,
+    "total_rows": 26844,
+    "completed_chunks": 756,
+    "total_chunks": 756
+  },
+  "window": {
+    "row_start": 10412,
+    "row_end": 19360,
+    "col_start": 14321,
+    "col_end": 24329,
+    "height": 8948,
+    "width": 10008,
+    "dx": 10.0,
+    "dy": -10.0,
+    "epsg_code": 32646,
+    "crs": "EPSG:32646",
+    "transform_tuple": [
+      10.0,
+      0.0,
+      559370.0,
+      0.0,
+      -10.0,
+      3020680.0
+    ],
+    "actual_bounds": {
+      "x_min_edge": 559370.0,
+      "x_max_edge": 659450.0,
+      "y_min_edge": 2931200.0,
+      "y_max_edge": 3020680.0,
+      "x_center_min": 559375.0,
+      "x_center_max": 659445.0,
+      "y_center_min": 2931205.0,
+      "y_center_max": 3020675.0
+    }
+  },
+  "cost_estimate": {
+    "estimated_blocks_8mb": 110,
+    "layers": {
+      "HHHH": {
+        "layout": "chunked",
+        "chunks": [
+          512,
+          512
+        ],
+        "compression": "gzip",
+        "chunk_rows": 18,
+        "chunk_cols": 21,
+        "total_chunks": 378,
+        "estimated_payload_bytes": 171787806,
+        "estimated_blocks_8mb": 36,
+        "output_uncompressed_bytes": 358206336
+      },
+      "HVHV": {
+        "layout": "chunked",
+        "chunks": [
+          512,
+          512
+        ],
+        "compression": "gzip",
+        "chunk_rows": 18,
+        "chunk_cols": 21,
+        "total_chunks": 378,
+        "estimated_payload_bytes": 171282974,
+        "estimated_blocks_8mb": 36,
+        "output_uncompressed_bytes": 358206336
+      },
+      "mask": {
+        "layout": "contiguous",
+        "chunks": null,
+        "compression": null,
+        "chunk_rows": null,
+        "chunk_cols": null,
+        "total_chunks": null,
+        "estimated_payload_bytes": 309232649,
+        "estimated_blocks_8mb": 38,
+        "output_uncompressed_bytes": 89551584
+      }
+    }
+  },
+  "outputs": {
+    "HHHH": "E:\\NASA SPACE APP 2026\\data\\output\\subsets\\NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001\\subset_20261111T120648Z_6ee0444d\\frequencyA_HHHH.tif",
+    "HVHV": "E:\\NASA SPACE APP 2026\\data\\output\\subsets\\NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001\\subset_20261111T120648Z_6ee0444d\\frequencyA_HVHV.tif",
+    "mask": "E:\\NASA SPACE APP 2026\\data\\output\\subsets\\NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001\\subset_20261111T120648Z_6ee0444d\\frequencyA_mask.tif"
+  },
+  "telemetry": {
+    "item_id": "NISAR_S2_PR_GCOV_029_040_A_015_3700_DHNA_A_20260827T230526_20260827T230602_P00500_M_F_I_001",
+    "collection": "NISAR_SSAR_GCOV",
+    "total_remote_size_bytes": 12666974812,
+    "bytes_served_to_reader": 742383870,
+    "bytes_fetched_remote": 855638016,
+    "upstream_requests_made": 109,
+    "cache_hits": 9965,
+    "cache_misses": 102,
+    "bandwidth_saved_bytes": 11811336796,
+    "bandwidth_saved_percent": 93.25,
+    "is_closed": true
+  },
+  "cumulative_telemetry": {
+    "bytes_fetched_remote": 1258291200,
+    "upstream_requests_made": 159,
+    "cache_hits": 11853,
+    "cache_misses": 149,
+    "attempts": 5
+  },
+  "error": null
+}

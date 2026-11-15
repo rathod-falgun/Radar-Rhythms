@@ -1,0 +1,34 @@
+{
+  "status": "success",
+  "baseline_date": "2026-06-27",
+  "event_date": "2026-07-09",
+  "comparison_interval_days": 12,
+  "spatial_reference": {
+    "crs": "EPSG:32646",
+    "pixel_area_m2": 635.5483369829491,
+    "dimensions": [
+      120,
+      120
+    ]
+  },
+  "change_metrics": {
+    "persistent_water_km2": 1.66,
+    "persistent_water_ha": 166.0,
+    "newly_inundated_km2": 2.337,
+    "newly_inundated_ha": 233.7,
+    "receded_water_km2": 0.0,
+    "receded_water_ha": 0.0,
+    "net_change_km2": 2.337,
+    "percentage_change": 140.77,
+    "baseline_water_km2": 1.66,
+    "event_water_km2": 3.997,
+    "stable_land_km2": 5.155,
+    "total_evaluated_km2": 9.152,
+    "change_polygon_features_count": 3
+  },
+  "outputs": {
+    "change_raster_geotiff": "E:\\NASA SPACE APP 2026\\data\\output\\change\\2026-06-27_to_2026-07-09\\change_2026-06-27_to_2026-07-09.tif",
+    "change_vector_geojson": "E:\\NASA SPACE APP 2026\\data\\output\\change\\2026-06-27_to_2026-07-09\\change_2026-06-27_to_2026-07-09.geojson"
+  },
+  "scientific_interpretation": "From 2026-06-27 to 2026-07-09, observed water extent changed from 1.66 km^2 to 3.997 km^2 (+140.8%). Newly inundated flood extent: 2.337 km^2. Receded water extent: 0.0 km^2. Persistent water channels: 1.66 km^2."
+}

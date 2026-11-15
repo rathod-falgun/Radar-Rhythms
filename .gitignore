@@ -2,9 +2,10 @@
 # Brahmaputra FloodWatch — Git Ignore Rules
 # -----------------------------------------------------------------------------
 
-# Large extracted NISAR GeoTIFFs, rasters, and temporary extraction files
-*.tif
-*.tiff
+# Large raw full-swath GeoTIFF rasters (>300MB)
+**/frequencyA_HHHH.tif
+**/frequencyA_HVHV.tif
+data/output/*.tif
 *.tmp
 *.tif.tmp
 
@@ -16,10 +17,6 @@ data/nisar_products/
 # Range-Block Cache and Bhoonidhi API Cache Data
 backend/app/data/cache/
 *.bin
-
-# Generated Processing Outputs & Large Deliverables
-data/output/subsets/
-data/output/change/
 
 # Python Virtual Environments & Bytecode
 __pycache__/

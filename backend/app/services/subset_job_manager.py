@@ -87,7 +87,12 @@ class SubsetJobManager:
 
     def _job_path(self, job_id: str) -> Path:
         safe = _sanitize_id(job_id)
-        return self.jobs_dir / f"{safe}.json"
+        primary = self.jobs_dir / f"{safe}.json"
+        if not primary.exists():
+            fallback = Path(__file__).resolve().parent.parent / "data" / "jobs" / f"{safe}.json"
+            if fallback.exists():
+                return fallback
+        return primary
 
     def _persist_job(self, job: Dict[str, Any]) -> None:
         job_path = self._job_path(job["job_id"])
