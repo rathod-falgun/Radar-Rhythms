@@ -1,7 +1,9 @@
-# pyrefly: ignore[missing-import]
-from PIL.Image import logger
+import logging
+from PIL import Image
 from fastapi import APIRouter, Query, HTTPException, UploadFile, File, Response, Body
 from fastapi.responses import FileResponse
+
+logger = logging.getLogger("routes")
 import os
 import io
 import csv
