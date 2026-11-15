@@ -141,10 +141,20 @@ class SubsetJobManager:
     def list_jobs(self, limit: int = 50) -> List[Dict[str, Any]]:
         jobs: List[Dict[str, Any]] = []
         with self._lock:
-            for p in self.jobs_dir.glob("*.json"):
-                loaded = self._load_job_raw(p)
-                if loaded is not None:
-                    jobs.append(loaded)
+            seen_ids = set()
+            search_dirs = [self.jobs_dir]
+            fallback_dir = Path(__file__).resolve().parent.parent / "data" / "jobs"
+            if fallback_dir.exists() and fallback_dir.resolve() != self.jobs_dir.resolve():
+                search_dirs.append(fallback_dir)
+
+            for d in search_dirs:
+                for p in d.glob("*.json"):
+                    loaded = self._load_job_raw(p)
+                    if loaded is not None:
+                        jid = loaded.get("job_id")
+                        if jid and jid not in seen_ids:
+                            seen_ids.add(jid)
+                            jobs.append(loaded)
         jobs.sort(key=lambda j: j.get("created_at", ""), reverse=True)
         return jobs[:max(1, limit)]
 
